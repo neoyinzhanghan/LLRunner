@@ -2,7 +2,9 @@ import os
 from tqdm import tqdm
 
 source_data_dirs = [
-    "/media/hdd3/neo/BMA_PCM"
+    "/media/hdd3/neo/BMA_PCM",
+    "/media/hdd3/neo/BMA_AML",
+    "/media/hdd3/neo/BMA_Normal",
 ]
 
 save_dir = "/media/hdd3/neo/tmp_slide_dir"

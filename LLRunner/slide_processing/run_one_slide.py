@@ -1,7 +1,7 @@
 import os
-
+from LLBMA.front_end.api import analyse_bma
 from LLRunner.slide_transfer.slides_management import copy_slide_to_tmp
-from LLRunner.config import tmp_slide_dir, slide_source_dir
+from LLRunner.config import tmp_slide_dir, slide_source_dir, available_pipelines
 
 def find_slide(wsi_name, copy_slide=False):
     """ Find the slide with the specified name. 
@@ -26,10 +26,17 @@ def find_slide(wsi_name, copy_slide=False):
         else:
             raise SlideNotFoundInTmpSlideDirError(wsi_name)
 
-def run_one_slide(wsi_name, pipeline, tmp_slide_mode=0):
+def run_one_slide(wsi_name, pipeline):
     """ Run the specified pipeline for one slide. 
-    
+    The pipeline running code here should be minimal directly through the pipeline api.
     """
+
+    if pipeline not in available_pipelines:
+        raise PipelineNotFoundError(pipeline)
+    else:
+        if pipeline == "BMA-diff":
+            slide_path = find_slide(wsi_name, copy_slide=True)
+            analyse_bma(slide_path)
 
     pass
 
@@ -39,6 +46,16 @@ class SlideNotFoundInTmpSlideDirError(Exception):
     def __init__(self, wsi_name="unspecified"):
         self.wsi_name = wsi_name
         self.message = f"Slide {wsi_name} not found in the tmp_slide_dir."
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
+    
+# the PipelineNotFoundError
+class PipelineNotFoundError(Exception):
+    def __init__(self, pipeline="unspecified"):
+        self.pipeline = pipeline
+        self.message = f"Pipeline {pipeline} not found in the available pipelines."
         super().__init__(self.message)
 
     def __str__(self):
