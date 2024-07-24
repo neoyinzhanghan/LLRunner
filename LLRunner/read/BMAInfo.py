@@ -89,10 +89,10 @@ class BMAInfo:
                 "plasma cells": row["plasma cells"],
             }
         
-            # make sure that the values are floats, if not, set them to -1
-            for key in diff_dct:
-                if not isinstance(diff_dct[key], (int, float)):
-                    diff_dct[key] = -1
+            # # make sure that the values are floats, if not, set them to -1
+            # for key in diff_dct:
+            #     if not isinstance(diff_dct[key], (int, float)):
+            #         diff_dct[key] = -1
 
             return diff_dct
 
