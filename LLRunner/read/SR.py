@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import pandas as pd
-from LLRunner.BMAassumptions import *
+from LLRunner.read.read_config import *
 
 
 @dataclass
@@ -15,24 +15,32 @@ class SR:
     def __post_init__(self):
         self.df = pd.read_csv(self.csv_path)
 
-    def get_recorded_specimen_type(self, slide_name: str) -> str:
+    def get_part_description(self, slide_name: str) -> str:
         """
-        Get the specimen type of the slide.
+        Get the part description of the slide.
         """
-        specimen_type_box = self.df.loc[
+        part_description_box = self.df.loc[
             self.df.index.str.strip() == slide_name, "Part Description"
         ]
 
-        if specimen_type_box.empty:
+        if part_description_box.empty:
             raise SlideNotFoundError(
                 f"Slide name '{slide_name}' not found in the dataset."
             )
 
-        specimen_type_str = str(specimen_type_box.iloc[0]).strip()
+        part_description = str(part_description_box.iloc[0]).strip()
         assert isinstance(
-            specimen_type_str, str
-        ), f"The specimen type is not a string. {specimen_type_str} is of type {type(specimen_type_str)}."
+            part_description, str
+        ), f"The part description is not a string. {part_description} is of type {type(part_description)}."
 
+        return part_description
+
+    def get_recorded_specimen_type(self, slide_name: str) -> str:
+        """
+        Get the specimen type of the slide.
+        """
+        specimen_type_str = self.get_part_description(slide_name)
+        
         if "bone marrow aspirate" in specimen_type_str.lower():
             specimen_type = "BMA"
         elif "peripheral blood" in specimen_type_str.lower():

@@ -1,7 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from LLRunner.assumptions import cellnames
-from LLRunner.BMAassumptions import *
+from LLRunner.read.read_config import *
 
 
 class BMAResult:

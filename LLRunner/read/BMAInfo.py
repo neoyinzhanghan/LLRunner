@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import pandas as pd
-from LLRunner.BMAassumptions import *
+from LLRunner.read.read_config import *
 
 
 @dataclass
@@ -56,3 +56,45 @@ class BMAInfo:
             return None
         else:
             return rows.iloc[0]
+        
+    def get_diff_dct_from_accession_number(self, accession_number: str) -> dict:
+        """
+        Get the differential counts from the accession number.
+        """
+
+        # the accession number should match the specnum_formatted column
+        rows = self.df.loc[self.df["specnum_formatted"] == accession_number]
+
+        # assert that either 0 or 1 rows are found
+        if len(rows) > 1:
+            # get the rows with most recent accession_date
+            rows = rows.sort_values("accession_date", ascending=False).head(1)
+
+        # if no rows are found, return None, else return the row
+        if rows.empty:
+            return None
+        else:
+            row = rows.iloc[0]
+            diff_dct = {
+                "blasts": row["blasts"],
+                "blast-equivalents": row["blast-equivalents"],
+                "promyelocytes": row["promyelocytes"],
+                "myelocytes": row["myelocytes"],
+                "metamyelocytes": row["metamyelocytes"],
+                "neutrophils/bands": row["neutrophils/bands"],
+                "monocytes": row["monocytes"],
+                "eosinophils": row["eosinophils"],
+                "erythroid precursors": row["erythroid precursors"],
+                "lymphocytes": row["lymphocytes"],
+                "plasma cells": row["plasma cells"],
+            }
+        
+            # make sure that the values are floats, if not, set them to -1
+            for key in diff_dct:
+                if not isinstance(diff_dct[key], (int, float)):
+                    diff_dct[key] = -1
+
+            return diff_dct
+
+bma_info = BMAInfo()
+

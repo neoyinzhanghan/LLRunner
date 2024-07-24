@@ -2,11 +2,11 @@
 ### Clinical Data Confid ###
 ############################
 
-slide_scanning_tracker_path = "/media/ssd2/clinical_text_data/SST/SST.xlsx"
+slide_scanning_tracker_path = "/media/hdd3/neo/clinical_text_data/SST.xlsx"
 slide_scanning_tracker_sheet_name = "Sheet1"
-status_results_path = "/media/ssd2/clinical_text_data/tissueType/status_results.csv"
+status_results_path = "/media/hdd3/neo/clinical_text_data/status_results.csv"
 bma_info_path = (
-    "/media/ssd2/clinical_text_data/HemeParser11/hemeParser11_bm_diff_202404032109.csv"
+    "/media/hdd3/neo/clinical_text_data/hemeParser11_bm_diff_202404032109.csv"
 )
 
 ############################
