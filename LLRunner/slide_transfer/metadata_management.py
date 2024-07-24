@@ -99,14 +99,17 @@ def update_slide_metadata(metadata_row_dct, overwrite=True):
     df = pd.read_csv(slide_metadata_path)
     
     wsi_name = metadata_row_dct["wsi_name"]
+
+    # turn the metadata_row_dct into a df
+    new_df_row = pd.DataFrame(metadata_row_dct, index=[0])
     
     # check to see if there is a row with the same slide name first
     if wsi_name in df["wsi_name"].values:
         if overwrite:
             df = df[df["wsi_name"] != wsi_name]
-            df = df.append(metadata_row_dct, ignore_index=True)
+            df = pd.concat([df, new_df_row], ignore_index=True) 
     else:
-        df = df.append(metadata_row_dct, ignore_index=True)
+        df = pd.concat([df, new_df_row], ignore_index=True)
 
     # save the df to replace the old metadata file
     df.to_csv(slide_metadata_path, index=False)
