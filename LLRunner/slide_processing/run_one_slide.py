@@ -37,8 +37,8 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
         raise PipelineNotFoundError(pipeline)
     else:
         metadata_row_dct = {
-            "pipeline": pipeline,
             "wsi_name": wsi_name,
+            "pipeline": pipeline,
             "datetime_processed": None,
             "result_dir": None,
             "error": False,

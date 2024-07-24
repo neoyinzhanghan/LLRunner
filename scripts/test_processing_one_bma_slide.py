@@ -8,7 +8,7 @@ if __name__ == "__main__":
     run_one_slide(wsi_name=wsi_name,
                   pipeline="BMA-diff",
                   note="Test",
-                  hoarding=True,
+                  hoarding=False,
                   continue_on_error=False,
                   do_extract_features=False,
                   check_specimen_clf=False)
