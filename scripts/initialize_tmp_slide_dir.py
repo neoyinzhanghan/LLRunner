@@ -24,5 +24,6 @@ slides = os.listdir(tmp_slide_dir)
 slides = [slide for slide in slides if Path(slide).suffix in allowed_extensions]
 
 # for each slide in the tmp_slide_dir, run copy_slide_to_tmp with overwrite=False and overwrite_topview=True
-for slide in tqdm(slides, desc="Initialize slides metadata and topviews for tmp_slide_dir)"):
+num_slides = len(slides)
+for slide in tqdm(slides, desc="Initialize slides metadata and topviews for tmp_slide_dir)", total=num_slides):
     copy_slide_to_tmp(slide, overwrite=False, overwrite_topview=True)
