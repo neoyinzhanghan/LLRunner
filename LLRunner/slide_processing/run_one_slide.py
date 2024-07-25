@@ -42,7 +42,8 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
             "datetime_processed": None,
             "result_dir": None,
             "error": False,
-            "note": note
+            "note": note,
+            "kwargs": str(kwargs)
         }
         if pipeline == "BMA-diff":
             slide_path = find_slide(wsi_name, copy_slide=True)
