@@ -1,6 +1,6 @@
 import os
 from tqdm import tqdm
-from LLRunner.slide_processing import run_one_slide
+from LLRunner.slide_processing.run_one_slide import run_one_slide
 from LLRunner.slide_transfer.retrieve_from_tmp import find_BMA_from_Dx
 from LLRunner.config import tmp_slide_dir
 
