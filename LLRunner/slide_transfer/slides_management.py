@@ -3,7 +3,7 @@ import shutil
 import datetime
 import pandas as pd
 import openslide
-from LLRunner.slide_transfer.metadata_management import get_slide_metadata_row, update_slide_metadata
+from LLRunner.slide_transfer.metadata_management import get_slide_metadata_row, update_slide_metadata, get_bma_diff_metadata_row, update_bma_diff_metadata
 from LLRunner.config import allowed_extensions, slide_source_dir, tmp_slide_dir, slide_metadata_path, topview_level
 
 def get_topview(wsi_name):

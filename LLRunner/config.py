@@ -6,7 +6,11 @@ results_dir = "/media/hdd3/neo/results_dir"
 
 slide_metadata_path = os.path.join(tmp_slide_dir, "tmp_slide_metadata.csv")
 
+bma_diff_metadata_path = os.path.join(results_dir, "bma_diff_metadata.csv")
+
 pipeline_run_history_path = os.path.join(results_dir, "pipeline_run_history.csv")
+
+bma_diff_results_path = os.path.join(results_dir, "bma_diff_results.csv")
 
 available_pipelines = [
     "BMA-diff"
