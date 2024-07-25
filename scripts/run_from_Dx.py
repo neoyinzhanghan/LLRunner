@@ -16,5 +16,8 @@ for wsi_name in tqdm(wsi_names, desc="Running BMA-diff pipeline", total=len(wsi_
     run_one_slide(wsi_name=wsi_name,
                   pipeline="BMA-diff",
                   note="LLBMA on AML, Normal BMA, and Plasma cell myeloma slides, version=0.1",
-                  hoarding=False, 
+                  hoarding=True,
+                  continue_on_error=True,
+                  do_extract_features=False,
+                  check_specimen_clf=False
                   )

@@ -11,7 +11,7 @@ class BMAInfo:
     df: pd.DataFrame = field(init=False)
 
     def __post_init__(self):
-        full_df = pd.read_csv(self.csv_path)
+        full_df = pd.read_csv(self.csv_path, low_memory=False)
 
         # only keep the columns specnum_formatted, accession_date, part_description, text_data_clindx, blasts, blast-equivalents,
         # promyelocytes, myelocytes, metamyelocytes, neutrophils/bands, monocytes, eosinophils, erythroid precursors, lymphocytes, plasma cells
