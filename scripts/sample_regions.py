@@ -81,7 +81,12 @@ for subdir in tqdm(sampled_subdirs, desc="Copying regions to save_dir"):
     # subdir is a directory in results_dir so make sure to shutil copy the contents to save_dir, the new folder name should be the current_index
     shutil.copytree(subdir, os.path.join(save_dir, str(current_index)))
 
+    # add the current_index and the slide_name to the metadata
+    md["idx"].append(current_index)
+    md["slide_name"].append(Path(subdir).name)
+
     current_index += 1
+
 
 # save the metadata to a csv file first convert it to a dataframe
 df = pd.DataFrame(md)
