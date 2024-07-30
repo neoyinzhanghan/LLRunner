@@ -7,8 +7,9 @@ from pathlib import Path
 from tqdm import tqdm
 
 results_dir = "/media/hdd3/neo/results_dir"
-save_dir = "/media/hdd3/neo/AML_examples"
+save_dir = "/media/hdd3/neo/Normal_examples"
 num_regions = 20
+Dx = "Normal BMA"
 
 # if the save_dir does not exist, create it
 if not os.path.exists(save_dir):
@@ -63,9 +64,9 @@ def get_Dx(result_dir):
 subdirs = [f.path for f in os.scandir(results_dir) if f.is_dir() and f.name.startswith("BMA-diff") and not has_error(f.path)]
 
 # only keep the directories such that the Dx is "AML"
-subdirs = [f for f in subdirs if get_Dx(f) == "AML"]
+subdirs = [f for f in subdirs if get_Dx(f) == Dx]
 
-print(f"Found {len(subdirs)} AML slides without errors.")
+print(f"Found {len(subdirs)} {Dx} slides without errors.")
 
 sampled_subdirs = random.sample(subdirs, num_regions)
 
