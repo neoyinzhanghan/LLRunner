@@ -70,4 +70,6 @@ print(f"Found {len(subdirs)} AML slides without errors.")
 sampled_subdirs = random.sample(subdirs, num_regions)
 
 for subdir in tqdm(sampled_subdirs, desc="Copying regions to save_dir"):
-    shutil.copy(subdir, save_dir)
+    
+    # subdir is a directory in results_dir so make sure to shutil copy the contents to save_dir
+    shutil.copytree(subdir, os.path.join(save_dir, Path(subdir).name))
