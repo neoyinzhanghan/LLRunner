@@ -70,7 +70,11 @@ print(f"Found {len(subdirs)} {Dx} slides without errors.")
 
 sampled_subdirs = random.sample(subdirs, num_regions)
 
+current_index = 0
+
 for subdir in tqdm(sampled_subdirs, desc="Copying regions to save_dir"):
     
-    # subdir is a directory in results_dir so make sure to shutil copy the contents to save_dir
-    shutil.copytree(subdir, os.path.join(save_dir, Path(subdir).name))
+    # subdir is a directory in results_dir so make sure to shutil copy the contents to save_dir, the new folder name should be the current_index
+    shutil.copytree(subdir, os.path.join(save_dir, str(current_index)))
+
+    current_index += 1
