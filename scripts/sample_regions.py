@@ -1,11 +1,18 @@
 import os
 import pandas as pd
+import random
+import shutil
 from LLRunner.config import results_dir, pipeline_run_history_path, slide_metadata_path
 from pathlib import Path
+from tqdm import tqdm
 
 results_dir = "/media/hdd3/neo/results_dir"
-save_dir = "/media/hdd3/neo/sampled_regions"
-num_regions = 25
+save_dir = "/media/hdd3/neo/AML_examples"
+num_regions = 20
+
+# if the save_dir does not exist, create it
+if not os.path.exists(save_dir):
+    os.mkdir(save_dir)
 
 # get all the subdirectories in the results_dir
 subdirs = [f.path for f in os.scandir(results_dir) if f.is_dir()]
@@ -59,3 +66,8 @@ subdirs = [f.path for f in os.scandir(results_dir) if f.is_dir() and f.name.star
 subdirs = [f for f in subdirs if get_Dx(f) == "AML"]
 
 print(f"Found {len(subdirs)} AML slides without errors.")
+
+sampled_subdirs = random.sample(subdirs, num_regions)
+
+for subdir in tqdm(sampled_subdirs, desc="Copying regions to save_dir"):
+    shutil.copy(subdir, save_dir)
