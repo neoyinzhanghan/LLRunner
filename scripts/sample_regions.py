@@ -71,6 +71,10 @@ print(f"Found {len(subdirs)} {Dx} slides without errors.")
 sampled_subdirs = random.sample(subdirs, num_regions)
 
 current_index = 0
+md = {
+    "idx": [],
+    "slide_name": []
+}
 
 for subdir in tqdm(sampled_subdirs, desc="Copying regions to save_dir"):
     
@@ -78,3 +82,8 @@ for subdir in tqdm(sampled_subdirs, desc="Copying regions to save_dir"):
     shutil.copytree(subdir, os.path.join(save_dir, str(current_index)))
 
     current_index += 1
+
+# save the metadata to a csv file first convert it to a dataframe
+df = pd.DataFrame(md)
+
+df.to_csv(os.path.join(save_dir, "metadata.csv"), index=False)
