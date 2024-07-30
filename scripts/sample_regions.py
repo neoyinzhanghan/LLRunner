@@ -7,9 +7,9 @@ from pathlib import Path
 from tqdm import tqdm
 
 results_dir = "/media/hdd3/neo/results_dir"
-save_dir = "/media/hdd3/neo/Normal_examples"
+save_dir = "/media/hdd3/neo/AML_examples"
 num_regions = 20
-Dx = "Normal BMA"
+Dx = "AML"
 
 # if the save_dir does not exist, create it
 if not os.path.exists(save_dir):
