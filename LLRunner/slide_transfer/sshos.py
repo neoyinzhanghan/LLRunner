@@ -23,7 +23,7 @@ class SSHOS:
             )
         else:
             self.client.connect(
-                self.hostname, username=self.username, password=self.password
+                self.hostname, username=self.username
             )
 
     def disconnect(self):
@@ -54,7 +54,7 @@ class SSHOS:
 
 
 # Example usage:
-# ssh_os = SSHOS(hostname="172.28.164.166", username="greg", password="your_password")
+# ssh_os = SSHOS(hostname="172.28.164.166", username="greg")
 # ssh_os.connect()
 # files = ssh_os.listdir("/pesgisipth/NDPI")
 # print(files)
