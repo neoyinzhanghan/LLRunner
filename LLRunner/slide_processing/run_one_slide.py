@@ -81,11 +81,7 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
         df.to_csv(pipeline_run_history_path, index=False)
 
 
-def decide_what_to_run(processing_filter_func, pipeline):
-    """Decide what to run based on the processing_filter_func and the pipeline."""
 
-    # first open the slide_metadata_path file
-    slide_md = pd.read_csv(slide_metadata_path)
 
 
 # the SlideNotFoundInTmpSlideDirError

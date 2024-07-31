@@ -290,3 +290,4 @@ if __name__ == "__main__":
     pool_metadata_one_time(wsi_name_filter_func=equality_filter, overwrite=True)
 
     wsi_names_to_run = decide_what_to_run(identity_filter, pipeline="BMA-diff")
+    print(f"Found {len(wsi_names_to_run)} slides to run the BMA-diff pipeline on.")
