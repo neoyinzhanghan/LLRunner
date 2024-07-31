@@ -2,10 +2,8 @@ import pandas as pd
 from LLRunner.config import slide_metadata_path
 
 def find_BMA_from_Dx(Dx):
-    """ First find all the rows in the slide metadata where the column in_tmp_slide_dir is True. 
-    Then further filter the rows based on the Dx column. 
-
-    Return a list of all the wsi_name in the filtered rows.
+    """
+    Find the slide with the specified Dx.
     """
 
     # read the slide metadata

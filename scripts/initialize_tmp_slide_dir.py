@@ -17,7 +17,7 @@ if not os.path.exists(topview_dir):
 # create the slide_metadata_path if it does not exist (which is a csv file)
 if not os.path.exists(slide_metadata_path):
     with open(slide_metadata_path, "w") as f:
-        f.write("wsi_name,accession_number,wsi_extension,part_description,reported_BMA,reported_PB,metadata_last_updated,Dx,sub_Dx,slide_last_updated,in_tmp_slide_dir,level_0_mpp,topview_error,level_0_mpp_error\n")
+        f.write("wsi_name,accession_number,wsi_extension,part_description,reported_BMA,reported_PB,metadata_last_updated,Dx,sub_Dx,slide_last_updated,level_0_mpp,topview_error,level_0_mpp_error\n")
 
 if not os.path.exists(bma_diff_metadata_path):
     with open(bma_diff_metadata_path, "w") as f:

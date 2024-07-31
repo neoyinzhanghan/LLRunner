@@ -98,7 +98,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             slide_metadata_row["slide_last_updated"] = datetime.datetime.now().strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
-            slide_metadata_row["in_tmp_slide_dir"] = True
 
             try:
                 topview_image = get_topview(wsi_name)
@@ -136,7 +135,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             slide_metadata_row["slide_last_updated"] = datetime.datetime.now().strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
-            slide_metadata_row["in_tmp_slide_dir"] = True
 
             try:
                 topview_image = get_topview(wsi_name)
@@ -177,7 +175,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
         slide_metadata_row["slide_last_updated"] = datetime.datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S"
         )
-        slide_metadata_row["in_tmp_slide_dir"] = True
 
         try:
             topview_image = get_topview(wsi_name)
@@ -218,11 +215,10 @@ def delete_slide_from_tmp(wsi_name):
 
         slide_md = pd.read_csv(slide_metadata_path)
 
-        # find the index of the row of the slide in the slide metadata
-        slide_md_idx = slide_md.index[slide_md["wsi_name"] == wsi_name]
-
-        # update the slide metadata directly using .loc
-        slide_md.loc[slide_md_idx, "in_tmp_slide_dir"] = False
+        # update the slide_last_updated column to current datetime
+        slide_md.loc[slide_md["wsi_name"] == wsi_name, "slide_last_updated"] = (
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
 
         slide_md.to_csv(slide_metadata_path, index=False)
 
