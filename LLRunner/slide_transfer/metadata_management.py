@@ -242,10 +242,51 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
         print(f"Number of Slides Missing Part Description: {missing_part_description}")
 
 
+def decide_what_to_run(processing_filter_func, pipeline):
+    """Decide what to run based on the processing_filter_func and the pipeline.
+    The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
+    """
+
+    assert pipeline in available_pipelines, f"{pipeline} is not an available pipeline."
+
+    # first open the slide_metadata_path file
+    slide_md = pd.read_csv(slide_metadata_path)
+
+    if pipeline == "BMA-diff":
+        # only keep the rows in slide_md where reported_BMA is True
+        slide_md = slide_md[
+            slide_md["reported_BMA"]
+        ]  # TODO DEPRECATED once we implement specimen classificaiton
+
+    # open the pipeline_run_history_path file
+    df = pd.read_csv(pipeline_run_history_path)
+
+    # only keep the rows in the pipeline_run_history_path for the specified pipeline
+    df = df[df["pipeline"] == pipeline]
+
+    filtered_df = processing_filter_func(df)
+
+    # look for all the wsi_names in slide_md that are not in the filtered_df
+    wsi_names = slide_md["wsi_name"].values
+
+    wsi_names_to_run = []
+
+    for wsi_name in wsi_names:
+        if wsi_name not in filtered_df["wsi_name"].values:
+            wsi_names_to_run.append(wsi_name)
+
+    return wsi_names_to_run
+
+
 if __name__ == "__main__":
 
     # Here is a filter function which is strict equality
     def equality_filter(wsi_name):
         return wsi_name == "H23-7455;S11;MSK1 - 2024-02-07 21.43.57.ndpi"
 
+    def identity_filter(pipeline_history_df):
+        return pipeline_history_df
+
     pool_metadata_one_time(wsi_name_filter_func=equality_filter, overwrite=True)
+
+    wsi_names_to_run = decide_what_to_run(identity_filter, pipeline="BMA-diff")

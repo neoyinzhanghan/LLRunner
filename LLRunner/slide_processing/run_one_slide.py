@@ -3,17 +3,24 @@ import datetime
 import pandas as pd
 from LLBMA.front_end.api import analyse_bma
 from LLRunner.slide_transfer.slides_management import copy_slide_to_tmp
-from LLRunner.config import tmp_slide_dir, pipeline_run_history_path, available_pipelines, results_dir
+from LLRunner.config import (
+    tmp_slide_dir,
+    pipeline_run_history_path,
+    available_pipelines,
+    results_dir,
+    slide_metadata_path
+)
+
 
 def find_slide(wsi_name, copy_slide=False):
-    """ Find the slide with the specified name. 
+    """Find the slide with the specified name.
     First look for wsi_name (this name includes extension) in the tmp_slide_dir.
     If not found then we need to decide what to do based on the copy_slide flag:
-    
+
     False: raise SlideNotFoundInTmpSlideDirError(wsi_name)
     True: copy the slide from the source slide directory to the tmp_slide_dir, update the slide metadata, and return the path to the slide in the tmp_slide_dir
     """
-    
+
     # check if the slide is in the tmp_slide_dir
     slide_path = os.path.join(tmp_slide_dir, wsi_name)
 
@@ -28,8 +35,9 @@ def find_slide(wsi_name, copy_slide=False):
         else:
             raise SlideNotFoundInTmpSlideDirError(wsi_name)
 
+
 def run_one_slide(wsi_name, pipeline, note="", **kwargs):
-    """ Run the specified pipeline for one slide. 
+    """Run the specified pipeline for one slide.
     The pipeline running code here should be minimal directly through the pipeline api.
     """
 
@@ -43,20 +51,24 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
             "result_dir": None,
             "error": False,
             "note": note,
-            "kwargs": str(kwargs)
+            "kwargs": str(kwargs),
         }
         if pipeline == "BMA-diff":
             slide_path = find_slide(wsi_name, copy_slide=True)
-            result_dir, error = analyse_bma(slide_path,
-                                            dump_dir=results_dir, # then just kwargs
-                                            **kwargs)
+            result_dir, error = analyse_bma(
+                slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
+            )
         else:
-            raise PipelineNotFoundError(pipeline) # more coming soon!            
-        
-        metadata_row_dct["datetime_processed"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
+            raise PipelineNotFoundError(pipeline)  # more coming soon!
+
+        metadata_row_dct["datetime_processed"] = datetime.datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
         # the new result_dir is the results_dir/newname where newname is the pipeline followed by datatime_processed
-        new_result_dir = os.path.join(results_dir, f"{pipeline}_{metadata_row_dct['datetime_processed']}")
+        new_result_dir = os.path.join(
+            results_dir, f"{pipeline}_{metadata_row_dct['datetime_processed']}"
+        )
         os.rename(result_dir, new_result_dir)
 
         metadata_row_dct["result_dir"] = new_result_dir
@@ -68,6 +80,14 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
         df = pd.concat([df, new_df_row], ignore_index=True)
         df.to_csv(pipeline_run_history_path, index=False)
 
+
+def decide_what_to_run(processing_filter_func, pipeline):
+    """Decide what to run based on the processing_filter_func and the pipeline."""
+
+    # first open the slide_metadata_path file
+    slide_md = pd.read_csv(slide_metadata_path)
+
+
 # the SlideNotFoundInTmpSlideDirError
 class SlideNotFoundInTmpSlideDirError(Exception):
     def __init__(self, wsi_name="unspecified"):
@@ -77,7 +97,8 @@ class SlideNotFoundInTmpSlideDirError(Exception):
 
     def __str__(self):
         return self.message
-    
+
+
 # the PipelineNotFoundError
 class PipelineNotFoundError(Exception):
     def __init__(self, pipeline="unspecified"):
