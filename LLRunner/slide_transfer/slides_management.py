@@ -8,6 +8,7 @@ from LLRunner.slide_transfer.metadata_management import (
     update_slide_metadata,
     get_bma_diff_metadata_row,
     update_bma_diff_metadata,
+    update_slide_time,
 )
 from LLRunner.config import (
     allowed_extensions,
@@ -124,10 +125,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             except Exception as e:
                 slide_metadata_row["level_0_mpp_error"] = True
 
-            update_slide_metadata(
-                metadata_row_dct=slide_metadata_row, overwrite=overwrite
-            )
-
         elif overwrite_topview:
             # update the slide metadata
             slide_metadata_row = get_slide_metadata_row(wsi_name)
@@ -160,10 +157,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
                 topview_image.save(topview_path)
             except Exception as e:
                 slide_metadata_row["level_0_mpp_error"] = True
-
-            update_slide_metadata(
-                metadata_row_dct=slide_metadata_row, overwrite=overwrite
-            )
 
     else:
         with SSHOS() as sshos:
@@ -201,7 +194,7 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
         except Exception as e:
             slide_metadata_row["level_0_mpp_error"] = True
 
-        update_slide_metadata(metadata_row_dct=slide_metadata_row, overwrite=overwrite)
+    update_slide_metadata(metadata_row_dct=slide_metadata_row, overwrite=True)
 
 
 def delete_slide_from_tmp(wsi_name):
@@ -213,15 +206,7 @@ def delete_slide_from_tmp(wsi_name):
     if os.path.exists(slide_path):
         os.remove(slide_path)
 
-        slide_md = pd.read_csv(slide_metadata_path)
-
-        # update the slide_last_updated column to current datetime
-        slide_md.loc[slide_md["wsi_name"] == wsi_name, "slide_last_updated"] = (
-            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        )
-
-        slide_md.to_csv(slide_metadata_path, index=False)
-
+        update_slide_time(wsi_name)
     else:
         print("UserWarning: Slide not found in the tmp_slide_dir.")
         pass

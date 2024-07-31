@@ -278,6 +278,16 @@ def decide_what_to_run(processing_filter_func, pipeline):
     return wsi_names_to_run
 
 
+def update_slide_time(wsi_name):
+    # open the slide_metadata_path file
+    slide_md = pd.read_csv(slide_metadata_path)
+
+    # change the slide_last_updated to the current datetime
+    slide_md.loc[slide_md["wsi_name"] == wsi_name, "slide_last_updated"] = (
+        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+
+
 if __name__ == "__main__":
 
     # Here is a filter function which is strict equality
