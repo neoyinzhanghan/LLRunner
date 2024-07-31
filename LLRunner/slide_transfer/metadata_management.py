@@ -284,10 +284,14 @@ if __name__ == "__main__":
     def equality_filter(wsi_name):
         return wsi_name == "H23-7455;S11;MSK1 - 2024-02-07 21.43.57.ndpi"
 
+    def H_filter(wsi_name):
+        """Look for slides with name that starts with H."""
+        return wsi_name.startswith("H")
+
     def identity_filter(pipeline_history_df):
         return pipeline_history_df
 
-    pool_metadata_one_time(wsi_name_filter_func=equality_filter, overwrite=True)
+    pool_metadata_one_time(wsi_name_filter_func=H_filter, overwrite=True)
 
     wsi_names_to_run = decide_what_to_run(identity_filter, pipeline="BMA-diff")
     print(f"Found {len(wsi_names_to_run)} slides to run the BMA-diff pipeline on.")
