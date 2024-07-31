@@ -2,8 +2,8 @@ import os
 
 slide_source_hostname = "172.28.164.166"
 slide_source_username = "greg"
-
 slide_source_dir = "/pesgisipth/NDPI"
+
 tmp_slide_dir = "/media/hdd3/neo/tmp_slide_dir"
 results_dir = "/media/hdd3/neo/results_dir"
 
