@@ -2,7 +2,10 @@ import os
 import datetime
 import pandas as pd
 from LLBMA.front_end.api import analyse_bma
-from LLRunner.slide_transfer.slides_management import copy_slide_to_tmp
+from LLRunner.slide_transfer.slides_management import (
+    copy_slide_to_tmp,
+    delete_slide_from_tmp,
+)
 from LLRunner.config import (
     tmp_slide_dir,
     pipeline_run_history_path,
@@ -40,7 +43,7 @@ def find_slide(wsi_name, copy_slide=False):
             raise SlideNotFoundInTmpSlideDirError(wsi_name)
 
 
-def run_one_slide(wsi_name, pipeline, note="", **kwargs):
+def run_one_slide(wsi_name, pipeline, delete_slide=False, note="", **kwargs):
     """Run the specified pipeline for one slide.
     The pipeline running code here should be minimal directly through the pipeline api.
     """
@@ -83,3 +86,6 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
 
         df = pd.concat([df, new_df_row], ignore_index=True)
         df.to_csv(pipeline_run_history_path, index=False)
+
+        if delete_slide:
+            delete_slide_from_tmp(wsi_name)

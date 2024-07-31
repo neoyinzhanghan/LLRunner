@@ -16,6 +16,7 @@ from LLRunner.config import (
     slide_metadata_path,
     topview_level,
 )
+from LLRunner.slide_transfer.sshos import SSHOS
 
 
 def get_topview(wsi_name):
@@ -86,7 +87,9 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
     if os.path.exists(slide_path):
         if overwrite:
             os.remove(slide_path)
-            shutil.copy2(os.path.join(slide_source_dir, wsi_name), slide_path)
+
+            with SSHOS() as sshos:
+                sshos.rsync_file(remote_path=slide_path, local_dir=tmp_slide_dir)
 
             # update the slide metadata
             slide_metadata_row = get_slide_metadata_row(wsi_name)
@@ -164,8 +167,8 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             )
 
     else:
-        shutil.copy2(os.path.join(slide_source_dir, wsi_name), slide_path)
-
+        with SSHOS() as sshos:
+            sshos.rsync_file(remote_path=slide_path, local_dir=tmp_slide_dir)
         # update the slide metadata
         slide_metadata_row = get_slide_metadata_row(wsi_name)
 
@@ -200,6 +203,30 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             slide_metadata_row["level_0_mpp_error"] = True
 
         update_slide_metadata(metadata_row_dct=slide_metadata_row, overwrite=overwrite)
+
+
+def delete_slide_from_tmp(wsi_name):
+    """Delete the slide from the tmp_slide_dir and update the slide metadata."""
+
+    # check if the slide is in the tmp_slide_dir
+    slide_path = os.path.join(tmp_slide_dir, wsi_name)
+
+    if os.path.exists(slide_path):
+        os.remove(slide_path)
+
+        slide_md = pd.read_csv(slide_metadata_path)
+
+        # find the row of the slide in the slide metadata
+        slide_md_row = slide_md.loc[slide_md["wsi_name"] == wsi_name]
+
+        # update the slide metadata
+        slide_md_row["in_tmp_slide_dir"] = False
+
+        slide_md.to_csv(slide_metadata_path, index=False)
+
+    else:
+        print("UserWarning: Slide not found in the tmp_slide_dir.")
+        pass
 
 
 def has_topview(wsi_name):
