@@ -159,7 +159,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
                 slide_metadata_row["level_0_mpp_error"] = True
 
     else:
-        print("CHECKPOINT 1")
         with SSHOS() as sshos:
             source_slide_path = os.path.join(slide_source_dir, wsi_name)
             sshos.rsync_file(remote_path=source_slide_path, local_dir=tmp_slide_dir)
@@ -172,7 +171,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
         )
 
         try:
-            print("CHECKPOINT 2")
             topview_image = get_topview(wsi_name)
             # save the topview image in the tmp_slide_dir/topview
             topview_path = os.path.join(
@@ -182,11 +180,9 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             )
             topview_image.save(topview_path)
         except Exception as e:
-            print("CHECKPOINT 2*")
             slide_metadata_row["topview_error"] = True
 
         try:
-            print("CHECKPOINT 3")
             level_0_mpp = get_level_0_mpp(wsi_name)
             slide_metadata_row["level_0_mpp"] = level_0_mpp
             # save the topview image in the tmp_slide_dir/topview
@@ -197,7 +193,6 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
             )
             topview_image.save(topview_path)
         except Exception as e:
-            print("CHECKPOINT 3*")
             slide_metadata_row["level_0_mpp_error"] = True
 
     update_slide_metadata(metadata_row_dct=slide_metadata_row)
