@@ -151,6 +151,8 @@ def update_slide_metadata(metadata_row_dct, overwrite=True):
     else:
         df = pd.concat([df, new_df_row], ignore_index=True)
 
+    # remove the old csv file
+    os.remove(slide_metadata_path)
     # save the df to replace the old metadata file
     df.to_csv(slide_metadata_path, index=False)
 
