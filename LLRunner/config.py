@@ -3,7 +3,7 @@ import os
 slide_source_hostname = "172.28.164.166"
 slide_source_username = "greg"
 
-slide_source_dir = "greg@172.28.164.166:/pesgisipth/NDPI"
+slide_source_dir = "/pesgisipth/NDPI"
 tmp_slide_dir = "/media/hdd3/neo/tmp_slide_dir"
 results_dir = "/media/hdd3/neo/results_dir"
 
@@ -15,9 +15,7 @@ pipeline_run_history_path = os.path.join(results_dir, "pipeline_run_history.csv"
 
 bma_diff_results_path = os.path.join(results_dir, "bma_diff_results.csv")
 
-available_pipelines = [
-    "BMA-diff"
-]
+available_pipelines = ["BMA-diff"]
 
 pipeline_results_path_dict = {
     "BMA-diff": os.path.join(results_dir, "BMA-diff_results.csv")
