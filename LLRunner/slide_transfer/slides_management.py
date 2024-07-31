@@ -222,7 +222,7 @@ def delete_slide_from_tmp(wsi_name):
         slide_md_row = slide_md.loc[slide_md["wsi_name"] == wsi_name]
 
         # update the slide metadata
-        slide_md_row["in_tmp_slide_dir"] = False
+        slide_md_row.iloc[:, slide_md.columns.get_loc("in_tmp_slide_dir")] = False
 
         slide_md.to_csv(slide_metadata_path, index=False)
 
