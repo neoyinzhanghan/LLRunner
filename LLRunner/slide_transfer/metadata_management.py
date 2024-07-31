@@ -196,15 +196,16 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
     sshos = SSHOS()
     sshos.connect()
 
-    # first get the list of all the slides in the slide_source_dir
-    wsi_names = [
-        f
-        for f in sshos.listdir(slide_source_dir)
-        if sshos.isfile(os.path.join(slide_source_dir, f))
-    ]
+    print("Looking for files in the slide source directory.")
 
-    # only keeps the slides such that the extension is in "allowed_extensions"
-    wsi_names = [f for f in wsi_names if Path(f).suffix in allowed_extensions]
+    # first get the list of all the slides in the slide_source_dir
+    files = sshos.listdir(slide_source_dir)
+    print("Looking for WSIs amongst the files.")
+
+    # only keep the slides such that the extension is in "allowed_extensions" and is a file
+    wsi_names = [
+        f for f in files if Path(f).suffix in allowed_extensions and sshos.isfile(f)
+    ]
 
     print("Looking for slides that satisfy the specified conditions.")
 
