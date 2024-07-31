@@ -26,4 +26,8 @@ if __name__ == "__main__":
         copy_slide=True,
         delete_slide=True,
         note="Testing the pipeline.",
+        hoarding=False,
+        continue_on_error=False,
+        do_extract_features=False,
+        check_specimen_clf=False,
     )
