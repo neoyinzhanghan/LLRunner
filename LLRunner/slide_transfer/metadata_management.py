@@ -206,6 +206,8 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
     # only keeps the slides such that the extension is in "allowed_extensions"
     wsi_names = [f for f in wsi_names if Path(f).suffix in allowed_extensions]
 
+    print("Looking for slides that satisfy the specified conditions.")
+
     # only keep the slides such that wsi_name_filter_func(wsi_name) is True
     wsi_names = [f for f in wsi_names if wsi_name_filter_func(f)]
 
