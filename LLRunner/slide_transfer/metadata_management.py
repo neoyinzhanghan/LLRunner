@@ -203,9 +203,7 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
     print("Looking for WSIs amongst the files.")
 
     # only keep the slides such that the extension is in "allowed_extensions" and is a file
-    wsi_names = [
-        f for f in files if Path(f).suffix in allowed_extensions and sshos.isfile(f)
-    ]
+    wsi_names = [f for f in files if Path(f).suffix in allowed_extensions]
 
     print("Looking for slides that satisfy the specified conditions.")
 
