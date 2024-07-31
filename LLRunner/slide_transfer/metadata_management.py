@@ -146,6 +146,7 @@ def update_slide_metadata(metadata_row_dct, overwrite=True):
     # check to see if there is a row with the same slide name first
     if wsi_name in df["wsi_name"].values:
         if overwrite:
+            print("CHECKPOINT 4")
             df = df[df["wsi_name"] != wsi_name]
             df = pd.concat([df, new_df_row], ignore_index=True)
     else:
