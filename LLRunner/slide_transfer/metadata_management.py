@@ -200,9 +200,9 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
     wsi_names = [
         f
         for f in sshos.listdir(slide_source_dir)
-        if sshos.path.isfile(os.path.join(slide_source_dir, f))
+        if sshos.isfile(os.path.join(slide_source_dir, f))
     ]
-    
+
     # only keeps the slides such that the extension is in "allowed_extensions"
     wsi_names = [f for f in wsi_names if Path(f).suffix in allowed_extensions]
 
