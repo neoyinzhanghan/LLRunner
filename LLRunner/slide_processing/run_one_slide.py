@@ -8,7 +8,11 @@ from LLRunner.config import (
     pipeline_run_history_path,
     available_pipelines,
     results_dir,
-    slide_metadata_path
+    slide_metadata_path,
+)
+from LLRunner.custom_errors import (
+    SlideNotFoundInTmpSlideDirError,
+    PipelineNotFoundError,
 )
 
 
@@ -79,28 +83,3 @@ def run_one_slide(wsi_name, pipeline, note="", **kwargs):
 
         df = pd.concat([df, new_df_row], ignore_index=True)
         df.to_csv(pipeline_run_history_path, index=False)
-
-
-
-
-
-# the SlideNotFoundInTmpSlideDirError
-class SlideNotFoundInTmpSlideDirError(Exception):
-    def __init__(self, wsi_name="unspecified"):
-        self.wsi_name = wsi_name
-        self.message = f"Slide {wsi_name} not found in the tmp_slide_dir."
-        super().__init__(self.message)
-
-    def __str__(self):
-        return self.message
-
-
-# the PipelineNotFoundError
-class PipelineNotFoundError(Exception):
-    def __init__(self, pipeline="unspecified"):
-        self.pipeline = pipeline
-        self.message = f"Pipeline {pipeline} not found in the available pipelines."
-        super().__init__(self.message)
-
-    def __str__(self):
-        return self.message

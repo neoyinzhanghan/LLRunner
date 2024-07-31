@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import pandas as pd
 from LLRunner.read.read_config import *
+from LLRunner.custom_errors import SlideNotFoundError
 
 
 @dataclass
@@ -52,17 +53,6 @@ class SR:
 
 
 sr = SR()
-
-
-class SlideNotFoundError(Exception):
-    """
-    Raised when the slide is not found in the status results.
-    """
-
-    def __init__(self, slide_name: str) -> None:
-        self.slide_name = slide_name
-        super().__init__(f"Slide {slide_name} not found in the status results.")
-
 
 if __name__ == "__main__":
     print(sr.get_recorded_specimen_type("H22-391;S10;MSK1 - 2023-05-31 21.16.06.ndpi"))

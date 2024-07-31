@@ -7,6 +7,7 @@ from LLRunner.read.SST import *
 from LLRunner.read.SR import *
 from LLRunner.config import *
 from LLRunner.slide_transfer.sshos import SSHOS
+from LLRunner.custom_errors import PipelineNotFoundError
 
 
 def get_slide_metadata_row(wsi_name):
@@ -247,12 +248,13 @@ def decide_what_to_run(processing_filter_func, pipeline):
     The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
     """
 
-    assert pipeline in available_pipelines, f"{pipeline} is not an available pipeline."
-
     # first open the slide_metadata_path file
     slide_md = pd.read_csv(slide_metadata_path)
 
-    if pipeline == "BMA-diff":
+    if pipeline not in available_pipelines:
+        raise PipelineNotFoundError(pipeline)
+
+    elif pipeline == "BMA-diff":
         # only keep the rows in slide_md where reported_BMA is True
         slide_md = slide_md[
             slide_md["reported_BMA"]

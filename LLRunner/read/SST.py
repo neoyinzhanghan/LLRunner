@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import pandas as pd
 from LLRunner.read.read_config import *
+from LLRunner.custom_errors import AccessionNumberNotFoundError
 
 
 @dataclass
@@ -41,14 +42,3 @@ class SST:
 
 sst = SST()
 
-
-class AccessionNumberNotFoundError(Exception):
-    """
-    Raised when the accession number is not found in the slide scanning tracker.
-    """
-
-    def __init__(self, accession_number: str) -> None:
-        self.accession_number = accession_number
-        super().__init__(
-            f"Accession Number {accession_number} not found in the slide scanning tracker."
-        )
