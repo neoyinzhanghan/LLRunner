@@ -218,11 +218,11 @@ def delete_slide_from_tmp(wsi_name):
 
         slide_md = pd.read_csv(slide_metadata_path)
 
-        # find the row of the slide in the slide metadata
-        slide_md_row = slide_md.loc[slide_md["wsi_name"] == wsi_name]
+        # find the index of the row of the slide in the slide metadata
+        slide_md_idx = slide_md.index[slide_md["wsi_name"] == wsi_name]
 
-        # update the slide metadata
-        slide_md_row.iloc[:, slide_md.columns.get_loc("in_tmp_slide_dir")] = False
+        # update the slide metadata directly using .loc
+        slide_md.loc[slide_md_idx, "in_tmp_slide_dir"] = False
 
         slide_md.to_csv(slide_metadata_path, index=False)
 
