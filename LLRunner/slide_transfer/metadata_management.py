@@ -194,6 +194,7 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
     """
 
     sshos = SSHOS()
+    sshos.connect()
 
     # first get the list of all the slides in the slide_source_dir
     wsi_names = [
