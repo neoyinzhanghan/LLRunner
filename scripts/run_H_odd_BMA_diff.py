@@ -1,6 +1,6 @@
 from tqdm import tqdm
 from LLRunner.slide_transfer.metadata_management import (
-    pool_metadata_one_time,
+    initialize_reported_bma_metadata,
     decide_what_to_run,
 )
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     def identity_filter(pipeline_history_df):
         return pipeline_history_df
 
-    pool_metadata_one_time(wsi_name_filter_func=H_odd_filter, overwrite=True)
+    initialize_reported_bma_metadata(wsi_name_filter_func=H_odd_filter, overwrite=True)
 
     wsi_names_to_run = decide_what_to_run(
         wsi_name_filter_func=H_odd_filter,

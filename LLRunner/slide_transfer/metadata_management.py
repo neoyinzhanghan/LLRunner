@@ -187,7 +187,7 @@ def add_bma_diff_metadata_row(wsi_name):
     update_bma_diff_metadata(metadata_row_dct, overwrite=True)
 
 
-def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
+def initialize_reported_bma_metadata(wsi_name_filter_func, overwrite=False):
     """Look for all the slides in the slide_source_dir and update the slide metadata file.
     wsi_name_filter_func is a function that takes in a wsi_name and returns True if the slide should be updated in the metadata file.
     """
@@ -218,9 +218,7 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
 
         for wsi_name in tqdm(wsi_names, desc="Pooling and updating metadata"):
             metadata_row_dct = get_slide_metadata_row(wsi_name)
-            update_slide_metadata(
-                metadata_row_dct=metadata_row_dct, overwrite=overwrite
-            )
+            update_slide_metadata(metadata_row_dct, overwrite=overwrite)
 
             if metadata_row_dct["reported_BMA"]:
                 bma_metadata_row_dct = get_bma_diff_metadata_row(wsi_name)
