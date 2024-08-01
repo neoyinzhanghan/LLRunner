@@ -195,7 +195,7 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
         except Exception as e:
             slide_metadata_row["level_0_mpp_error"] = True
 
-    update_slide_metadata(metadata_row_dct=slide_metadata_row)
+    update_slide_metadata(metadata_row_dct=slide_metadata_row, overwrite=True)
 
 
 def delete_slide_from_tmp(wsi_name):

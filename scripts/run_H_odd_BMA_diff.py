@@ -38,19 +38,19 @@ if __name__ == "__main__":
 
     print(f"Found {len(wsi_names_to_run)} slides to run the BMA-diff pipeline on.")
 
-    # for wsi_name in tqdm(
-    #     wsi_names_to_run,
-    #     desc="Running BMA-diff pipeline on slides",
-    #     total=len(wsi_names_to_run),
-    # ):
-    #     run_one_slide(
-    #         wsi_name,
-    #         pipeline="BMA-diff",
-    #         copy_slide=True,
-    #         delete_slide=True,
-    #         note="Running BMA-diff Pipeline on H-odd-year slides reported as BMA in part description.",
-    #         hoarding=True,
-    #         continue_on_error=True,
-    #         do_extract_features=False,
-    #         check_specimen_clf=False,
-    #     )
+    for wsi_name in tqdm(
+        wsi_names_to_run,
+        desc="Running BMA-diff pipeline on slides",
+        total=len(wsi_names_to_run),
+    ):
+        run_one_slide(
+            wsi_name,
+            pipeline="BMA-diff",
+            copy_slide=True,
+            delete_slide=False,
+            note="Running BMA-diff Pipeline on H-odd-year slides reported as BMA in part description.",
+            hoarding=True,
+            continue_on_error=True,
+            do_extract_features=False,
+            check_specimen_clf=False,
+        )
