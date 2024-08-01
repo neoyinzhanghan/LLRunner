@@ -28,7 +28,7 @@ if __name__ == "__main__":
     def identity_filter(pipeline_history_df):
         return pipeline_history_df
 
-    initialize_reported_bma_metadata(wsi_name_filter_func=H_odd_filter, overwrite=True)
+    initialize_reported_bma_metadata(wsi_name_filter_func=H_odd_filter, overwrite=False)
 
     wsi_names_to_run = decide_what_to_run(
         wsi_name_filter_func=H_odd_filter,
