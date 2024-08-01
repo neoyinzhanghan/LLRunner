@@ -130,7 +130,7 @@ def get_bma_diff_metadata_row(wsi_name):
     return row_dct
 
 
-def update_slide_metadata(metadata_row_dct, overwrite=True):
+def update_slide_metadata(metadata_row_dct, overwrite=False):
     """Update the slide metadata file by adding the new metadata row to the slide metadata file.
     If the row with the same slide name is already in the metadata file, then do nothing.
     Unless overwrite is set to True, then overwrite the row in the metadata file.
@@ -145,6 +145,7 @@ def update_slide_metadata(metadata_row_dct, overwrite=True):
 
     # check to see if there is a row with the same slide name first
     if wsi_name in df["wsi_name"].values:
+        print("TRUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")  
         if overwrite:
             df = df[df["wsi_name"] != wsi_name]
             df = pd.concat([df, new_df_row], ignore_index=True)
@@ -155,7 +156,7 @@ def update_slide_metadata(metadata_row_dct, overwrite=True):
     df.to_csv(slide_metadata_path, index=False)
 
 
-def update_bma_diff_metadata(metadata_row_dct, overwrite=True):
+def update_bma_diff_metadata(metadata_row_dct, overwrite=False):
     """Update the bma diff metadata file by adding the new metadata row to the bma diff metadata file.
     If the row with the same slide name is already in the metadata file, then do nothing.
     Unless overwrite is set to True, then overwrite the row in the metadata file.
@@ -170,6 +171,7 @@ def update_bma_diff_metadata(metadata_row_dct, overwrite=True):
 
     # check to see if there is a row with the same slide name first
     if wsi_name in df["wsi_name"].values:
+        print("TRUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         if overwrite:
             df = df[df["wsi_name"] != wsi_name]
             df = pd.concat([df, new_df_row], ignore_index=True)
