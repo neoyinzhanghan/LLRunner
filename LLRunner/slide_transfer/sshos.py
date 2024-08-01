@@ -1,5 +1,6 @@
 import paramiko
 import subprocess
+import os
 from LLRunner.config import slide_source_hostname, slide_source_username
 
 
@@ -54,6 +55,13 @@ class SSHOS:
 
     def rsync_file(self, remote_path, local_dir):
         """Rsync a single file from the remote server to a local directory."""
+        # if the file already exists in the local directory, delete it first then rsync
+        filename = os.path.basename(remote_path)
+        local_file = os.path.join(local_dir, filename)
+
+        if os.path.exists(local_file):
+            os.remove(local_file)
+
         remote_file = f"{self.username}@{self.hostname}:{remote_path}"
         cmd = ["rsync", "-avz", "-e", "ssh", remote_file, local_dir]
         subprocess.run(cmd, check=True)
