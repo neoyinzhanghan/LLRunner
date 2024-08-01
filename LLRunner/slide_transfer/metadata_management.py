@@ -241,7 +241,7 @@ def pool_metadata_one_time(wsi_name_filter_func, overwrite=True):
         print(f"Number of Slides Missing Part Description: {missing_part_description}")
 
 
-def decide_what_to_run(processing_filter_func, pipeline):
+def decide_what_to_run(wsi_name_filter_func, processing_filter_func, pipeline):
     """Decide what to run based on the processing_filter_func and the pipeline.
     The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
     """
@@ -257,6 +257,9 @@ def decide_what_to_run(processing_filter_func, pipeline):
         slide_md = slide_md[
             slide_md["reported_BMA"]
         ]  # TODO DEPRECATED once we implement specimen classificaiton
+
+    # use wsi_name_filter_func to filter the slide_md based on wsi_name column
+    slide_md = slide_md[slide_md["wsi_name"].apply(wsi_name_filter_func)]
 
     # open the pipeline_run_history_path file
     df = pd.read_csv(pipeline_run_history_path)
@@ -286,22 +289,3 @@ def update_slide_time(wsi_name):
     slide_md.loc[slide_md["wsi_name"] == wsi_name, "slide_last_updated"] = (
         datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
-
-
-if __name__ == "__main__":
-
-    # Here is a filter function which is strict equality
-    def equality_filter(wsi_name):
-        return wsi_name == "H23-7455;S11;MSK1 - 2024-02-07 21.43.57.ndpi"
-
-    def H_filter(wsi_name):
-        """Look for slides with name that starts with H."""
-        return wsi_name.startswith("H")
-
-    def identity_filter(pipeline_history_df):
-        return pipeline_history_df
-
-    pool_metadata_one_time(wsi_name_filter_func=H_filter, overwrite=True)
-
-    wsi_names_to_run = decide_what_to_run(identity_filter, pipeline="BMA-diff")
-    print(f"Found {len(wsi_names_to_run)} slides to run the BMA-diff pipeline on.")
