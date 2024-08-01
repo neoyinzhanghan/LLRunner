@@ -1,6 +1,6 @@
 import paramiko
 import subprocess
-import os
+import time
 from LLRunner.config import slide_source_hostname, slide_source_username
 
 
@@ -53,18 +53,28 @@ class SSHOS:
         )
         return stdout.read().decode().strip() == "True"
 
-    def rsync_file(self, remote_path, local_dir):
-        """Rsync a single file from the remote server to a local directory."""
-        # if the file already exists in the local directory, delete it first then rsync
-        filename = os.path.basename(remote_path)
-        local_file = os.path.join(local_dir, filename)
-
-        if os.path.exists(local_file):
-            os.remove(local_file)
-
+    def rsync_file(self, remote_path, local_dir, retries=5, backoff_factor=1.5):
+        """Rsync a single file from the remote server to a local directory with retry logic."""
         remote_file = f"{self.username}@{self.hostname}:{remote_path}"
         cmd = ["rsync", "-avz", "-e", "ssh", remote_file, local_dir]
-        subprocess.run(cmd, check=True)
+        attempt = 0
+
+        while attempt < retries:
+            try:
+                subprocess.run(cmd, check=True)
+                print("Rsync successful.")
+                break
+            except subprocess.CalledProcessError as e:
+                attempt += 1
+                if attempt < retries:
+                    sleep_time = backoff_factor**attempt
+                    print(
+                        f"Rsync failed (attempt {attempt}/{retries}). Retrying in {sleep_time} seconds..."
+                    )
+                    time.sleep(sleep_time)
+                else:
+                    print(f"Rsync failed after {retries} attempts.")
+                    raise e
 
     def rsync_dir(self, remote_dir, local_dir):
         """Rsync an entire directory from the remote server to a local directory."""
