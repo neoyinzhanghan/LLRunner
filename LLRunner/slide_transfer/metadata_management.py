@@ -145,7 +145,6 @@ def update_slide_metadata(metadata_row_dct, overwrite=False):
 
     # check to see if there is a row with the same slide name first
     if wsi_name in df["wsi_name"].values:
-        print("TRUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")  
         if overwrite:
             df = df[df["wsi_name"] != wsi_name]
             df = pd.concat([df, new_df_row], ignore_index=True)
@@ -171,7 +170,6 @@ def update_bma_diff_metadata(metadata_row_dct, overwrite=False):
 
     # check to see if there is a row with the same slide name first
     if wsi_name in df["wsi_name"].values:
-        print("TRUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         if overwrite:
             df = df[df["wsi_name"] != wsi_name]
             df = pd.concat([df, new_df_row], ignore_index=True)
