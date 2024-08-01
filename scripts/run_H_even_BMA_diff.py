@@ -48,7 +48,7 @@ if __name__ == "__main__":
             pipeline="BMA-diff",
             copy_slide=True,
             delete_slide=True,
-            note="Running Pipeling on H-even-year slides reported as BMA in part description.",
+            note="Running BMA-diff Pipeline on H-even-year slides reported as BMA in part description.",
             hoarding=True,
             continue_on_error=True,
             do_extract_features=False,
