@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 results_dir = "/media/hdd3/neo/results_dir"
 save_dir = "/media/hdd3/neo/NL_examples"
-num_regions = 20
+num_regions = 100
 Dx = "Normal BMA"
 
 # if the save_dir does not exist, create it
