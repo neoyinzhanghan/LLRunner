@@ -835,7 +835,7 @@ if __name__ == "__main__":
     # TESTING SSH VERSION
     ##########################################
 
-    hostname = "172.28.164.114x"
+    hostname = "172.28.164.114"
     username = "greg"
     remote_result_dir = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-31 23:06:08"
 
