@@ -523,7 +523,7 @@ class BMAResultSSH:
     Class for keeping track of the results of the LLRunner on a BMA slide.
 
     === Class Attributes ===
-    -- result_dir: the directory where the results are stored
+    -- remote_result_dir: the directory where the results are stored
     -- result_folder_name: the name of the folder where the results are stored
     -- pipeline: result_folder_name.split("_")[0]
     -- datetime_processed: result_folder_name.split("_")[1]
@@ -839,7 +839,7 @@ if __name__ == "__main__":
     username = "greg"
     remote_result_dir = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-31 23:06:08"
 
-    bma_result = BMAResultSSH(
+    bma_result_ssh = BMAResultSSH(
         hostname=hostname,
         username=username,
         remote_result_dir=remote_result_dir,
@@ -847,22 +847,21 @@ if __name__ == "__main__":
         backoff_factor=2,  # Optional: set the backoff factor for rsync, defaults to 2
     )
 
-    print(f"Slide result path: {bma_result.result_dir}")
+    # Print basic information
+    print(f"Slide result path: {bma_result.remote_result_dir}")
     print(f"Pipeline: {bma_result.pipeline}")
     print(f"Datetime processed: {bma_result.datetime_processed}")
-    print(f"Error: {bma_result.has_error()}")
+    print(f"Error: {bma_result.error}")
 
-    # now all the methods should work
+    # Use the methods to get results
     print(f"Stacked differential: {bma_result.get_stacked_differential()}")
     print(f"One hot differential: {bma_result.get_one_hot_differential()}")
     print(f"Grouped differential: {bma_result.get_grouped_differential()}")
-    print(
-        f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}"
-    )
+    print(f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}")
     print(f"Raw counts: {bma_result.get_raw_counts()}")
     print(f"Grouped raw counts: {bma_result.get_grouped_raw_counts()}")
 
-    # now print the images
+    # Print the images
     grid_rep = bma_result.get_grid_rep()
     confidence_heatmap = bma_result.get_confidence_heatmap()
     (
@@ -874,7 +873,11 @@ if __name__ == "__main__":
     ) = bma_result.get_focus_regions()
 
     print(f"Grid rep: {grid_rep}")
+    grid_rep.show()  # Display the grid rep image
+
     print(f"Confidence heatmap: {confidence_heatmap}")
+    confidence_heatmap.show()  # Display the confidence heatmap image
+
     for (
         top_region_image,
         top_region_annotated_image,
@@ -889,27 +892,31 @@ if __name__ == "__main__":
         high_mag_confidences,
     ):
         print(f"Top region image: {top_region_image}")
+        top_region_image.show()  # Display each top region image
+
         print(f"Top region annotated image: {top_region_annotated_image}")
+        top_region_annotated_image.show()  # Display each annotated image
+
         print(f"Region idx: {region_idx}")
         print(f"Low mag confidence: {low_mag_confidence}")
         print(f"High mag confidence: {high_mag_confidence}")
 
-    # now print the breakdowns
+    # Print the breakdowns
     runtime_breakdown = bma_result.get_runtime_breakdown()
     storage_consumption_breakdown = bma_result.get_storage_consumption_breakdown()
-    run_history = bma_result.get_run_history()
-    wsi_name = bma_result.get_wsi_name()
+    # run_history = bma_result.get_run_history()  # Assuming this method is implemented
 
     print(f"Runtime breakdown: {runtime_breakdown}")
     print(f"Storage consumption breakdown: {storage_consumption_breakdown}")
-    print(f"Run history: {run_history}")
-    print(f"WSI name: {wsi_name}")
+    # print(f"Run history: {run_history}")  # Uncomment if the method is implemented
 
-    # now print the metadata
+    # Print metadata information
+    # wsi_name = bma_result.get_wsi_name()  # Assuming this method is implemented
     slide_metadata_dict = bma_result.get_slide_metadata_dict()
     part_description = bma_result.get_part_description()
     Dx, sub_Dx = bma_result.get_Dx_and_sub_Dx()
 
+    # print(f"WSI name: {wsi_name}")  # Uncomment if the method is implemented
     print(f"Slide metadata dict: {slide_metadata_dict}")
     print(f"Part description: {part_description}")
     print(f"Dx: {Dx}")
