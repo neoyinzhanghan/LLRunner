@@ -507,6 +507,255 @@ class BMAResult:
         pass  # TODO, we need to check the integrity of the stored differential and make sure that it actually matches with the differential computed here.
 
 
+import paramiko
+import pandas as pd
+from PIL import Image
+from io import BytesIO
+import os
+import math
+from pathlib import Path
+import random
+import time
+
+
+class BMAResultSSH:
+    """
+    Class for keeping track of the results of the LLRunner on a BMA slide.
+
+    === Class Attributes ===
+    -- result_dir: the directory where the results are stored
+    -- result_folder_name: the name of the folder where the results are stored
+    -- pipeline: result_folder_name.split("_")[0]
+    -- datetime_processed: result_folder_name.split("_")[1]
+    -- error: a boolean indicating if the result directory is an error directory
+    -- cell_info: a pandas DataFrame containing the cell information
+    -- hostname: the hostname of the server where the results are stored
+    -- username: the username to login to the server
+    -- max_retries: the maximum number of retries for rsync
+    -- backoff_factor: the backoff factor for rsync
+
+    KEY ASSUMPTIONS:
+    -- the file location for metadata files is the same on the server as it is on the local machine
+    """
+
+    def __init__(
+        self,
+        hostname,
+        username,
+        remote_result_dir,
+        rsa_key_path,
+        max_retries=3,
+        backoff_factor=2,
+    ):
+        """Use the result directory to get the results of the LLRunner on a remote machine."""
+
+        self.hostname = hostname
+        self.username = username
+        self.remote_result_dir = Path(remote_result_dir)
+        self.max_retries = max_retries
+        self.backoff_factor = backoff_factor
+
+        # Set up the SSH client and SFTP
+        self.ssh_client = paramiko.SSHClient()
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh_client.connect(
+            hostname=self.hostname, username=self.username, key_filename=rsa_key_path
+        )
+        self.sftp_client = self.ssh_client.open_sftp()
+
+        # Check if the result directory exists on the remote server
+        try:
+            self.sftp_client.stat(str(self.remote_result_dir))
+        except FileNotFoundError:
+            raise NotADirectoryError(
+                f"Result directory {self.remote_result_dir} does not exist on the remote server."
+            )
+
+        # Get the name of the folder where the results are stored
+        self.result_folder_name = self.remote_result_dir.name
+
+        # Get the pipeline from the result_folder_name
+        self.pipeline = self.result_folder_name.split("_")[0]
+
+        # Get the datetime_processed from the result_folder_name
+        self.datetime_processed = self.result_folder_name.split("_")[1]
+
+        # Second check if the result directory's folder name starts with "ERROR_"
+        self.error = self.result_folder_name.startswith("ERROR_")
+
+        # Load cell_info from the remote CSV file
+        with self.sftp_client.open(
+            str(self.remote_result_dir / "cells" / "cells_info.csv"), "r"
+        ) as f:
+            self.cell_info = pd.read_csv(f)
+
+    def get_stacked_differential(self):
+        """Compute the stacked differential from the cell info."""
+        cell_columns = self.cell_info[cellnames]
+        average_probabilities = cell_columns.mean()
+        return average_probabilities.to_dict()
+
+    def get_one_hot_differential(self):
+        """Compute the one-hot differential from the cell info."""
+        cell_columns = self.cell_info[cellnames]
+        predicted_classes = cell_columns.idxmax(axis=1)
+        one_hot_differential = predicted_classes.value_counts(normalize=True)
+        return one_hot_differential.to_dict()
+
+    def get_grouped_differential(self):
+        """Compute the grouped differential from the cell info."""
+        self.cell_info[omitted_classes] = 0
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+        self.cell_info = self.cell_info[
+            ~self.cell_info["cell_class"].isin(removed_classes)
+        ]
+        self.cell_info["grouped_class"] = self.cell_info["cell_class"].apply(
+            lambda x: next(
+                (
+                    grouped_class
+                    for grouped_class in differential_group_dict
+                    if x in differential_group_dict[grouped_class]
+                ),
+                None,
+            )
+        )
+        grouped_differential = self.cell_info["grouped_class"].value_counts(
+            normalize=True
+        )
+        return grouped_differential.to_dict()
+
+    def get_grouped_stacked_differential(self):
+        """Compute the grouped stacked differential from the cell info."""
+        self.cell_info[omitted_classes] = 0
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+        self.cell_info = self.cell_info[
+            ~self.cell_info["cell_class"].isin(removed_classes)
+        ]
+
+        for grouped_class, cellnames_list in differential_group_dict.items():
+            self.cell_info[grouped_class + "_grouped_stacked"] = self.cell_info[
+                cellnames_list
+            ].sum(axis=1)
+
+        grouped_stacked_differential = self.cell_info[
+            [
+                grouped_class + "_grouped_stacked"
+                for grouped_class in differential_group_dict
+            ]
+        ].mean()
+
+        prob_dict = grouped_stacked_differential.to_dict()
+        prob_sum = sum(prob_dict.values())
+        return {key: value / prob_sum for key, value in prob_dict.items()}
+
+    def get_raw_counts(self):
+        """Compute the raw counts of cells from the cell info."""
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+        raw_counts = self.cell_info["cell_class"].value_counts()
+        return raw_counts.to_dict()
+
+    def get_grouped_raw_counts(self):
+        """Compute the grouped raw counts of cells from the cell info."""
+        self.cell_info[omitted_classes] = 0
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+        self.cell_info = self.cell_info[
+            ~self.cell_info["cell_class"].isin(removed_classes)
+        ]
+        self.cell_info["grouped_class"] = self.cell_info["cell_class"].apply(
+            lambda x: next(
+                (
+                    grouped_class
+                    for grouped_class in differential_group_dict
+                    if x in differential_group_dict[grouped_class]
+                ),
+                None,
+            )
+        )
+        grouped_raw_counts = self.cell_info["grouped_class"].value_counts()
+        return grouped_raw_counts.to_dict()
+
+    def get_grid_rep(self):
+        """Return the grid rep image of the slide."""
+        grid_rep_path = self.remote_result_dir / "top_view_grid_rep.png"
+        with self.sftp_client.open(str(grid_rep_path), "rb") as f:
+            return Image.open(BytesIO(f.read()))
+
+    def get_confidence_heatmap(self):
+        """Return the confidence heatmap image of the slide."""
+        confidence_heatmap_path = self.remote_result_dir / "confidence_heatmap.png"
+        with self.sftp_client.open(str(confidence_heatmap_path), "rb") as f:
+            return Image.open(BytesIO(f.read()))
+
+    def get_runtime_breakdown(self):
+        """Return the runtime breakdown of the slide."""
+        runtime_data_path = self.remote_result_dir / "runtime_data.csv"
+        with self.sftp_client.open(str(runtime_data_path), "r") as f:
+            runtime_data_dict = self.csv_to_dict(f)
+        return runtime_data_dict
+
+    def csv_to_dict(self, file_obj):
+        """Convert a CSV file into a dictionary."""
+        result_dict = {}
+        reader = pd.read_csv(file_obj)
+        for _, row in reader.iterrows():
+            key = row[0]
+            value = float(row[1])
+            result_dict[key] = value
+        return result_dict
+
+    def _convert_size(self, size_bytes):
+        """Convert bytes to a more human-readable format."""
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 2)
+        return f"{s} {size_name[i]}"
+
+    def get_storage_consumption_breakdown(self):
+        """Return the storage consumption breakdown of the slide result folder."""
+        breakdown = {}
+        for attr in self.sftp_client.listdir_attr(str(self.remote_result_dir)):
+            if not attr.filename.startswith("."):
+                extension = os.path.splitext(attr.filename)[1].lower()
+                if extension not in breakdown:
+                    breakdown[extension] = 0
+                breakdown[extension] += attr.st_size
+
+        breakdown_readable = {
+            ext: self._convert_size(size) for ext, size in breakdown.items()
+        }
+
+        return breakdown_readable
+
+    def rsync_files(self, remote_source, local_dest, options="-avz"):
+        """Use rsync to copy files from remote_source to local_dest with retry logic."""
+        for attempt in range(self.max_retries):
+            try:
+                command = f"rsync {options} {self.username}@{self.hostname}:{remote_source} {local_dest}"
+                os.system(command)
+                break  # Exit loop if successful
+            except Exception as e:
+                if attempt < self.max_retries - 1:
+                    wait_time = self.backoff_factor * (2**attempt)
+                    print(
+                        f"Attempt {attempt + 1} failed: {e}. Retrying in {wait_time} seconds..."
+                    )
+                    time.sleep(wait_time)
+                else:
+                    raise RuntimeError(
+                        f"Rsync failed after {self.max_retries} attempts: {e}"
+                    )
+
+    def __del__(self):
+        """Cleanup the SSH and SFTP connections."""
+        if hasattr(self, "sftp_client") and self.sftp_client:
+            self.sftp_client.close()
+        if hasattr(self, "ssh_client") and self.ssh_client:
+            self.ssh_client.close()
+
+
 if __name__ == "__main__":
     slide_result_path = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-25 08:22:42"
 
@@ -579,3 +828,21 @@ if __name__ == "__main__":
     print(f"Part description: {part_description}")
     print(f"Dx: {Dx}")
     print(f"Sub Dx: {sub_Dx}")
+
+    ##########################################
+    # TESTING SSH VERSION
+    ##########################################
+
+    hostname = "172.28.164.114x"
+    username = "greg"
+    remote_result_dir = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-31 23:06:08"
+    rsa_key_path = "/home/greg/.ssh/id_rsa"
+
+    bma_result = BMAResultSSH(
+        hostname=hostname,
+        username=username,
+        remote_result_dir=remote_result_dir,
+        rsa_key_path=rsa_key_path,
+        max_retries=5,  # Optional: set the max retries for rsync, defaults to 3
+        backoff_factor=2,  # Optional: set the backoff factor for rsync, defaults to 2
+    )
