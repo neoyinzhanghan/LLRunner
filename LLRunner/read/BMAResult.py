@@ -22,8 +22,11 @@ def csv_to_dict(file_path):
 def has_error(result_dir):
     """Check if there results directory corresponds to an error run."""
 
+    # result_dir is a string, make it a Path object
+    result_dir_Path = Path(result_dir)
+
     # first split the result_dir into its components by _, first part is the pipeline and the second part is the datetime_processed
-    pipeline, datetime_processed = result_dir.name.split("_", 1)
+    pipeline, datetime_processed = result_dir_Path.name.split("_", 1)
 
     # read the pipeline_run_history.csv file
     pipeline_run_history = pd.read_csv(pipeline_run_history_path)
@@ -541,6 +544,6 @@ if __name__ == "__main__":
     print(f"Part description: {part_description}")
     print(f"Dx: {Dx}")
     print(f"Sub Dx: {sub_Dx}")
-    
+
 
 
