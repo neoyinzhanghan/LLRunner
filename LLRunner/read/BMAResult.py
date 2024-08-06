@@ -870,7 +870,6 @@ class BMAResultSSH:
 
     def get_run_history(self):
         """Return the run history of the slide."""
-        pipeline_run_history_path = self.remote_result_dir / "pipeline_run_history.csv"
 
         with self.sftp_client.open(str(pipeline_run_history_path), "r") as f:
             run_history = pd.read_csv(f)
