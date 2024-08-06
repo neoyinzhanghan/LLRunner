@@ -508,7 +508,7 @@ class BMAResult:
 
 
 if __name__ == "__main__":
-    slide_result_path = "/media/hdd3/neo/results_dir/BMA-diff_2024-08-03 21:15:14"
+    slide_result_path = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-25 08:22:42"
 
     bma_result = BMAResult(slide_result_path)
 
