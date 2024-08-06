@@ -2,6 +2,7 @@ import os
 import random
 import csv
 import pandas as pd
+import math
 from pathlib import Path
 from PIL import Image
 from LLRunner.read.read_config import *
@@ -380,6 +381,16 @@ class BMAResult:
         runtime_data_dict = csv_to_dict(runtime_data_path)
 
         return runtime_data_dict
+
+    def _convert_size(self, size_bytes):
+        """Convert bytes to a more human-readable format (KB, MB, GB, etc.)."""
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 2)
+        return f"{s} {size_name[i]}"    
 
     def get_storage_consumption_breakdown(self):
         """Return the storage consumption breakdown of the slide result folder."""
