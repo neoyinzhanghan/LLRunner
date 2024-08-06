@@ -839,7 +839,7 @@ if __name__ == "__main__":
     username = "greg"
     remote_result_dir = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-31 23:06:08"
 
-    bma_result_ssh = BMAResultSSH(
+    bma_result = BMAResultSSH(
         hostname=hostname,
         username=username,
         remote_result_dir=remote_result_dir,
