@@ -29,7 +29,7 @@ def has_error(result_dir):
     # first split the result_dir into its components by _, first part is the pipeline and the second part is the datetime_processed
     pipeline, datetime_processed = result_dir_Path.name.split("_", 1)
 
-    # read the pipeline_run_history.csv file
+    # read the pipeline_run_history file
     pipeline_run_history = pd.read_csv(pipeline_run_history_path)
 
     # look for the row in the pipeline_run_history dataframe that corresponds to the pipeline and datetime_processed
@@ -390,7 +390,7 @@ class BMAResult:
         i = int(math.floor(math.log(size_bytes, 1024)))
         p = math.pow(1024, i)
         s = round(size_bytes / p, 2)
-        return f"{s} {size_name[i]}"    
+        return f"{s} {size_name[i]}"
 
     def get_storage_consumption_breakdown(self):
         """Return the storage consumption breakdown of the slide result folder."""
@@ -417,10 +417,10 @@ class BMAResult:
 
     def get_run_history(self):
         """Return the run history of the slide.
-        Which is located at the directory/run_history.csv.
+        Which is located at the pipeline_run_history file.
         """
 
-        run_history = pd.read_csv(self.result_dir / "run_history.csv")
+        run_history = pd.read_csv(pipeline_run_history_path)
 
         # look for the row in the run_history dataframe that corresponds to the pipeline and datetime_processed
         row = run_history[
@@ -506,6 +506,7 @@ class BMAResult:
     def get_stored_differential(self):  # TODO We will do this manually for now
         pass  # TODO, we need to check the integrity of the stored differential and make sure that it actually matches with the differential computed here.
 
+
 if __name__ == "__main__":
     slide_result_path = "/media/hdd3/neo/results_dir/BMA-diff_2024-08-03 21:15:14"
 
@@ -515,23 +516,43 @@ if __name__ == "__main__":
     print(f"Pipeline: {bma_result.pipeline}")
     print(f"Datetime processed: {bma_result.datetime_processed}")
     print(f"Error: {bma_result.has_error()}")
-    
+
     # now all the methods should work
     print(f"Stacked differential: {bma_result.get_stacked_differential()}")
     print(f"One hot differential: {bma_result.get_one_hot_differential()}")
     print(f"Grouped differential: {bma_result.get_grouped_differential()}")
-    print(f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}")
+    print(
+        f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}"
+    )
     print(f"Raw counts: {bma_result.get_raw_counts()}")
     print(f"Grouped raw counts: {bma_result.get_grouped_raw_counts()}")
-    
+
     # now print the images
     grid_rep = bma_result.get_grid_rep()
     confidence_heatmap = bma_result.get_confidence_heatmap()
-    top_regions_images, top_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences = bma_result.get_focus_regions()
+    (
+        top_regions_images,
+        top_regions_annotated_images,
+        region_idxs,
+        low_mag_confidences,
+        high_mag_confidences,
+    ) = bma_result.get_focus_regions()
 
     print(f"Grid rep: {grid_rep}")
     print(f"Confidence heatmap: {confidence_heatmap}")
-    for top_region_image, top_region_annotated_image, region_idx, low_mag_confidence, high_mag_confidence in zip(top_regions_images, top_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences):
+    for (
+        top_region_image,
+        top_region_annotated_image,
+        region_idx,
+        low_mag_confidence,
+        high_mag_confidence,
+    ) in zip(
+        top_regions_images,
+        top_regions_annotated_images,
+        region_idxs,
+        low_mag_confidences,
+        high_mag_confidences,
+    ):
         print(f"Top region image: {top_region_image}")
         print(f"Top region annotated image: {top_region_annotated_image}")
         print(f"Region idx: {region_idx}")
@@ -543,7 +564,6 @@ if __name__ == "__main__":
     storage_consumption_breakdown = bma_result.get_storage_consumption_breakdown()
     run_history = bma_result.get_run_history()
     wsi_name = bma_result.get_wsi_name()
-
 
     print(f"Runtime breakdown: {runtime_breakdown}")
     print(f"Storage consumption breakdown: {storage_consumption_breakdown}")
@@ -559,6 +579,3 @@ if __name__ == "__main__":
     print(f"Part description: {part_description}")
     print(f"Dx: {Dx}")
     print(f"Sub Dx: {sub_Dx}")
-
-
-
