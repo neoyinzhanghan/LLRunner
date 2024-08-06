@@ -514,7 +514,7 @@ if __name__ == "__main__":
     # now print the images
     grid_rep = bma_result.get_grid_rep()
     confidence_heatmap = bma_result.get_confidence_heatmap()
-    top_regions_images, top_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences = bma_result.get_top_regions()
+    top_regions_images, top_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences = bma_result.get_focus_regions()
 
     print(f"Grid rep: {grid_rep}")
     print(f"Confidence heatmap: {confidence_heatmap}")
