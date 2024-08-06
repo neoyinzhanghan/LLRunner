@@ -566,6 +566,166 @@ class BMAResultSSH:
         ) as f:
             self.cell_info = pd.read_csv(f)
 
+    def get_stacked_differential(self):
+        """In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
+        Take the average of the probabilities for each cell type and return a dictionary with the cell type as the key and the average probability as the value.
+        """
+
+        # get the columns corresponding to the cell types
+        cell_columns = self.cell_info[cellnames]
+
+        # take the average of the probabilities for each cell type
+        average_probabilities = cell_columns.mean()
+
+        # return a dictionary with the cell type as the key and the average probability as the value
+        return average_probabilities.to_dict()
+
+    def get_one_hot_differential(self):
+        """
+        In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
+        The predicted class is the class with the highest probability, return a dictionary with the cell type as the key and the proportion of cells predicted as that type as the value.
+        """
+
+        # get the columns corresponding to the cell types
+        cell_columns = self.cell_info[cellnames]
+
+        # get the predicted class for each cell
+        predicted_classes = cell_columns.idxmax(axis=1)
+
+        # get the proportion of cells predicted as each cell type
+        one_hot_differential = predicted_classes.value_counts(normalize=True)
+
+        # return a dictionary with the cell type as the key and the proportion of cells predicted as that type as the value
+        return one_hot_differential.to_dict()
+
+    def get_grouped_differential(self):
+        """
+        First set the probability in the omitted classes to 0.
+        Then classify the cells into the cellnames classes and remove all the cells in the removed classes.
+        Finally, give the cell a class from the differential_group_dict based on their cellname classes.
+        (The differential_group_dict should map a grouped class to the a list of cellname classes that grouped class contains)
+        """
+
+        # set the values of columns corresponding to the omitted classes to 0
+        self.cell_info[omitted_classes] = 0
+
+        # classify the cells into the cellnames classes
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+
+        # remove all the cells in the removed classes
+        self.cell_info = self.cell_info[
+            ~self.cell_info["cell_class"].isin(removed_classes)
+        ]
+
+        # give the cell a class from the differential_group_dict based on their cellname classes
+        self.cell_info["grouped_class"] = self.cell_info["cell_class"].apply(
+            lambda x: next(
+                (
+                    grouped_class
+                    for grouped_class in differential_group_dict
+                    if x in differential_group_dict[grouped_class]
+                ),
+                None,
+            )
+        )
+
+        # get the proportion of cells in each grouped class
+        grouped_differential = self.cell_info["grouped_class"].value_counts(
+            normalize=True
+        )
+
+        # return a dictionary with the grouped class as the key and the proportion of cells in that class as the value
+        return grouped_differential.to_dict()
+
+    def get_grouped_stacked_differential(self):
+        """First set the omitted class probabilities to zero, and then remove all rows where the top probability class is in removed_classes.
+        Then use the differential_group_dict to group the cells into the grouped classes.
+        But you stack the probablities together, for example if "neutrophils/bands": ["M5", "M6"]" then you sum the probabilities of M5 and M6 together to get the probability of neutrophils/bands.
+        Then return a dictionary with the grouped class as the key and the average probability as the value.
+        """
+
+        # set the values of columns corresponding to the omitted classes to 0
+        self.cell_info[omitted_classes] = 0
+
+        # classify the cells into the cellnames classes
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+
+        # remove all the cells in the removed classes
+        self.cell_info = self.cell_info[
+            ~self.cell_info["cell_class"].isin(removed_classes)
+        ]
+
+        for grouped_class, cellnames_list in differential_group_dict.items():
+            self.cell_info[grouped_class + "_grouped_stacked"] = self.cell_info[
+                cellnames_list
+            ].sum(axis=1)
+
+        # get the average probability of cells in each grouped class
+        grouped_stacked_differential = self.cell_info[
+            [
+                grouped_class + "_grouped_stacked"
+                for grouped_class in differential_group_dict
+            ]
+        ].mean()
+
+        # return a dictionary with the grouped class as the key and the average probability of cells in that class as the value
+        prob_dict = grouped_stacked_differential.to_dict()
+
+        # normalize the probabilities so it sums to 1
+        prob_sum = sum(prob_dict.values())
+
+        return {key: value / prob_sum for key, value in prob_dict.items()}
+
+    def get_raw_counts(self):
+        """
+        Return the raw counts of the cells in the cell_info dataframe after classifying the cells into the cellnames classes.
+        """
+
+        # classify the cells into the cellnames classes
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+
+        # get the raw counts of the cells in the cell_info dataframe
+        raw_counts = self.cell_info["cell_class"].value_counts()
+
+        # return a dictionary with the cell type as the key and the raw count of cells of that type as the value
+        return raw_counts.to_dict()
+
+    def get_grouped_raw_counts(self):
+        """
+        Return the raw counts of the cells in the cell_info dataframe after classifying the cells into the cellnames classes
+        after setting omitted class probabilities to 0 and removing all the cells in the removed classes.
+        The counts should be grouped based on the differential_group_dict.
+        """
+
+        # set the values of columns corresponding to the omitted classes to 0
+        self.cell_info[omitted_classes] = 0
+
+        # classify the cells into the cellnames classes
+        self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
+
+        # remove all the cells in the removed classes
+        self.cell_info = self.cell_info[
+            ~self.cell_info["cell_class"].isin(removed_classes)
+        ]
+
+        # give the cell a class from the differential_group_dict based on their cellname classes
+        self.cell_info["grouped_class"] = self.cell_info["cell_class"].apply(
+            lambda x: next(
+                (
+                    grouped_class
+                    for grouped_class in differential_group_dict
+                    if x in differential_group_dict[grouped_class]
+                ),
+                None,
+            )
+        )
+
+        # get the raw counts of the cells in the cell_info dataframe
+        grouped_raw_counts = self.cell_info["grouped_class"].value_counts()
+
+        # return a dictionary with the grouped class as the key and the raw count of cells in that class as the value
+        return grouped_raw_counts.to_dict()
+
     def has_error(self):
         return self.error
 
