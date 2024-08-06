@@ -908,6 +908,18 @@ class BMAResultSSH:
 
     def get_pipeline(self):
         return self.pipeline
+    
+    def get_grid_rep(self):
+        """Return the grid rep image of the slide.
+        Which is located at the directory/top_view_grid_rep.png.
+        Use PIL
+        """
+
+        grid_rep_path = self.remote_result_dir / "top_view_grid_rep.png"
+
+        with self.sftp_client.open(str(grid_rep_path), "rb") as f:
+            return Image.open(BytesIO(f.read()))
+
 
     def get_part_description(self):
         """Return the part_description of the slide."""
