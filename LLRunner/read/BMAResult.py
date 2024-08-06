@@ -280,11 +280,9 @@ class BMAResult:
         Use PIL
         """
 
-        confidence_heatmap_path = self.remote_result_dir / "confidence_heatmap.png"
+        confidence_heatmap_path = self.result_dir / "confidence_heatmap.png"
 
-        with self.sftp_client.open(str(confidence_heatmap_path), "rb") as f:
-            return Image.open(BytesIO(f.read()))
-
+        return Image.open(confidence_heatmap_path)
 
     def has_error(self):
         return self.error
@@ -730,6 +728,18 @@ class BMAResultSSH:
 
     def has_error(self):
         return self.error
+    
+    def get_confidence_heatmap(self):   
+        """Return the confidence heatmap image of the slide.
+        Which is located at the directory/confidence_heatmap.png.
+        Use PIL
+        """
+
+        confidence_heatmap_path = self.remote_result_dir / "confidence_heatmap.png"
+
+        with self.sftp_client.open(str(confidence_heatmap_path), "rb") as f:
+            return Image.open(BytesIO(f.read()))
+
 
     def get_region_confidence(self, region_idx):
         """Get the confidence scores for a specific region."""
