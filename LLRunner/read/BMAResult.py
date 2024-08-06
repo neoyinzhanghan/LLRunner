@@ -294,7 +294,7 @@ class BMAResult:
         ), f"Multiple regions with idx {region_idx} found in focus_regions_info.csv This should never happen and the pipeline log could be corrupted."
 
         # get the confidence of the region
-        low_mag_confidence = row["confidence_score"].values[0]
+        low_mag_confidence = row["adequate_confidence_score"].values[0]
 
         # now do the samething with the high_mag_focus_regions_info.csv file
         high_mag_focus_regions_info = pd.read_csv(
@@ -313,7 +313,7 @@ class BMAResult:
             len(row) == 1
         ), f"Multiple regions with idx {region_idx} found in high_mag_focus_regions_info.csv This should never happen and the pipeline log could be corrupted."
 
-        high_mag_confidence = row["confidence_score_high_mag"].values[0]
+        high_mag_confidence = row["adequate_confidence_score_high_mag"].values[0]
 
         return low_mag_confidence, high_mag_confidence
 
