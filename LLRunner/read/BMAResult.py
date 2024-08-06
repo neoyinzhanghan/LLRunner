@@ -898,7 +898,6 @@ class BMAResultSSH:
     def get_slide_metadata_dict(self):
         """Return the slide metadata dictionary."""
         wsi_name = self.get_wsi_name()
-        slide_metadata_path = self.remote_result_dir / "slide_metadata.csv"
 
         with self.sftp_client.open(str(slide_metadata_path), "r") as f:
             slide_metadata = pd.read_csv(f)
