@@ -301,14 +301,8 @@ class BMAResult:
             self.result_dir / "focus_regions" / "high_mag_focus_regions_info.csv"
         )
 
-        # print all th unique values if idx column
-        print(high_mag_focus_regions_info["idx"].unique())
-
-        import sys  
-        sys.exit()
-
         row = high_mag_focus_regions_info[
-            high_mag_focus_regions_info["idx"] == region_idx
+            high_mag_focus_regions_info["idx"] == int(region_idx)
         ]
 
         # if there is no row found, then just None
