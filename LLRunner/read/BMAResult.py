@@ -543,7 +543,6 @@ class BMAResultSSH:
         hostname,
         username,
         remote_result_dir,
-        rsa_key_path,
         max_retries=3,
         backoff_factor=2,
     ):
@@ -558,9 +557,7 @@ class BMAResultSSH:
         # Set up the SSH client and SFTP
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_client.connect(
-            hostname=self.hostname, username=self.username, key_filename=rsa_key_path
-        )
+        self.ssh_client.connect(hostname=self.hostname, username=self.username)
         self.sftp_client = self.ssh_client.open_sftp()
 
         # Check if the result directory exists on the remote server
@@ -841,13 +838,11 @@ if __name__ == "__main__":
     hostname = "172.28.164.114x"
     username = "greg"
     remote_result_dir = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-31 23:06:08"
-    rsa_key_path = "/home/greg/.ssh/id_rsa"
 
     bma_result = BMAResultSSH(
         hostname=hostname,
         username=username,
         remote_result_dir=remote_result_dir,
-        rsa_key_path=rsa_key_path,
         max_retries=5,  # Optional: set the max retries for rsync, defaults to 3
         backoff_factor=2,  # Optional: set the backoff factor for rsync, defaults to 2
     )
