@@ -341,7 +341,7 @@ class BMAResult:
         ]
 
         # for each focus region, the filename without the extension is the region id
-        region_idxs = [file.stem for file in focus_regions_images]
+        region_idxs = [file.stem for file in focus_regions_files]
 
         low_mag_confidences = []
         high_mag_confidences = []
