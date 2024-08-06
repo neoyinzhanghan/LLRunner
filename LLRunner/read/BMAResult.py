@@ -12,10 +12,10 @@ from LLRunner.read.read_config import *
 from LLRunner.config import pipeline_run_history_path, slide_metadata_path
 
 
-
 ####################################################################################################
 # HELPER FUNCTIONS
 ####################################################################################################
+
 
 def csv_to_dict(file_path):
     result_dict = {}
@@ -526,7 +526,15 @@ class BMAResult:
 
 
 class BMAResultSSH:
-    def __init__(self, hostname, username, remote_result_dir, rsa_key_path, max_retries=3, backoff_factor=2):
+    def __init__(
+        self,
+        hostname,
+        username,
+        remote_result_dir,
+        rsa_key_path=None,
+        max_retries=3,
+        backoff_factor=2,
+    ):
         """Initialize the BMAResultSSH class with remote SSH access."""
         self.hostname = hostname
         self.username = username
@@ -536,20 +544,26 @@ class BMAResultSSH:
 
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_client.connect(hostname=self.hostname, username=self.username, key_filename=rsa_key_path)
+        self.ssh_client.connect(
+            hostname=self.hostname, username=self.username, key_filename=rsa_key_path
+        )
         self.sftp_client = self.ssh_client.open_sftp()
 
         try:
             self.sftp_client.stat(str(self.remote_result_dir))
         except FileNotFoundError:
-            raise NotADirectoryError(f"Result directory {self.remote_result_dir} does not exist on the remote server.")
+            raise NotADirectoryError(
+                f"Result directory {self.remote_result_dir} does not exist on the remote server."
+            )
 
         self.result_folder_name = self.remote_result_dir.name
         self.pipeline = self.result_folder_name.split("_")[0]
         self.datetime_processed = self.result_folder_name.split("_")[1]
         self.error = self.result_folder_name.startswith("ERROR_")
 
-        with self.sftp_client.open(str(self.remote_result_dir / "cells" / "cells_info.csv"), "r") as f:
+        with self.sftp_client.open(
+            str(self.remote_result_dir / "cells" / "cells_info.csv"), "r"
+        ) as f:
             self.cell_info = pd.read_csv(f)
 
     def has_error(self):
@@ -557,28 +571,40 @@ class BMAResultSSH:
 
     def get_region_confidence(self, region_idx):
         """Get the confidence scores for a specific region."""
-        focus_regions_info_path = self.remote_result_dir / "focus_regions" / "focus_regions_info.csv"
-        high_mag_focus_regions_info_path = self.remote_result_dir / "focus_regions" / "high_mag_focus_regions_info.csv"
+        focus_regions_info_path = (
+            self.remote_result_dir / "focus_regions" / "focus_regions_info.csv"
+        )
+        high_mag_focus_regions_info_path = (
+            self.remote_result_dir / "focus_regions" / "high_mag_focus_regions_info.csv"
+        )
 
         with self.sftp_client.open(str(focus_regions_info_path), "r") as f:
             focus_regions_info = pd.read_csv(f)
 
         row = focus_regions_info[focus_regions_info["idx"] == int(region_idx)]
 
-        assert len(row) >= 1, f"Region with idx {region_idx} not found in focus_regions_info.csv"
-        assert len(row) == 1, f"Multiple regions with idx {region_idx} found. This should not happen."
+        assert (
+            len(row) >= 1
+        ), f"Region with idx {region_idx} not found in focus_regions_info.csv"
+        assert (
+            len(row) == 1
+        ), f"Multiple regions with idx {region_idx} found. This should not happen."
 
         low_mag_confidence = row["adequate_confidence_score"].values[0]
 
         with self.sftp_client.open(str(high_mag_focus_regions_info_path), "r") as f:
             high_mag_focus_regions_info = pd.read_csv(f)
 
-        row = high_mag_focus_regions_info[high_mag_focus_regions_info["idx"] == int(region_idx)]
+        row = high_mag_focus_regions_info[
+            high_mag_focus_regions_info["idx"] == int(region_idx)
+        ]
 
         if len(row) == 0:
             return low_mag_confidence, None
 
-        assert len(row) == 1, f"Multiple regions with idx {region_idx} found in high_mag_focus_regions_info.csv. This should not happen."
+        assert (
+            len(row) == 1
+        ), f"Multiple regions with idx {region_idx} found in high_mag_focus_regions_info.csv. This should not happen."
 
         high_mag_confidence = row["adequate_confidence_score_high_mag"].values[0]
 
@@ -586,8 +612,12 @@ class BMAResultSSH:
 
     def get_focus_regions(self, num_to_sample=5):
         """Return images of the top regions of the slide."""
-        high_mag_unannotated_dir = self.remote_result_dir / "focus_regions" / "high_mag_unannotated"
-        high_mag_annotated_dir = self.remote_result_dir / "focus_regions" / "high_mag_annotated"
+        high_mag_unannotated_dir = (
+            self.remote_result_dir / "focus_regions" / "high_mag_unannotated"
+        )
+        high_mag_annotated_dir = (
+            self.remote_result_dir / "focus_regions" / "high_mag_annotated"
+        )
 
         focus_regions_files = self.sftp_client.listdir(str(high_mag_unannotated_dir))
         focus_regions_files = [f for f in focus_regions_files if f.endswith(".jpg")]
@@ -597,9 +627,13 @@ class BMAResultSSH:
         focus_regions_images = []
         focus_regions_annotated_images = []
         for file_name in focus_regions_files_sample:
-            with self.sftp_client.open(str(high_mag_unannotated_dir / file_name), "rb") as f:
+            with self.sftp_client.open(
+                str(high_mag_unannotated_dir / file_name), "rb"
+            ) as f:
                 focus_regions_images.append(Image.open(BytesIO(f.read())))
-            with self.sftp_client.open(str(high_mag_annotated_dir / file_name), "rb") as f:
+            with self.sftp_client.open(
+                str(high_mag_annotated_dir / file_name), "rb"
+            ) as f:
                 focus_regions_annotated_images.append(Image.open(BytesIO(f.read())))
 
         region_idxs = [Path(file).stem for file in focus_regions_files_sample]
@@ -608,14 +642,24 @@ class BMAResultSSH:
         high_mag_confidences = []
 
         for region_idx in region_idxs:
-            low_mag_confidence, high_mag_confidence = self.get_region_confidence(region_idx)
+            low_mag_confidence, high_mag_confidence = self.get_region_confidence(
+                region_idx
+            )
 
-            assert high_mag_confidence is not None, f"High mag confidence for region {region_idx} is None."
+            assert (
+                high_mag_confidence is not None
+            ), f"High mag confidence for region {region_idx} is None."
 
             low_mag_confidences.append(low_mag_confidence)
             high_mag_confidences.append(high_mag_confidence)
 
-        return focus_regions_images, focus_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences
+        return (
+            focus_regions_images,
+            focus_regions_annotated_images,
+            region_idxs,
+            low_mag_confidences,
+            high_mag_confidences,
+        )
 
     def get_runtime_breakdown(self):
         """Return the runtime breakdown of the slide."""
@@ -640,7 +684,7 @@ class BMAResultSSH:
         """Return the storage consumption breakdown of the slide result folder."""
         breakdown = {}
         for attr in self.sftp_client.listdir_attr(str(self.remote_result_dir)):
-            if not attr.filename.startswith('.'):
+            if not attr.filename.startswith("."):
                 extension = os.path.splitext(attr.filename)[1].lower()
                 if extension not in breakdown:
                     breakdown[extension] = 0
@@ -664,8 +708,12 @@ class BMAResultSSH:
             & (run_history["datetime_processed"] == self.datetime_processed)
         ]
 
-        assert len(row) >= 1, f"Row not found in run_history for {self.pipeline} and {self.datetime_processed}"
-        assert len(row) == 1, f"Multiple rows found in run_history for {self.pipeline} and {self.datetime_processed}. This should not happen."
+        assert (
+            len(row) >= 1
+        ), f"Row not found in run_history for {self.pipeline} and {self.datetime_processed}"
+        assert (
+            len(row) == 1
+        ), f"Multiple rows found in run_history for {self.pipeline} and {self.datetime_processed}. This should not happen."
 
         run_history_dict = row.to_dict(orient="records")[0]
 
@@ -687,7 +735,9 @@ class BMAResultSSH:
         row = slide_metadata[slide_metadata["wsi_name"] == wsi_name]
 
         assert len(row) >= 1, f"Row not found in slide_metadata for {wsi_name}"
-        assert len(row) == 1, f"Multiple rows found in slide_metadata for {wsi_name}. This should not happen."
+        assert (
+            len(row) == 1
+        ), f"Multiple rows found in slide_metadata for {wsi_name}. This should not happen."
 
         slide_metadata_dict = row.to_dict(orient="records")[0]
 
@@ -701,7 +751,9 @@ class BMAResultSSH:
 
     def get_part_description(self):
         """Return the part_description of the slide."""
-        part_desc = self.get_slide_metadata_dict().get("part_description", "Missing part description")
+        part_desc = self.get_slide_metadata_dict().get(
+            "part_description", "Missing part description"
+        )
 
         if pd.isna(part_desc) or part_desc.isspace() or not part_desc:
             return "Missing part description"
@@ -712,7 +764,7 @@ class BMAResultSSH:
         """Return the Dx and sub_Dx of the slide."""
         Dx, sub_Dx = (
             self.get_slide_metadata_dict().get("Dx", "Missing Dx"),
-            self.get_slide_metadata_dict().get("sub_Dx", "Missing sub_Dx")
+            self.get_slide_metadata_dict().get("sub_Dx", "Missing sub_Dx"),
         )
 
         if pd.isna(Dx) or Dx.isspace() or not Dx:
@@ -739,9 +791,9 @@ class BMAResultSSH:
 
     def __del__(self):
         """Cleanup the SSH and SFTP connections."""
-        if hasattr(self, 'sftp_client') and self.sftp_client:
+        if hasattr(self, "sftp_client") and self.sftp_client:
             self.sftp_client.close()
-        if hasattr(self, 'ssh_client') and self.ssh_client:
+        if hasattr(self, "ssh_client") and self.ssh_client:
             self.ssh_client.close()
 
 
@@ -849,7 +901,9 @@ if __name__ == "__main__":
     print(f"Stacked differential: {bma_result.get_stacked_differential()}")
     print(f"One hot differential: {bma_result.get_one_hot_differential()}")
     print(f"Grouped differential: {bma_result.get_grouped_differential()}")
-    print(f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}")
+    print(
+        f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}"
+    )
     print(f"Raw counts: {bma_result.get_raw_counts()}")
     print(f"Grouped raw counts: {bma_result.get_grouped_raw_counts()}")
 
