@@ -284,7 +284,7 @@ class BMAResult:
         )
 
         # get the row in the focus_regions_info dataframe that corresponds to the region_idx
-        row = focus_regions_info[focus_regions_info["idx"] == region_idx]
+        row = focus_regions_info[int(focus_regions_info["idx"]) == int(region_idx)]
 
         assert (
             len(row) >= 1
