@@ -1,6 +1,53 @@
+import os
+import random
+import csv
 import pandas as pd
 from pathlib import Path
+from PIL import Image
 from LLRunner.read.read_config import *
+from LLRunner.config import pipeline_run_history_path, slide_metadata_path
+
+
+def csv_to_dict(file_path):
+    result_dict = {}
+    with open(file_path, mode="r") as csvfile:
+        csv_reader = csv.reader(csvfile)
+        for row in csv_reader:
+            key = row[0]
+            value = float(row[1])
+            result_dict[key] = value
+    return result_dict
+
+
+def has_error(result_dir):
+    """Check if there results directory corresponds to an error run."""
+
+    # first split the result_dir into its components by _, first part is the pipeline and the second part is the datetime_processed
+    pipeline, datetime_processed = result_dir.name.split("_", 1)
+
+    # read the pipeline_run_history.csv file
+    pipeline_run_history = pd.read_csv(pipeline_run_history_path)
+
+    # look for the row in the pipeline_run_history dataframe that corresponds to the pipeline and datetime_processed
+    row = pipeline_run_history[
+        (pipeline_run_history["pipeline"] == pipeline)
+        & (pipeline_run_history["datetime_processed"] == datetime_processed)
+    ]
+
+    # if the row does not exist, then raise an error using assert statement (there should be only one row)
+    assert (
+        len(row) >= 1
+    ), f"Row not found in pipeline_run_history for {pipeline} and {datetime_processed}"
+
+    assert (
+        len(row) == 1
+    ), f"Multiple rows found in pipeline_run_history for {pipeline} and {datetime_processed}. This should never happen and the pipeline log could be corrupted."
+
+    # get the error column from the row
+    error = row["error"].values[0]
+
+    # return the error value as boolean
+    return bool(error)
 
 
 class BMAResult:
@@ -9,6 +56,9 @@ class BMAResult:
 
     === Class Attributes ===
     -- result_dir: the directory where the results are stored
+    -- result_folder_name: the name of the folder where the results are stored
+    -- pipeline: result_folder_name.split("_")[0]
+    -- datetime_processed: result_folder_name.split("_")[1]
     -- error: a boolean indicating if the result directory is an error directory
     -- cell_info: a pandas DataFrame containing the cell information
     """
@@ -22,22 +72,20 @@ class BMAResult:
         # first check if the result directory exists
         assert result_dir.exists(), f"Result directory {result_dir} does not exist."
 
+        # get the name of the folder where the results are stored
+        self.result_folder_name = result_dir.name
+
+        # get the pipeline from the result_folder_name
+        self.pipeline = self.result_folder_name.split("_")[0]
+
+        # get the datetime_processed from the result_folder_name
+        self.datetime_processed = self.result_folder_name.split("_")[1]
+
         # second check if the result directory's folder name starts with "ERROR_"
-        self.error = result_dir.name.startswith("ERROR_")
+        self.error = has_error(self.result_folder_name)
 
         self.result_dir = result_dir
-
-        if not self.error:
-            self.cell_info = pd.read_csv(result_dir / "skippocytes" / "cells_info.csv")
-
-            # # compute the max probability score among the cellnames
-            # self.cell_info["max_prob"] = self.cell_info[cellnames].max(axis=1)
-
-            # # only keeps the cells with a max probability score greater than 0.6927
-            # self.cell_info = self.cell_info[self.cell_info["max_prob"] > 0.6927]
-
-            # only keeps the cells where skippocyte_score is less than 0.5
-            self.cell_info = self.cell_info[self.cell_info["skippocyte_score"] < 0.5]
+        self.cell_info = pd.read_csv(result_dir / "cells" / "cells_info.csv")
 
     def get_stacked_differential(self):
         """In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
@@ -199,42 +247,300 @@ class BMAResult:
         # return a dictionary with the grouped class as the key and the raw count of cells in that class as the value
         return grouped_raw_counts.to_dict()
 
-    def get_M1L2_results(self):
-        """Get the differential and count for cells where the top class is M1 and the second class is L2.
-        Conversely, get the differential and count for cells where the top class is L2 and the second class is M1.
-
-        Store in a dictionary with keys `M1L2` and `L2M1`, and `M1L2_count`, `L2M1_count` respectively.
+    def get_grid_rep(self):
+        """Return the grid rep image of the slide.
+        Which is located at the directory/top_view_grid_rep.png.
+        Use PIL
         """
 
-        # make the column first which is the top class
-        self.cell_info["first"] = self.cell_info[cellnames].idxmax(axis=1)
+        grid_rep_path = self.result_dir / "top_view_grid_rep.png"
 
-        # make the column second which is the second highest class
-        self.cell_info["second"] = self.cell_info[cellnames].apply(
-            lambda row: row.nlargest(2).index[-1], axis=1
+        return Image.open(grid_rep_path)
+
+    def get_confidence_heatmap(self):
+        """Return the confidence heatmap image of the slide.
+        Which is located at the directory/confidence_heatmap.png.
+        Use PIL
+        """
+
+        confidence_heatmap_path = self.result_dir / "confidence_heatmap.png"
+
+        return Image.open(confidence_heatmap_path)
+
+    def has_error(self):
+        return self.error
+
+    def get_region_confidence(self, region_idx):
+        """Use the focus_regions/focus_regions_info.csv file and the focus_regions/high_mag_focus_regions_info.csv file to get the confidence of the region with region_idx."""
+
+        # read the focus_regions_info.csv file
+        focus_regions_info = pd.read_csv(
+            self.result_dir / "focus_regions" / "focus_regions_info.csv"
         )
 
-        # get all the cells that have M1 as the top probability class and L2 as the second highest probability class
-        M1L2_cells = self.cell_info[
-            (self.cell_info["first"] == "M1") & (self.cell_info["second"] == "L2")
+        # get the row in the focus_regions_info dataframe that corresponds to the region_idx
+        row = focus_regions_info[focus_regions_info["idx"] == region_idx]
+
+        assert (
+            len(row) >= 1
+        ), f"Region with idx {region_idx} not found in focus_regions_info.csv"
+        assert (
+            len(row) == 1
+        ), f"Multiple regions with idx {region_idx} found in focus_regions_info.csv This should never happen and the pipeline log could be corrupted."
+
+        # get the confidence of the region
+        low_mag_confidence = row["confidence_score"].values[0]
+
+        # now do the samething with the high_mag_focus_regions_info.csv file
+        high_mag_focus_regions_info = pd.read_csv(
+            self.result_dir / "focus_regions" / "high_mag_focus_regions_info.csv"
+        )
+
+        row = high_mag_focus_regions_info[
+            high_mag_focus_regions_info["idx"] == region_idx
         ]
 
-        # conversely, get all the cells that have L2 as the top probability class and M1 as the second highest probability class
-        L2M1_cells = self.cell_info[
-            (self.cell_info["first"] == "L2") & (self.cell_info["second"] == "M1")
+        # if there is no row found, then just None
+        if len(row) == 0:
+            return low_mag_confidence, None
+
+        assert (
+            len(row) == 1
+        ), f"Multiple regions with idx {region_idx} found in high_mag_focus_regions_info.csv This should never happen and the pipeline log could be corrupted."
+
+        high_mag_confidence = row["confidence_score_high_mag"].values[0]
+
+        return low_mag_confidence, high_mag_confidence
+
+    def get_top_regions(self, num_to_sample=5):
+        """Return the top regions image of the slide.
+        Which is located at the directory/top_regions.png.
+        Use PIL
+        """
+
+        # get the list of all the top regions images which are stored in dir/top_regions/high_mag_unannotated
+        top_regions_dir = self.result_dir / "top_regions" / "high_mag_unannotated"
+
+        # get the list of all the top regions images jpg files in the directory
+        top_regions_files = list(top_regions_dir.glob("*.jpg"))
+
+        # randomly sample num_to_sample images from the list
+        top_regions_files_sample = random.sample(top_regions_files, num_to_sample)
+
+        # open the images using PIL and return them as a list, also the corresponding annotated images as a list
+        top_regions_images = [Image.open(file) for file in top_regions_files_sample]
+        # the annotated images have the same name but comes from high_mag_annotated instead of high_mag_unannotated
+        top_regions_annotated_images = [
+            Image.open(top_regions_dir / "high_mag_annotated" / file.name)
+            for file in top_regions_files_sample
         ]
 
-        # print how many cells are in each of these categories
-        M1L2_count = len(M1L2_cells)
-        L2M1_count = len(L2M1_cells)
+        # for each focus region, the filename without the extension is the region id
+        region_idxs = [file.stem for file in top_regions_files_sample]
 
-        # get the differential for each of these categories
-        M1L2_diff = M1L2_count / len(self.cell_info)
-        L2M1_diff = L2M1_count / len(self.cell_info)
+        low_mag_confidences = []
+        high_mag_confidences = []
 
-        return {
-            "M1L2": M1L2_diff,
-            "L2M1": L2M1_diff,
-            "M1L2_count": M1L2_count,
-            "L2M1_count": L2M1_count,
+        for region_idx in region_idxs:
+            low_mag_confidence, high_mag_confidence = self.get_region_confidence(
+                region_idx
+            )
+
+            assert (
+                high_mag_confidence is not None
+            ), f"High mag confidence for region {region_idx} is None. This should not happen because the region should have passed high mag check."
+
+            low_mag_confidences.append(low_mag_confidence)
+            high_mag_confidences.append(high_mag_confidence)
+
+        return (
+            top_regions_images,
+            top_regions_annotated_images,
+            region_idxs,
+            low_mag_confidences,
+            high_mag_confidences,
+        )
+
+    def get_runtime_breakdown(self):  # TODO
+        """Return the runtime breakdown of the slide.
+        Which is located at the directory/runtime_breakdown.csv.
+        """
+
+        # the runtime_data_path is dir/runtime_data.csv
+        runtime_data_path = self.result_dir / "runtime_data.csv"
+
+        # read the runtime_data.csv file
+        runtime_data_dict = csv_to_dict(runtime_data_path)
+
+        return runtime_data_dict
+
+    def get_storage_consumption_breakdown(self):
+        """Return the storage consumption breakdown of the slide result folder."""
+        if not os.path.isdir(self.result_dir):
+            raise NotADirectoryError(f"{self.result_dir} is not a valid directory.")
+
+        breakdown = {}
+        for root, dirs, files in os.walk(self.result_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                file_size = os.path.getsize(file_path)
+                extension = os.path.splitext(file)[1].lower()  # Get file extension
+
+                if extension not in breakdown:
+                    breakdown[extension] = 0
+                breakdown[extension] += file_size
+
+        # Convert file sizes to a more readable format (e.g., MB, GB)
+        breakdown_readable = {
+            ext: self._convert_size(size) for ext, size in breakdown.items()
         }
+
+        return breakdown_readable
+
+    def get_run_history(self):
+        """Return the run history of the slide.
+        Which is located at the directory/run_history.csv.
+        """
+
+        run_history = pd.read_csv(self.result_dir / "run_history.csv")
+
+        # look for the row in the run_history dataframe that corresponds to the pipeline and datetime_processed
+        row = run_history[
+            (run_history["pipeline"] == self.pipeline)
+            & (run_history["datetime_processed"] == self.datetime_processed)
+        ]
+
+        assert (
+            len(row) >= 1
+        ), f"Row not found in run_history for {self.pipeline} and {self.datetime_processed}"
+
+        assert (
+            len(row) == 1
+        ), f"Multiple rows found in run_history for {self.pipeline} and {self.datetime_processed}. This should never happen and the pipeline log could be corrupted."
+
+        # convert row to dictionary
+        run_history_dict = row.to_dict(orient="records")[0]
+
+        return run_history_dict
+
+    def get_wsi_name(self):
+        """From the slide_metadata.csv file, get the wsi_name of the slide."""
+
+        run_history_dict = self.get_run_history()
+
+        return run_history_dict["wsi_name"]
+
+    def get_slide_metadata_dict(self):
+        """Return the slide metadata dictionary of the slide.
+        Which is located at the directory/slide_metadata.csv.
+        """
+
+        wsi_name = self.get_wsi_name()
+
+        slide_metadata = pd.read_csv(slide_metadata_path)
+
+        # get the row in the slide_metadata dataframe that corresponds to the wsi_name
+        row = slide_metadata[slide_metadata["wsi_name"] == wsi_name]
+
+        assert len(row) >= 1, f"Row not found in slide_metadata for {wsi_name}"
+
+        assert (
+            len(row) == 1
+        ), f"Multiple rows found in slide_metadata for {wsi_name}. This should never happen and the pipeline log could be corrupted."
+
+        # convert row to dictionary
+        slide_metadata_dict = row.to_dict(orient="records")[0]
+
+        return slide_metadata_dict
+
+    def get_datetime_processed(self):  # TODO
+        return self.datetime_processed
+
+    def get_pipeline(self):
+        return self.pipeline
+
+    def get_part_description(self):
+        """From the slide_metadata.csv file, get the part_description of the slide."""
+        part_desc = self.get_slide_metadata_dict()["part_description"]
+
+        # if the part_desc is nan, or a string of spaces, or None, or empty string, then return "Missing part description"
+        if pd.isna(part_desc) or part_desc.isspace() or not part_desc:
+            return "Missing part description"
+
+        return part_desc
+
+    def get_Dx_and_sub_Dx(self):  # TODO
+        """From the slide_metadata.csv file, get the Dx and sub_Dx of the slide."""
+
+        Dx, sub_Dx = (
+            self.get_slide_metadata_dict()["Dx"],
+            self.get_slide_metadata_dict()["sub_Dx"],
+        )
+
+        if pd.isna(Dx) or Dx.isspace() or not Dx:
+            Dx = "Missing Dx"
+
+        if pd.isna(sub_Dx) or sub_Dx.isspace() or not sub_Dx:
+            sub_Dx = "Missing sub_Dx"
+
+        return Dx, sub_Dx
+
+    def get_stored_differential(self):  # TODO We will do this manually for now
+        pass  # TODO, we need to check the integrity of the stored differential and make sure that it actually matches with the differential computed here.
+
+if __name__ == "__main__":
+    slide_result_path = "/media/hdd3/neo/results_dir/BMA-diff_2024-08-03 21:15:14"
+
+    bma_result = BMAResult(slide_result_path)
+
+    print(f"Slide result path: {bma_result.result_dir}")
+    print(f"Pipeline: {bma_result.pipeline}")
+    print(f"Datetime processed: {bma_result.datetime_processed}")
+    print(f"Error: {bma_result.has_error()}")
+    
+    # now all the methods should work
+    print(f"Stacked differential: {bma_result.get_stacked_differential()}")
+    print(f"One hot differential: {bma_result.get_one_hot_differential()}")
+    print(f"Grouped differential: {bma_result.get_grouped_differential()}")
+    print(f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}")
+    print(f"Raw counts: {bma_result.get_raw_counts()}")
+    print(f"Grouped raw counts: {bma_result.get_grouped_raw_counts()}")
+    
+    # now print the images
+    grid_rep = bma_result.get_grid_rep()
+    confidence_heatmap = bma_result.get_confidence_heatmap()
+    top_regions_images, top_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences = bma_result.get_top_regions()
+
+    print(f"Grid rep: {grid_rep}")
+    print(f"Confidence heatmap: {confidence_heatmap}")
+    for top_region_image, top_region_annotated_image, region_idx, low_mag_confidence, high_mag_confidence in zip(top_regions_images, top_regions_annotated_images, region_idxs, low_mag_confidences, high_mag_confidences):
+        print(f"Top region image: {top_region_image}")
+        print(f"Top region annotated image: {top_region_annotated_image}")
+        print(f"Region idx: {region_idx}")
+        print(f"Low mag confidence: {low_mag_confidence}")
+        print(f"High mag confidence: {high_mag_confidence}")
+
+    # now print the breakdowns
+    runtime_breakdown = bma_result.get_runtime_breakdown()
+    storage_consumption_breakdown = bma_result.get_storage_consumption_breakdown()
+    run_history = bma_result.get_run_history()
+    wsi_name = bma_result.get_wsi_name()
+
+
+    print(f"Runtime breakdown: {runtime_breakdown}")
+    print(f"Storage consumption breakdown: {storage_consumption_breakdown}")
+    print(f"Run history: {run_history}")
+    print(f"WSI name: {wsi_name}")
+
+    # now print the metadata
+    slide_metadata_dict = bma_result.get_slide_metadata_dict()
+    part_description = bma_result.get_part_description()
+    Dx, sub_Dx = bma_result.get_Dx_and_sub_Dx()
+
+    print(f"Slide metadata dict: {slide_metadata_dict}")
+    print(f"Part description: {part_description}")
+    print(f"Dx: {Dx}")
+    print(f"Sub Dx: {sub_Dx}")
+    
+
+
