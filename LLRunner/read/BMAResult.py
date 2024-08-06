@@ -280,9 +280,11 @@ class BMAResult:
         Use PIL
         """
 
-        confidence_heatmap_path = self.result_dir / "confidence_heatmap.png"
+        confidence_heatmap_path = self.remote_result_dir / "confidence_heatmap.png"
 
-        return Image.open(confidence_heatmap_path)
+        with self.sftp_client.open(str(confidence_heatmap_path), "rb") as f:
+            return Image.open(BytesIO(f.read()))
+
 
     def has_error(self):
         return self.error
