@@ -757,6 +757,11 @@ class BMAResultSSH:
 
 
 if __name__ == "__main__":
+
+    ##########################################
+    # TESTING LOCAL VERSION
+    ##########################################
+
     slide_result_path = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-25 08:22:42"
 
     bma_result = BMAResult(slide_result_path)
@@ -846,3 +851,71 @@ if __name__ == "__main__":
         max_retries=5,  # Optional: set the max retries for rsync, defaults to 3
         backoff_factor=2,  # Optional: set the backoff factor for rsync, defaults to 2
     )
+
+    print(f"Slide result path: {bma_result.result_dir}")
+    print(f"Pipeline: {bma_result.pipeline}")
+    print(f"Datetime processed: {bma_result.datetime_processed}")
+    print(f"Error: {bma_result.has_error()}")
+
+    # now all the methods should work
+    print(f"Stacked differential: {bma_result.get_stacked_differential()}")
+    print(f"One hot differential: {bma_result.get_one_hot_differential()}")
+    print(f"Grouped differential: {bma_result.get_grouped_differential()}")
+    print(
+        f"Grouped stacked differential: {bma_result.get_grouped_stacked_differential()}"
+    )
+    print(f"Raw counts: {bma_result.get_raw_counts()}")
+    print(f"Grouped raw counts: {bma_result.get_grouped_raw_counts()}")
+
+    # now print the images
+    grid_rep = bma_result.get_grid_rep()
+    confidence_heatmap = bma_result.get_confidence_heatmap()
+    (
+        top_regions_images,
+        top_regions_annotated_images,
+        region_idxs,
+        low_mag_confidences,
+        high_mag_confidences,
+    ) = bma_result.get_focus_regions()
+
+    print(f"Grid rep: {grid_rep}")
+    print(f"Confidence heatmap: {confidence_heatmap}")
+    for (
+        top_region_image,
+        top_region_annotated_image,
+        region_idx,
+        low_mag_confidence,
+        high_mag_confidence,
+    ) in zip(
+        top_regions_images,
+        top_regions_annotated_images,
+        region_idxs,
+        low_mag_confidences,
+        high_mag_confidences,
+    ):
+        print(f"Top region image: {top_region_image}")
+        print(f"Top region annotated image: {top_region_annotated_image}")
+        print(f"Region idx: {region_idx}")
+        print(f"Low mag confidence: {low_mag_confidence}")
+        print(f"High mag confidence: {high_mag_confidence}")
+
+    # now print the breakdowns
+    runtime_breakdown = bma_result.get_runtime_breakdown()
+    storage_consumption_breakdown = bma_result.get_storage_consumption_breakdown()
+    run_history = bma_result.get_run_history()
+    wsi_name = bma_result.get_wsi_name()
+
+    print(f"Runtime breakdown: {runtime_breakdown}")
+    print(f"Storage consumption breakdown: {storage_consumption_breakdown}")
+    print(f"Run history: {run_history}")
+    print(f"WSI name: {wsi_name}")
+
+    # now print the metadata
+    slide_metadata_dict = bma_result.get_slide_metadata_dict()
+    part_description = bma_result.get_part_description()
+    Dx, sub_Dx = bma_result.get_Dx_and_sub_Dx()
+
+    print(f"Slide metadata dict: {slide_metadata_dict}")
+    print(f"Part description: {part_description}")
+    print(f"Dx: {Dx}")
+    print(f"Sub Dx: {sub_Dx}")
