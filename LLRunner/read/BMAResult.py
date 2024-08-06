@@ -320,11 +320,11 @@ class BMAResult:
 
     def get_focus_regions(self, num_to_sample=5):
         """Return the top regions image of the slide.
-        Which is located at the directory/top_regions.png.
+        Which is located at the directory/focus_regions.png.
         Use PIL
         """
 
-        # get the list of all the top regions images which are stored in dir/top_regions/high_mag_unannotated
+        # get the list of all the top regions images which are stored in dir/focus_regions/high_mag_unannotated
         result_dir_Path = Path(self.result_dir)
         focus_regions_dir = result_dir_Path / "focus_regions"
         high_mag_unannotated_dir = focus_regions_dir / "high_mag_unannotated"
@@ -782,8 +782,8 @@ if __name__ == "__main__":
     grid_rep = bma_result.get_grid_rep()
     confidence_heatmap = bma_result.get_confidence_heatmap()
     (
-        top_regions_images,
-        top_regions_annotated_images,
+        focus_regions_images,
+        focus_regions_annotated_images,
         region_idxs,
         low_mag_confidences,
         high_mag_confidences,
@@ -798,8 +798,8 @@ if __name__ == "__main__":
         low_mag_confidence,
         high_mag_confidence,
     ) in zip(
-        top_regions_images,
-        top_regions_annotated_images,
+        focus_regions_images,
+        focus_regions_annotated_images,
         region_idxs,
         low_mag_confidences,
         high_mag_confidences,
@@ -865,8 +865,8 @@ if __name__ == "__main__":
     grid_rep = bma_result.get_grid_rep()
     confidence_heatmap = bma_result.get_confidence_heatmap()
     (
-        top_regions_images,
-        top_regions_annotated_images,
+        focus_regions_images,
+        focus_regions_annotated_images,
         region_idxs,
         low_mag_confidences,
         high_mag_confidences,
@@ -885,8 +885,8 @@ if __name__ == "__main__":
         low_mag_confidence,
         high_mag_confidence,
     ) in zip(
-        top_regions_images,
-        top_regions_annotated_images,
+        focus_regions_images,
+        focus_regions_annotated_images,
         region_idxs,
         low_mag_confidences,
         high_mag_confidences,
