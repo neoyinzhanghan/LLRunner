@@ -276,9 +276,11 @@ class BMAResult:
     def get_region_confidence(self, region_idx):
         """Use the focus_regions/focus_regions_info.csv file and the focus_regions/high_mag_focus_regions_info.csv file to get the confidence of the region with region_idx."""
 
+        results_dir_Path = Path(self.result_dir)
+
         # read the focus_regions_info.csv file
         focus_regions_info = pd.read_csv(
-            self.result_dir / "focus_regions" / "focus_regions_info.csv"
+            results_dir_Path / "focus_regions" / "focus_regions_info.csv"
         )
 
         # get the row in the focus_regions_info dataframe that corresponds to the region_idx
