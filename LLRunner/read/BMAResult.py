@@ -1,21 +1,21 @@
 import os
 import random
 import csv
-import pandas as pd
 import math
-from pathlib import Path
-from PIL import Image
-from LLRunner.read.read_config import *
-from LLRunner.config import pipeline_run_history_path, slide_metadata_path
 import paramiko
 import pandas as pd
 from PIL import Image
 from io import BytesIO
-import os
-import math
 from pathlib import Path
-import random
-import time
+from PIL import Image
+from LLRunner.read.read_config import *
+from LLRunner.config import pipeline_run_history_path, slide_metadata_path
+
+
+
+####################################################################################################
+# HELPER FUNCTIONS
+####################################################################################################
 
 def csv_to_dict(file_path):
     result_dict = {}
@@ -60,6 +60,11 @@ def has_error(result_dir):
 
     # return the error value as boolean
     return bool(error)
+
+
+####################################################################################################
+# LOCAL RESULT DIRECTORY IMPLEMENTATION
+####################################################################################################
 
 
 class BMAResult:
@@ -514,6 +519,10 @@ class BMAResult:
     def get_stored_differential(self):  # TODO We will do this manually for now
         pass  # TODO, we need to check the integrity of the stored differential and make sure that it actually matches with the differential computed here.
 
+
+####################################################################################################
+# SSH RESULT DIRECTORY IMPLEMENTATION
+####################################################################################################
 
 
 class BMAResultSSH:
