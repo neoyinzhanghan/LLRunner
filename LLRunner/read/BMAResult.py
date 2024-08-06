@@ -728,8 +728,8 @@ class BMAResultSSH:
 
     def has_error(self):
         return self.error
-    
-    def get_confidence_heatmap(self):   
+
+    def get_confidence_heatmap(self):
         """Return the confidence heatmap image of the slide.
         Which is located at the directory/confidence_heatmap.png.
         Use PIL
@@ -739,7 +739,6 @@ class BMAResultSSH:
 
         with self.sftp_client.open(str(confidence_heatmap_path), "rb") as f:
             return Image.open(BytesIO(f.read()))
-
 
     def get_region_confidence(self, region_idx):
         """Get the confidence scores for a specific region."""
@@ -918,7 +917,7 @@ class BMAResultSSH:
 
     def get_pipeline(self):
         return self.pipeline
-    
+
     def get_grid_rep(self):
         """Return the grid rep image of the slide.
         Which is located at the directory/top_view_grid_rep.png.
@@ -929,7 +928,6 @@ class BMAResultSSH:
 
         with self.sftp_client.open(str(grid_rep_path), "rb") as f:
             return Image.open(BytesIO(f.read()))
-
 
     def get_part_description(self):
         """Return the part_description of the slide."""
@@ -1101,10 +1099,7 @@ if __name__ == "__main__":
     ) = bma_result.get_focus_regions()
 
     print(f"Grid rep: {grid_rep}")
-    grid_rep.show()  # Display the grid rep image
-
     print(f"Confidence heatmap: {confidence_heatmap}")
-    confidence_heatmap.show()  # Display the confidence heatmap image
 
     for (
         top_region_image,
@@ -1120,10 +1115,8 @@ if __name__ == "__main__":
         high_mag_confidences,
     ):
         print(f"Top region image: {top_region_image}")
-        top_region_image.show()  # Display each top region image
 
         print(f"Top region annotated image: {top_region_annotated_image}")
-        top_region_annotated_image.show()  # Display each annotated image
 
         print(f"Region idx: {region_idx}")
         print(f"Low mag confidence: {low_mag_confidence}")
