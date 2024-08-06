@@ -315,31 +315,33 @@ class BMAResult:
 
         return low_mag_confidence, high_mag_confidence
 
-    def get_top_regions(self, num_to_sample=5):
+    def get_focus_regions(self, num_to_sample=5):
         """Return the top regions image of the slide.
         Which is located at the directory/top_regions.png.
         Use PIL
         """
 
         # get the list of all the top regions images which are stored in dir/top_regions/high_mag_unannotated
-        top_regions_dir = self.result_dir / "top_regions" / "high_mag_unannotated"
+        result_dir_Path = Path(self.result_dir)
+        focus_regions_dir = result_dir_Path / "focus_regions"
+        high_mag_unannotated_dir = focus_regions_dir / "high_mag_unannotated"
 
         # get the list of all the top regions images jpg files in the directory
-        top_regions_files = list(top_regions_dir.glob("*.jpg"))
+        focus_regions_files = list(high_mag_unannotated_dir.glob("*.jpg"))
 
         # randomly sample num_to_sample images from the list
-        top_regions_files_sample = random.sample(top_regions_files, num_to_sample)
+        focus_regions_files_sample = random.sample(focus_regions_files, num_to_sample)
 
         # open the images using PIL and return them as a list, also the corresponding annotated images as a list
-        top_regions_images = [Image.open(file) for file in top_regions_files_sample]
+        focus_regions_images = [Image.open(file) for file in focus_regions_files_sample]
         # the annotated images have the same name but comes from high_mag_annotated instead of high_mag_unannotated
-        top_regions_annotated_images = [
-            Image.open(top_regions_dir / "high_mag_annotated" / file.name)
-            for file in top_regions_files_sample
+        focus_regions_annotated_images = [
+            Image.open(focus_regions_dir / "high_mag_annotated" / file.name)
+            for file in focus_regions_files_sample
         ]
 
         # for each focus region, the filename without the extension is the region id
-        region_idxs = [file.stem for file in top_regions_files_sample]
+        region_idxs = [file.stem for file in focus_regions_images]
 
         low_mag_confidences = []
         high_mag_confidences = []
@@ -357,8 +359,8 @@ class BMAResult:
             high_mag_confidences.append(high_mag_confidence)
 
         return (
-            top_regions_images,
-            top_regions_annotated_images,
+            focus_regions_images,
+            focus_regions_annotated_images,
             region_idxs,
             low_mag_confidences,
             high_mag_confidences,
