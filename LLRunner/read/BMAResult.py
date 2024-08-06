@@ -22,8 +22,8 @@ def csv_to_dict(file_path):
     with open(file_path, mode="r") as csvfile:
         csv_reader = csv.reader(csvfile)
         for row in csv_reader:
-            key = row[0]
-            value = float(row[1])
+            key = row[0]  # Access the first column as the key
+            value = float(row[1])  # Access the second column as the value, converting it to float
             result_dict[key] = value
     return result_dict
 
@@ -56,7 +56,7 @@ def has_error(result_dir):
     ), f"Multiple rows found in pipeline_run_history for {pipeline} and {datetime_processed}. This should never happen and the pipeline log could be corrupted."
 
     # get the error column from the row
-    error = row["error"].values[0]
+    error = row["error"].iloc[0]
 
     # return the error value as boolean
     return bool(error)
@@ -308,7 +308,7 @@ class BMAResult:
         ), f"Multiple regions with idx {region_idx} found in focus_regions_info.csv This should never happen and the pipeline log could be corrupted."
 
         # get the confidence of the region
-        low_mag_confidence = row["adequate_confidence_score"].values[0]
+        low_mag_confidence = row["adequate_confidence_score"].iloc[0]
 
         # now do the samething with the high_mag_focus_regions_info.csv file
         high_mag_focus_regions_info = pd.read_csv(
@@ -327,7 +327,7 @@ class BMAResult:
             len(row) == 1
         ), f"Multiple regions with idx {region_idx} found in high_mag_focus_regions_info.csv This should never happen and the pipeline log could be corrupted."
 
-        high_mag_confidence = row["adequate_confidence_score_high_mag"].values[0]
+        high_mag_confidence = row["adequate_confidence_score_high_mag"].iloc[0]
 
         return low_mag_confidence, high_mag_confidence
 
@@ -761,7 +761,7 @@ class BMAResultSSH:
             len(row) == 1
         ), f"Multiple regions with idx {region_idx} found. This should not happen."
 
-        low_mag_confidence = row["adequate_confidence_score"].values[0]
+        low_mag_confidence = row["adequate_confidence_score"].iloc[0]
 
         with self.sftp_client.open(str(high_mag_focus_regions_info_path), "r") as f:
             high_mag_focus_regions_info = pd.read_csv(f)
@@ -777,7 +777,7 @@ class BMAResultSSH:
             len(row) == 1
         ), f"Multiple regions with idx {region_idx} found in high_mag_focus_regions_info.csv. This should not happen."
 
-        high_mag_confidence = row["adequate_confidence_score_high_mag"].values[0]
+        high_mag_confidence = row["adequate_confidence_score_high_mag"].iloc[0]
 
         return low_mag_confidence, high_mag_confidence
 
