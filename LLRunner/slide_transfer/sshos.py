@@ -44,7 +44,7 @@ class SSHOS:
     def isfile(self, remote_path):
         """Check if the given remote path is a file."""
         # Execute the command on the remote server
-        stdin, stdout, stderr = self.ssh_client.exec_command(f'test -f "{remote_path}" && echo 1 || echo 0')
+        stdin, stdout, stderr = self.client.exec_command(f'test -f "{remote_path}" && echo 1 || echo 0')
 
         # Read the output
         result = stdout.read().decode().strip()
@@ -56,7 +56,7 @@ class SSHOS:
     def isdir(self, remote_path):
         """Check if the given remote path is a directory."""
         # Execute the command on the remote server
-        stdin, stdout, stderr = self.ssh_client.exec_command(f'test -d "{remote_path}" && echo 1 || echo 0')
+        stdin, stdout, stderr = self.client.exec_command(f'test -d "{remote_path}" && echo 1 || echo 0')
 
         # Read the output
         result = stdout.read().decode().strip()
