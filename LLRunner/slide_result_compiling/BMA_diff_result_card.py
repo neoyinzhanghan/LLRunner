@@ -271,7 +271,7 @@ def create_result_card_stacked_with_simple_theme(
     card_height = (
         confidence_heatmap_resized.height
         + differential_comparison_image_resized.height
-        + 350
+        + 360
     )  # Extra space for text
     card = Image.new(
         "RGB", (card_width, card_height), color="white"
