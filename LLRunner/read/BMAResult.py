@@ -594,7 +594,7 @@ class BMAResultSSH:
         self.datetime_processed = self.result_folder_name.split("_")[1]
         self.error = self.has_error()
 
-        with SSHOS() as sshos:
+        with SSHOS(hostname=self.hostname, username=self.username) as sshos:
             # check that the remote result directory exists
             assert sshos.isdir(
                 self.remote_result_dir
