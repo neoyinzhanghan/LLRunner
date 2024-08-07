@@ -116,12 +116,15 @@ def compile_results():
                 datetime_processed = remote_result_dir.split("_")[1]
             except Exception as e:
                 print(
-                    f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}"
+                    f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}. This is most likely due to continually running data extraction pipeline processes."
                 )
-                # raise e while printing the remote_result_dir
-                e.args = (f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}",)
+                # # raise e while printing the remote_result_dir
+                # e.args = (
+                #     f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}",
+                # )
 
-                raise e
+                # continue to the next remote_result_dir
+                continue
 
             # look for the row in pipeline_run_history_df with the same pipeline and datetime_processed
             pipeline_run_history_row = pipeline_run_history_df[
