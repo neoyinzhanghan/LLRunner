@@ -16,13 +16,16 @@ def match_reported_and_grouped_differential(reported_diff_dict, grouped_diff_dic
 
     # then for each key in reported_diff_dict, if the value is None, set it to 0
     reported_diff_dict = {
-        k: v if v is not None else 0 for k, v in reported_diff_dict.items()
+        k: v if v is not None else -0.1 for k, v in reported_diff_dict.items()
     }
 
     # then for each key in grouped_diff_dict, if the value is None, set it to 0
     grouped_diff_dict = {
-        k: v if v is not None else 0 for k, v in grouped_diff_dict.items()
+        k: v if v is not None else -0.1 for k, v in grouped_diff_dict.items()
     }
+
+    # need to multiply by 100 to get the percentage <<< due to how the differential is computed
+    grouped_diff_dict = {k: v * 100 for k, v in grouped_diff_dict.items()}
 
     # only keep the keys that are in grouped_diff_dict
     reported_diff_dict = {
@@ -227,7 +230,6 @@ def plot_differential_comparison_image_light_futuristic(
 #     return card
 
 
-
 def create_result_card_stacked_with_simple_theme(
     differential_comparison_image,
     confidence_heatmap,
@@ -345,7 +347,7 @@ def create_result_card_stacked_with_simple_theme(
     draw.text(
         (margin, text_y),
         f"Number of Regions: {num_regions}",
-        font=font, 
+        font=font,
         fill=text_color,
     )
     text_y += line_height
