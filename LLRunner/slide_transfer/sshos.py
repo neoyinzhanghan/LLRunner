@@ -6,12 +6,7 @@ from LLRunner.config import slide_source_hostname, slide_source_username
 
 
 class SSHOS:
-    def __init__(
-        self,
-        hostname=slide_source_hostname,
-        username=slide_source_username,
-        key_filename=None,
-    ):
+    def __init__(self, hostname, username, key_filename=None):
         self.hostname = hostname
         self.username = username
         self.key_filename = key_filename
@@ -43,21 +38,20 @@ class SSHOS:
             self.client.close()
 
     def listdir(self, remote_path):
-        stdin, stdout, stderr = self.client.exec_command(f"ls -p {remote_path}")
-        return stdout.read().decode().splitlines()
+        return self.sftp.listdir(str(remote_path))  # Ensure path is a string
 
     def isfile(self, remote_path):
         """Check if the given remote path is a file."""
         try:
-            return stat.S_ISREG(self.sftp.stat(remote_path).st_mode)
-        except FileNotFoundError:
+            return not self.isdir(remote_path)  # If it's not a directory, it's a file
+        except IOError:  # or FileNotFoundError depending on your version of Python
             return False
 
     def isdir(self, remote_path):
         """Check if the given remote path is a directory."""
         try:
-            return stat.S_ISDIR(self.sftp.stat(remote_path).st_mode)
-        except FileNotFoundError:
+            return paramiko.S_ISDIR(self.sftp.stat(str(remote_path)).st_mode)
+        except IOError:  # or FileNotFoundError depending on your version of Python
             return False
 
     def rsync_file(self, remote_path, local_dir, retries=5, backoff_factor=1.5):
