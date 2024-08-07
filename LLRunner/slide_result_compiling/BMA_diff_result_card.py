@@ -227,6 +227,7 @@ def plot_differential_comparison_image_light_futuristic(
 #     return card
 
 
+
 def create_result_card_stacked_with_simple_theme(
     differential_comparison_image,
     confidence_heatmap,
@@ -278,9 +279,14 @@ def create_result_card_stacked_with_simple_theme(
 
     draw = ImageDraw.Draw(card)
 
-    # Increase the font size by loading a truetype font with a specific size
+    # Load a generic font with customizable size
     font_size = 24
-    font = ImageFont.truetype("arial.ttf", font_size)  # Use a truetype font
+    try:
+        font = ImageFont.truetype("DejaVuSans.ttf", font_size)
+    except OSError:
+        print("DejaVuSans.ttf not found. Using default PIL font with custom size.")
+        font = ImageFont.truetype("LiberationSans-Regular.ttf", font_size)
+
     line_height = font_size + 5  # Adjust line height (add a small margin)
 
     # Define positions for the images and text
@@ -339,7 +345,7 @@ def create_result_card_stacked_with_simple_theme(
     draw.text(
         (margin, text_y),
         f"Number of Regions: {num_regions}",
-        font=font,
+        font=font, 
         fill=text_color,
     )
     text_y += line_height

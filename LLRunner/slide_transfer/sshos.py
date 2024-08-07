@@ -7,8 +7,11 @@ import os
 from time import sleep
 from LLRunner.config import slide_source_hostname, slide_source_username
 
+
 def sftp_walk(sftp, remotepath):
     """Walks a remote directory tree using SFTP."""
+
+    remotepath = str(remotepath)
     files = []
     directories = []
     for item in sftp.listdir_attr(remotepath):
@@ -17,13 +20,14 @@ def sftp_walk(sftp, remotepath):
             directories.append(item.filename)
         else:
             files.append(item.filename)
-    
+
     yield remotepath, directories, files
 
     for directory in directories:
         new_path = os.path.join(remotepath, directory)
         for x in sftp_walk(sftp, new_path):
             yield x
+
 
 class SSHOS:
     def __init__(
