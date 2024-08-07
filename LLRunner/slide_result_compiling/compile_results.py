@@ -194,7 +194,6 @@ def compile_results():
 
     tmp_df = pd.DataFrame(df_dict)
 
-    tmp_df['datetime_processed'] = pd.to_datetime(tmp_df['datetime_processed'])
-
+    # tmp_df['datetime_processed'] = pd.to_datetime(tmp_df['datetime_processed']) # DEPRECATED - not needed
 
     return tmp_df
