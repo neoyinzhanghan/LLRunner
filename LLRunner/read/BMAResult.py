@@ -660,7 +660,7 @@ class BMAResultSSH:
             self.sftp_client.stat(str(self.remote_result_dir))
         except FileNotFoundError:
             raise NotADirectoryError(
-                f"Result directory {self.remote_result_dir} does not exist on the remote server."
+                f"Result directory {self.remote_result_dir} does not exist on the remote server {self.username}@{self.hostname}."   
             )
 
         self.result_folder_name = self.remote_result_dir.name
