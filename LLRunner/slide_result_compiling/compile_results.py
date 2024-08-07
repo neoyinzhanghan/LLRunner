@@ -40,6 +40,8 @@ def compile_results():
         remote_result_dirs = all_result_dirs(machine)
 
         for remote_result_dir in remote_result_dirs:
+
+            remote_result_dir = os.path.join(results_dir, remote_result_dir)
             try:
                 bma_result = BMAResultSSH(
                     hostname=ssh_config[machine]["hostname"],
@@ -49,9 +51,8 @@ def compile_results():
             except Exception as e:
                 print(f"Error: {e}")
                 print(f"Machine: {machine}, remote_result_dir: {remote_result_dir}")
-                import sys
 
-                sys.exit()
+                raise e
 
             if not bma_result.has_error():
                 df_dict["machine"].append(machine)
