@@ -42,17 +42,28 @@ class SSHOS:
         return stdout.read().decode().splitlines()
 
     def isfile(self, remote_path):
-        stdin, stdout, stderr = self.client.exec_command(
-            f"if [ -f \"{remote_path}\" ]; then echo 'True'; else echo 'False'; fi"
-        )
-        return stdout.read().decode().strip() == "True"
+        """Check if the given remote path is a file."""
+        # Execute the command on the remote server
+        stdin, stdout, stderr = self.ssh_client.exec_command(f'test -f "{remote_path}" && echo 1 || echo 0')
+
+        # Read the output
+        result = stdout.read().decode().strip()
+
+        # Return True if the output is "1", meaning the file exists
+        return result == "1"
+
 
     def isdir(self, remote_path):
-        stdin, stdout, stderr = self.client.exec_command(
-            f"if [ -d \"{remote_path}\" ]; then echo 'True'; else echo 'False'; fi"
-        )
+        """Check if the given remote path is a directory."""
+        # Execute the command on the remote server
+        stdin, stdout, stderr = self.ssh_client.exec_command(f'test -d "{remote_path}" && echo 1 || echo 0')
 
-        return stdout.read().decode().strip() == "True"
+        # Read the output
+        result = stdout.read().decode().strip()
+
+        # Return True if the output is "1", meaning the directory exists
+        return result == "1"
+
 
     def rsync_file(self, remote_path, local_dir, retries=5, backoff_factor=1.5):
         """Rsync a single file from the remote server to a local directory with retry logic."""
