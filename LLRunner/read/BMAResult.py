@@ -85,6 +85,8 @@ class BMAResult:
         Take the average of the probabilities for each cell type and return a dictionary with the cell type as the key and the average probability as the value.
         """
 
+        assert not self.error, "Cannot get stacked differential for error directory."
+
         # get the columns corresponding to the cell types
         cell_columns = self.cell_info[cellnames]
 
@@ -99,6 +101,8 @@ class BMAResult:
         In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
         The predicted class is the class with the highest probability, return a dictionary with the cell type as the key and the proportion of cells predicted as that type as the value.
         """
+
+        assert not self.error, "Cannot get one hot differential for error directory."
 
         # get the columns corresponding to the cell types
         cell_columns = self.cell_info[cellnames]
@@ -119,6 +123,8 @@ class BMAResult:
         Finally, give the cell a class from the differential_group_dict based on their cellname classes.
         (The differential_group_dict should map a grouped class to the a list of cellname classes that grouped class contains)
         """
+
+        assert not self.error, "Cannot get grouped differential for error directory."
 
         # set the values of columns corresponding to the omitted classes to 0
         self.cell_info[omitted_classes] = 0
@@ -158,6 +164,10 @@ class BMAResult:
         Then return a dictionary with the grouped class as the key and the average probability as the value.
         """
 
+        assert (
+            not self.error
+        ), "Cannot get grouped stacked differential for error directory."
+
         # set the values of columns corresponding to the omitted classes to 0
         self.cell_info[omitted_classes] = 0
 
@@ -195,6 +205,8 @@ class BMAResult:
         Return the raw counts of the cells in the cell_info dataframe after classifying the cells into the cellnames classes.
         """
 
+        assert not self.error, "Cannot get raw counts for error directory."
+
         # classify the cells into the cellnames classes
         self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
 
@@ -210,6 +222,8 @@ class BMAResult:
         after setting omitted class probabilities to 0 and removing all the cells in the removed classes.
         The counts should be grouped based on the differential_group_dict.
         """
+
+        assert not self.error, "Cannot get grouped raw counts for error directory."
 
         # set the values of columns corresponding to the omitted classes to 0
         self.cell_info[omitted_classes] = 0
@@ -246,6 +260,8 @@ class BMAResult:
         Use PIL
         """
 
+        assert not self.error, "Cannot get grid rep for error directory."
+
         grid_rep_path = self.result_dir / "top_view_grid_rep.png"
 
         return Image.open(grid_rep_path)
@@ -256,6 +272,8 @@ class BMAResult:
         Use PIL
         """
 
+        assert not self.error, "Cannot get confidence heatmap for error directory."
+
         confidence_heatmap_path = self.result_dir / "confidence_heatmap.png"
 
         return Image.open(confidence_heatmap_path)
@@ -265,6 +283,8 @@ class BMAResult:
 
     def get_region_confidence(self, region_idx):
         """Use the focus_regions/focus_regions_info.csv file and the focus_regions/high_mag_focus_regions_info.csv file to get the confidence of the region with region_idx."""
+
+        assert not self.error, "Cannot get region confidence for error directory."
 
         results_dir_Path = Path(self.result_dir)
 
@@ -312,6 +332,8 @@ class BMAResult:
         Which is located at the directory/focus_regions.png.
         Use PIL
         """
+
+        assert not self.error, "Cannot get focus regions for error directory."
 
         # get the list of all the top regions images which are stored in dir/focus_regions/high_mag_unannotated
         result_dir_Path = Path(self.result_dir)
@@ -362,6 +384,8 @@ class BMAResult:
         """Return the runtime breakdown of the slide.
         Which is located at the directory/runtime_breakdown.csv.
         """
+
+        assert not self.error, "Cannot get runtime breakdown for error directory."
 
         # the runtime_data_path is dir/runtime_data.csv
         runtime_data_path = self.result_dir / "runtime_data.csv"
@@ -555,6 +579,8 @@ class BMAResult:
     def get_num_regions(self):
         """Count how many regio jpg images are in the high_mag_unannotated folder."""
 
+        assert not self.error, "Cannot get num regions for error directory."
+
         high_mag_unannotated_dir = (
             self.result_dir / "focus_regions" / "high_mag_unannotated"
         )
@@ -563,6 +589,8 @@ class BMAResult:
 
     def get_num_cells(self):
         """Recursively count how many jpg files are in the cells folder and its subfolders."""
+
+        assert not self.error, "Cannot get num cells for error directory."
 
         cells_dir = self.result_dir / "cells"
 
@@ -618,7 +646,11 @@ class BMAResultSSH:
         self.result_folder_name = self.remote_result_dir.name
         self.pipeline = self.result_folder_name.split("_")[0]
         self.datetime_processed = self.result_folder_name.split("_")[1]
+
         self.error = self.has_error()
+
+        if self.error:
+            pass  # TODO
 
         with SSHOS(hostname=self.hostname, username=self.username) as sshos:
             # check that the remote result directory exists
@@ -636,6 +668,8 @@ class BMAResultSSH:
         Take the average of the probabilities for each cell type and return a dictionary with the cell type as the key and the average probability as the value.
         """
 
+        assert not self.error, "Cannot get stacked differential for error directories."
+
         # get the columns corresponding to the cell types
         cell_columns = self.cell_info[cellnames]
 
@@ -650,6 +684,8 @@ class BMAResultSSH:
         In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
         The predicted class is the class with the highest probability, return a dictionary with the cell type as the key and the proportion of cells predicted as that type as the value.
         """
+
+        assert not self.error, "Cannot get stacked differential for error directories."
 
         # get the columns corresponding to the cell types
         cell_columns = self.cell_info[cellnames]
@@ -670,6 +706,8 @@ class BMAResultSSH:
         Finally, give the cell a class from the differential_group_dict based on their cellname classes.
         (The differential_group_dict should map a grouped class to the a list of cellname classes that grouped class contains)
         """
+
+        assert not self.error, "Cannot get stacked differential for error directories."
 
         # set the values of columns corresponding to the omitted classes to 0
         self.cell_info[omitted_classes] = 0
@@ -709,6 +747,8 @@ class BMAResultSSH:
         Then return a dictionary with the grouped class as the key and the average probability as the value.
         """
 
+        assert not self.error, "Cannot get stacked differential for error directories."
+
         # set the values of columns corresponding to the omitted classes to 0
         self.cell_info[omitted_classes] = 0
 
@@ -746,6 +786,8 @@ class BMAResultSSH:
         Return the raw counts of the cells in the cell_info dataframe after classifying the cells into the cellnames classes.
         """
 
+        assert not self.error, "Cannot get stacked differential for error directories."
+
         # classify the cells into the cellnames classes
         self.cell_info["cell_class"] = self.cell_info[cellnames].idxmax(axis=1)
 
@@ -761,6 +803,8 @@ class BMAResultSSH:
         after setting omitted class probabilities to 0 and removing all the cells in the removed classes.
         The counts should be grouped based on the differential_group_dict.
         """
+
+        assert not self.error, "Cannot get stacked differential for error directories."
 
         # set the values of columns corresponding to the omitted classes to 0
         self.cell_info[omitted_classes] = 0
@@ -800,6 +844,8 @@ class BMAResultSSH:
         Use PIL
         """
 
+        assert not self.error, "Cannot get confidence heatmap for error directories."
+
         confidence_heatmap_path = self.remote_result_dir / "confidence_heatmap.png"
 
         with self.sftp_client.open(str(confidence_heatmap_path), "rb") as f:
@@ -807,6 +853,9 @@ class BMAResultSSH:
 
     def get_region_confidence(self, region_idx):
         """Get the confidence scores for a specific region."""
+
+        assert not self.error, "Cannot get region confidence for error directories."
+
         focus_regions_info_path = (
             self.remote_result_dir / "focus_regions" / "focus_regions_info.csv"
         )
@@ -848,6 +897,9 @@ class BMAResultSSH:
 
     def get_focus_regions(self, num_to_sample=5):
         """Return images of the top regions of the slide."""
+
+        assert not self.error, "Cannot get focus regions for error directories."
+
         high_mag_unannotated_dir = (
             self.remote_result_dir / "focus_regions" / "high_mag_unannotated"
         )
@@ -899,6 +951,9 @@ class BMAResultSSH:
 
     def get_runtime_breakdown(self):
         """Return the runtime breakdown of the slide."""
+
+        assert not self.error, "Cannot get runtime breakdown for error directories."
+
         runtime_data_path = self.remote_result_dir / "runtime_data.csv"
 
         with self.sftp_client.open(str(runtime_data_path), "r") as f:
@@ -988,6 +1043,8 @@ class BMAResultSSH:
         Which is located at the directory/top_view_grid_rep.png.
         Use PIL
         """
+
+        assert not self.error, "Cannot get grid rep for error directories."
 
         grid_rep_path = self.remote_result_dir / "top_view_grid_rep.png"
 
@@ -1084,6 +1141,8 @@ class BMAResultSSH:
     def get_num_regions(self):
         """Count how many region jpg images are in the high_mag_unannotated folder."""
 
+        assert not self.error, "Cannot get num regions for error directories."
+
         high_mag_unannotated_dir = str(
             self.remote_result_dir / "focus_regions" / "high_mag_unannotated"
         )
@@ -1099,6 +1158,8 @@ class BMAResultSSH:
 
     def get_num_cells(self):
         """Recursively count how many jpg files are in the cell`s folder and its subfolders."""
+
+        assert not self.error, "Cannot get num cells for error directories."
 
         cells_dir = str(self.remote_result_dir / "cells")
 
