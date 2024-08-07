@@ -21,7 +21,7 @@ def all_result_dirs(machine):
     return result_dirs
 
 
-def compile_result():
+def compile_results():
 
     df_dict = {
         "machine": [],
