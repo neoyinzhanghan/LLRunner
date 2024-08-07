@@ -105,6 +105,128 @@ def plot_differential_comparison_image_light_futuristic(
     return Image.open(image_stream)
 
 
+# def create_result_card_stacked_with_simple_theme(
+#     differential_comparison_image,
+#     confidence_heatmap,
+#     total_processing_time,
+#     storage_consumption,
+#     Dx,
+#     sub_Dx,
+#     wsi_name,
+#     datetime_processed,
+#     pipeline,
+#     num_regions,
+#     num_cells,
+# ):
+#     """
+#     Create a result card image that consolidates the confidence heatmap, differential comparison image, and other metadata.
+#     The images are resized to fit within a specific width and stacked on top of each other.
+#     Text is displayed with a simple, clean theme matching the plot font.
+#     """
+
+#     # Set a target width and maintain aspect ratio for resizing
+#     target_width = 1000
+#     confidence_heatmap_resized = confidence_heatmap.resize(
+#         (
+#             target_width,
+#             int(confidence_heatmap.height * target_width / confidence_heatmap.width),
+#         )
+#     )
+#     differential_comparison_image_resized = differential_comparison_image.resize(
+#         (
+#             target_width,
+#             int(
+#                 differential_comparison_image.height
+#                 * target_width
+#                 / differential_comparison_image.width
+#             ),
+#         )
+#     )
+
+#     # Define the size of the card
+#     card_width = target_width + 40  # 40 for margin
+#     card_height = (
+#         confidence_heatmap_resized.height
+#         + differential_comparison_image_resized.height
+#         + 350
+#     )  # Extra space for text
+#     card = Image.new(
+#         "RGB", (card_width, card_height), color="white"
+#     )  # White background
+
+#     draw = ImageDraw.Draw(card)
+
+#     # Use a simple, clean font
+#     font = ImageFont.load_default()
+#     line_height = 32  # Adjust line height for better readability
+
+#     # Define positions for the images and text
+#     margin = 20
+
+#     # Paste the confidence heatmap on the top
+#     card.paste(confidence_heatmap_resized, (margin, margin))
+
+#     # Paste the differential comparison image below the heatmap
+#     card.paste(
+#         differential_comparison_image_resized,
+#         (margin, confidence_heatmap_resized.height + margin + 20),
+#     )
+
+#     # Write the metadata below the images with matching font
+#     text_y = (
+#         confidence_heatmap_resized.height
+#         + differential_comparison_image_resized.height
+#         + 2 * margin
+#         + 20
+#     )
+#     text_color = "black"  # Simple black text
+
+#     draw.text((margin, text_y), f"WSI Name: {wsi_name}", font=font, fill=text_color)
+#     text_y += line_height
+#     draw.text((margin, text_y), f"Pipeline: {pipeline}", font=font, fill=text_color)
+#     text_y += line_height
+#     draw.text(
+#         (margin, text_y),
+#         f"Date Processed: {datetime_processed}",
+#         font=font,
+#         fill=text_color,
+#     )
+#     text_y += line_height
+#     draw.text(
+#         (margin, text_y),
+#         f"Diagnosis: {Dx}, Sub Diagnosis: {sub_Dx}",
+#         font=font,
+#         fill=text_color,
+#     )
+#     text_y += line_height
+#     draw.text(
+#         (margin, text_y),
+#         f"Total Processing Time: {total_processing_time} seconds",
+#         font=font,
+#         fill=text_color,
+#     )
+#     text_y += line_height
+#     draw.text(
+#         (margin, text_y),
+#         f"Storage Consumption: {storage_consumption}",
+#         font=font,
+#         fill=text_color,
+#     )
+#     text_y += line_height
+#     draw.text(
+#         (margin, text_y),
+#         f"Number of Regions: {num_regions}",
+#         font=font,
+#         fill=text_color,
+#     )
+#     text_y += line_height
+#     draw.text(
+#         (margin, text_y), f"Number of Cells: {num_cells}", font=font, fill=text_color
+#     )
+
+#     return card
+
+
 def create_result_card_stacked_with_simple_theme(
     differential_comparison_image,
     confidence_heatmap,
@@ -156,9 +278,10 @@ def create_result_card_stacked_with_simple_theme(
 
     draw = ImageDraw.Draw(card)
 
-    # Use a simple, clean font
-    font = ImageFont.load_default()
-    line_height = 32  # Adjust line height for better readability
+    # Increase the font size by loading a truetype font with a specific size
+    font_size = 24
+    font = ImageFont.truetype("arial.ttf", font_size)  # Use a truetype font
+    line_height = font_size + 5  # Adjust line height (add a small margin)
 
     # Define positions for the images and text
     margin = 20
