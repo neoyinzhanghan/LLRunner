@@ -9,7 +9,12 @@ from io import BytesIO
 from pathlib import Path
 from PIL import Image
 from LLRunner.read.read_config import *
-from LLRunner.config import pipeline_run_history_path, slide_metadata_path
+from LLRunner.config import (
+    pipeline_run_history_path,
+    slide_metadata_path,
+    bma_diff_metadata_path,
+)
+from LLRunner.slide_transfer.sshos import SSHOS
 
 
 ####################################################################################################
@@ -23,43 +28,11 @@ def csv_to_dict(file_path):
         csv_reader = csv.reader(csvfile)
         for row in csv_reader:
             key = row[0]  # Access the first column as the key
-            value = float(row[1])  # Access the second column as the value, converting it to float
+            value = float(
+                row[1]
+            )  # Access the second column as the value, converting it to float
             result_dict[key] = value
     return result_dict
-
-
-def has_error(result_dir):
-    """Check if there results directory corresponds to an error run."""
-
-    # result_dir is a string, make it a Path object
-    result_dir_Path = Path(result_dir)
-
-    # first split the result_dir into its components by _, first part is the pipeline and the second part is the datetime_processed
-    pipeline, datetime_processed = result_dir_Path.name.split("_", 1)
-
-    # read the pipeline_run_history file
-    pipeline_run_history = pd.read_csv(pipeline_run_history_path)
-
-    # look for the row in the pipeline_run_history dataframe that corresponds to the pipeline and datetime_processed
-    row = pipeline_run_history[
-        (pipeline_run_history["pipeline"] == pipeline)
-        & (pipeline_run_history["datetime_processed"] == datetime_processed)
-    ]
-
-    # if the row does not exist, then raise an error using assert statement (there should be only one row)
-    assert (
-        len(row) >= 1
-    ), f"Row not found in pipeline_run_history for {pipeline} and {datetime_processed}"
-
-    assert (
-        len(row) == 1
-    ), f"Multiple rows found in pipeline_run_history for {pipeline} and {datetime_processed}. This should never happen and the pipeline log could be corrupted."
-
-    # get the error column from the row
-    error = row["error"].iloc[0]
-
-    # return the error value as boolean
-    return bool(error)
 
 
 ####################################################################################################
@@ -99,7 +72,10 @@ class BMAResult:
         self.datetime_processed = self.result_folder_name.split("_")[1]
 
         # second check if the result directory's folder name starts with "ERROR_"
-        self.error = has_error(self.result_folder_name)
+        self.error = self.has_error(self.result_folder_name)
+
+        # check that the result directory exists and is actually a directory
+        assert result_dir.is_dir(), f"{result_dir} is not a valid directory."
 
         self.result_dir = result_dir
         self.cell_info = pd.read_csv(result_dir / "cells" / "cells_info.csv")
@@ -285,7 +261,7 @@ class BMAResult:
         return Image.open(confidence_heatmap_path)
 
     def has_error(self):
-        return self.error
+        return bool(self.get_run_history()["error"])
 
     def get_region_confidence(self, region_idx):
         """Use the focus_regions/focus_regions_info.csv file and the focus_regions/high_mag_focus_regions_info.csv file to get the confidence of the region with region_idx."""
@@ -516,8 +492,65 @@ class BMAResult:
 
         return Dx, sub_Dx
 
-    def get_stored_differential(self):  # TODO We will do this manually for now
-        pass  # TODO, we need to check the integrity of the stored differential and make sure that it actually matches with the differential computed here.
+    def get_reported_differential(self):
+        """Use the bma_diff_metadata.csv file to get the reported differential of the slide."""
+
+        diff_dict = {
+            "blasts": None,
+            "blast-equivalents": None,
+            "promyelocytes": None,
+            "myelocytes": None,
+            "metamyelocytes": None,
+            "neutrophils/bands": None,
+            "monocytes": None,
+            "eosinophils": None,
+            "erythroid precursors": None,
+            "lymphocytes": None,
+            "plasma cells": None,
+        }
+
+        bma_diff_metadata = pd.read_csv(bma_diff_metadata_path)
+
+        # get the row in the bma_diff_metadata dataframe that corresponds to the wsi_name
+        row = bma_diff_metadata[bma_diff_metadata["wsi_name"] == self.get_wsi_name()]
+
+        if len(row) == 0:
+            print(
+                "User Warning: No row found in bma_diff_metadata for this slide. Returning None for all cell types. However, this means that the slide differential has not been pulled from the database. This behaviour could indicate a problem in the data pipeline."
+            )
+            return diff_dict
+
+        assert (
+            len(row) == 1
+        ), f"Multiple rows found in bma_diff_metadata for {self.get_wsi_name()}. This should never happen and the pipeline log could be corrupted."
+
+        blasts = row["blasts"].iloc[0]
+        blast_equivalents = row["blast-equivalents"].iloc[0]
+        promyelocytes = row["promyelocytes"].iloc[0]
+        myelocytes = row["myelocytes"].iloc[0]
+        metamyelocytes = row["metamyelocytes"].iloc[0]
+        neutrophils_bands = row["neutrophils/bands"].iloc[0]
+        monocytes = row["monocytes"].iloc[0]
+        eosinophils = row["eosinophils"].iloc[0]
+        erythroid_precursors = row["erythroid precursors"].iloc[0]
+        lymphocytes = row["lymphocytes"].iloc[0]
+        plasma_cells = row["plasma cells"].iloc[0]
+
+        diff_dict = {
+            "blasts": blasts,
+            "blast-equivalents": blast_equivalents,
+            "promyelocytes": promyelocytes,
+            "myelocytes": myelocytes,
+            "metamyelocytes": metamyelocytes,
+            "neutrophils/bands": neutrophils_bands,
+            "monocytes": monocytes,
+            "eosinophils": eosinophils,
+            "erythroid precursors": erythroid_precursors,
+            "lymphocytes": lymphocytes,
+            "plasma cells": plasma_cells,
+        }
+
+        return diff_dict
 
 
 ####################################################################################################
@@ -559,7 +592,13 @@ class BMAResultSSH:
         self.result_folder_name = self.remote_result_dir.name
         self.pipeline = self.result_folder_name.split("_")[0]
         self.datetime_processed = self.result_folder_name.split("_")[1]
-        self.error = self.result_folder_name.startswith("ERROR_")
+        self.error = self.has_error()
+
+        with SSHOS() as sshos:
+            # check that the remote result directory exists
+            assert sshos.isdir(
+                self.remote_result_dir
+            ), f"Remote result directory {self.remote_result_dir} does not exist on the server {self.username}@{self.hostname}."
 
         with self.sftp_client.open(
             str(self.remote_result_dir / "cells" / "cells_info.csv"), "r"
@@ -727,7 +766,7 @@ class BMAResultSSH:
         return grouped_raw_counts.to_dict()
 
     def has_error(self):
-        return self.error
+        return bool(self.get_run_history()["error"])
 
     def get_confidence_heatmap(self):
         """Return the confidence heatmap image of the slide.
@@ -955,9 +994,58 @@ class BMAResultSSH:
 
         return Dx, sub_Dx
 
-    def get_stored_differential(self):
-        """Placeholder for stored differential logic."""
-        pass  # TODO: Implement the logic to check integrity of stored differential
+    def get_reported_differential(self):
+        """Use the bma_diff_metadata.csv file to get the reported differential of the slide."""
+
+        diff_dict = {
+            "blasts": None,
+            "blast-equivalents": None,
+            "promyelocytes": None,
+            "myelocytes": None,
+            "metamyelocytes": None,
+            "neutrophils/bands": None,
+            "monocytes": None,
+            "eosinophils": None,
+            "erythroid precursors": None,
+            "lymphocytes": None,
+            "plasma cells": None,
+        }
+
+        # Assuming bma_diff_metadata_path is defined or passed as an argument
+        with self.sftp_client.open(
+            str(self.remote_result_dir / "bma_diff_metadata.csv"), "r"
+        ) as f:
+            bma_diff_metadata = pd.read_csv(f)
+
+        # Get the row in the bma_diff_metadata dataframe that corresponds to the wsi_name
+        row = bma_diff_metadata[bma_diff_metadata["wsi_name"] == self.get_wsi_name()]
+
+        if len(row) == 0:
+            print(
+                "User Warning: No row found in bma_diff_metadata for this slide. Returning None for all cell types. However, this means that the slide differential has not been pulled from the database. This behaviour could indicate a problem in the data pipeline."
+            )
+            return diff_dict
+
+        assert (
+            len(row) == 1
+        ), f"Multiple rows found in bma_diff_metadata for {self.get_wsi_name()}. This should never happen and the pipeline log could be corrupted."
+
+        # Extracting values from the DataFrame
+        diff_dict = {
+            "blasts": row["blasts"].iloc[0],
+            "blast-equivalents": row["blast-equivalents"].iloc[0],
+            "promyelocytes": row["promyelocytes"].iloc[0],
+            "myelocytes": row["myelocytes"].iloc[0],
+            "metamyelocytes": row["metamyelocytes"].iloc[0],
+            "neutrophils/bands": row["neutrophils/bands"].iloc[0],
+            "monocytes": row["monocytes"].iloc[0],
+            "eosinophils": row["eosinophils"].iloc[0],
+            "erythroid precursors": row["erythroid precursors"].iloc[0],
+            "lymphocytes": row["lymphocytes"].iloc[0],
+            "plasma cells": row["plasma cells"].iloc[0],
+        }
+
+        return diff_dict
 
     def csv_to_dict(self, file_obj):
         """Convert a CSV file into a dictionary."""
