@@ -1,8 +1,9 @@
 import paramiko
 import subprocess
 import time
-from time import sleep
+import stat
 import pandas as pd
+from time import sleep
 from LLRunner.config import slide_source_hostname, slide_source_username
 
 
@@ -17,6 +18,7 @@ class SSHOS:
         self.username = username
         self.key_filename = key_filename
         self.client = None
+        self.sftp = None
 
     def __enter__(self):
         self.connect()
@@ -34,32 +36,32 @@ class SSHOS:
             )
         else:
             self.client.connect(self.hostname, username=self.username)
+        self.sftp = self.client.open_sftp()
 
     def disconnect(self):
+        if self.sftp:
+            self.sftp.close()
         if self.client:
             self.client.close()
 
     def listdir(self, remote_path):
-        stdin, stdout, stderr = self.client.exec_command(f"ls -p {remote_path}")
-        output = stdout.read().decode().splitlines()
-
-        # Remove trailing slashes from directories
-        output = [line[:-1] if line.endswith("/") else line for line in output]
-
-        return output
+        try:
+            return self.sftp.listdir(remote_path)
+        except IOError as e:
+            print(f"Error reading remote directory: {e}")
+            return []
 
     def isfile(self, remote_path):
-        stdin, stdout, stderr = self.client.exec_command(
-            f"if [ -f \"{remote_path}\" ]; then echo 'True'; else echo 'False'; fi"
-        )
-        return stdout.read().decode().strip() == "True"
+        try:
+            return stat.S_ISREG(self.sftp.stat(remote_path).st_mode)
+        except IOError:
+            return False
 
     def isdir(self, remote_path):
-        stdin, stdout, stderr = self.client.exec_command(
-            f"if [ -d \"{remote_path}\" ]; then echo 'True'; else echo 'False'; fi"
-        )
-
-        return stdout.read().decode().strip() == "True"
+        try:
+            return stat.S_ISDIR(self.sftp.stat(remote_path).st_mode)
+        except IOError:
+            return False
 
     def rsync_file(self, remote_path, local_dir, retries=5, backoff_factor=1.5):
         """Rsync a single file from the remote server to a local directory with retry logic."""
