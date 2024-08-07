@@ -1,6 +1,7 @@
 import paramiko
 import subprocess
 import time
+import stat
 from LLRunner.config import slide_source_hostname, slide_source_username
 
 
@@ -15,6 +16,7 @@ class SSHOS:
         self.username = username
         self.key_filename = key_filename
         self.client = None
+        self.sftp = None
 
     def __enter__(self):
         self.connect()
@@ -32,8 +34,11 @@ class SSHOS:
             )
         else:
             self.client.connect(self.hostname, username=self.username)
+        self.sftp = self.client.open_sftp()
 
     def disconnect(self):
+        if self.sftp:
+            self.sftp.close()
         if self.client:
             self.client.close()
 
@@ -43,27 +48,17 @@ class SSHOS:
 
     def isfile(self, remote_path):
         """Check if the given remote path is a file."""
-        # Execute the command on the remote server
-        stdin, stdout, stderr = self.client.exec_command(f'test -f "{remote_path}" && echo 1 || echo 0')
-
-        # Read the output
-        result = stdout.read().decode().strip()
-
-        # Return True if the output is "1", meaning the file exists
-        return result == "1"
-
+        try:
+            return stat.S_ISREG(self.sftp.stat(remote_path).st_mode)
+        except FileNotFoundError:
+            return False
 
     def isdir(self, remote_path):
         """Check if the given remote path is a directory."""
-        # Execute the command on the remote server
-        stdin, stdout, stderr = self.client.exec_command(f'test -d "{remote_path}" && echo 1 || echo 0')
-
-        # Read the output
-        result = stdout.read().decode().strip()
-
-        # Return True if the output is "1", meaning the directory exists
-        return result == "1"
-
+        try:
+            return stat.S_ISDIR(self.sftp.stat(remote_path).st_mode)
+        except FileNotFoundError:
+            return False
 
     def rsync_file(self, remote_path, local_dir, retries=5, backoff_factor=1.5):
         """Rsync a single file from the remote server to a local directory with retry logic."""
