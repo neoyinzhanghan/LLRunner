@@ -280,7 +280,7 @@ def create_result_card_stacked_with_simple_theme(
     draw = ImageDraw.Draw(card)
 
     # Load a generic font with customizable size
-    font_size = 24
+    font_size = 32
     try:
         font = ImageFont.truetype("DejaVuSans.ttf", font_size)
     except OSError:
