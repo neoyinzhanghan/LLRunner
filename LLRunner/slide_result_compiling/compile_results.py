@@ -76,6 +76,13 @@ def all_result_dirs(machine):
     with SSHOS(hostname=hostname, username=username) as sshos:
         result_dirs = sshos.listdir(results_dir)
 
+        # only keep the ones that are actually directories
+        result_dirs = [
+            result_dir
+            for result_dir in result_dirs
+            if sshos.isdir(os.path.join(results_dir, result_dir))
+        ]
+
     return result_dirs
 
 
