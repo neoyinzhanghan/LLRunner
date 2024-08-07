@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import time
 from LLRunner.config import results_dir, available_machines, ssh_config
 from LLRunner.read.BMAResult import BMAResultSSH
 from LLRunner.slide_transfer.sshos import SSHOS
@@ -45,6 +46,8 @@ def compile_results():
         ):
 
             remote_result_dir = os.path.join(results_dir, remote_result_dir)
+
+            start_time = time.time()
             try:
                 bma_result = BMAResultSSH(
                     hostname=ssh_config[machine]["hostname"],
@@ -70,6 +73,10 @@ def compile_results():
                     bma_result.get_datetime_processed()
                 )
                 df_dict["note"].append(bma_result.get_note())
+
+            time_taken = time.time() - start_time
+
+            print(f"Time taken for {remote_result_dir}: {time_taken:.2f} seconds.")
 
     df = pd.DataFrame(df_dict)
 
