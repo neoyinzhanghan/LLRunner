@@ -104,7 +104,8 @@ def compile_results():
             remote_result_dirs, desc=f"Compiling Result Dirs on Machine: {machine}"
         ):
 
-            pipeline, datetime_processed = remote_result_dir.split("_", 1)
+            pipeline = remote_result_dir.split("_")[0]
+            datetime_processed = remote_result_dir.split("_")[1]
 
             # look for the row in pipeline_run_history_df with the same pipeline and datetime_processed
             pipeline_run_history_row = pipeline_run_history_df[
