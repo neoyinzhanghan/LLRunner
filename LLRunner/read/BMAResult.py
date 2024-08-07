@@ -1143,6 +1143,11 @@ if __name__ == "__main__":
     print(f"Dx: {Dx}")
     print(f"Sub Dx: {sub_Dx}")
 
+    # now print the reported differential
+    reported_differential = bma_result.get_reported_differential()
+
+    print(f"Reported differential: {reported_differential}")
+
     ##########################################
     # TESTING SSH VERSION
     ##########################################
@@ -1230,3 +1235,8 @@ if __name__ == "__main__":
     print(f"Part description: {part_description}")
     print(f"Dx: {Dx}")
     print(f"Sub Dx: {sub_Dx}")
+
+    # Get the reported differential
+    reported_differential = bma_result.get_reported_differential()
+
+    print(f"Reported differential: {reported_differential}")
