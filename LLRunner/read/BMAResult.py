@@ -409,28 +409,44 @@ class BMAResult:
         s = round(size_bytes / p, 2)
         return f"{s} {size_name[i]}"
 
-    def get_storage_consumption_breakdown(self):
-        """Return the storage consumption breakdown of the slide result folder."""
+    # def get_storage_consumption_breakdown(self):
+    #     """Return the storage consumption breakdown of the slide result folder."""
+    #     if not os.path.isdir(self.result_dir):
+    #         raise NotADirectoryError(f"{self.result_dir} is not a valid directory.")
+
+    #     breakdown = {}
+    #     for root, dirs, files in os.walk(self.result_dir):
+    #         for file in files:
+    #             file_path = os.path.join(root, file)
+    #             file_size = os.path.getsize(file_path)
+    #             extension = os.path.splitext(file)[1].lower()  # Get file extension
+
+    #             if extension not in breakdown:
+    #                 breakdown[extension] = 0
+    #             breakdown[extension] += file_size
+
+    #     # Convert file sizes to a more readable format (e.g., MB, GB)
+    #     breakdown_readable = {
+    #         ext: self._convert_size(size) for ext, size in breakdown.items()
+    #     }
+
+    #     return breakdown_readable
+
+    def get_storage_consumption(self):
+        """Return the total storage consumption of the slide result folder."""
         if not os.path.isdir(self.result_dir):
             raise NotADirectoryError(f"{self.result_dir} is not a valid directory.")
 
-        breakdown = {}
+        total_size = 0
         for root, dirs, files in os.walk(self.result_dir):
             for file in files:
                 file_path = os.path.join(root, file)
-                file_size = os.path.getsize(file_path)
-                extension = os.path.splitext(file)[1].lower()  # Get file extension
+                total_size += os.path.getsize(file_path)
 
-                if extension not in breakdown:
-                    breakdown[extension] = 0
-                breakdown[extension] += file_size
+        # Convert the total size to a more readable format (e.g., MB, GB)
+        total_size_readable = self._convert_size(total_size)
 
-        # Convert file sizes to a more readable format (e.g., MB, GB)
-        breakdown_readable = {
-            ext: self._convert_size(size) for ext, size in breakdown.items()
-        }
-
-        return breakdown_readable
+        return total_size_readable
 
     def get_run_history(self):
         """Return the run history of the slide.
@@ -991,6 +1007,18 @@ class BMAResultSSH:
         }
 
         return breakdown_readable
+
+    def get_storage_consumption(self):
+        """Return the total storage consumption of the slide result folder."""
+
+        total_size = 0
+        for attr in self.sftp_client.listdir_attr(str(self.remote_result_dir)):
+            if not attr.filename.startswith("."):
+                total_size += attr.st_size
+
+        total_size_readable = self._convert_size(total_size)
+
+        return total_size_readable
 
     def get_run_history(self):
         """Return the run history of the slide."""

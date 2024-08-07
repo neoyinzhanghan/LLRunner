@@ -398,7 +398,7 @@ def get_mini_result_card(remote_result_dir, machine):
         ),
         confidence_heatmap=bma_result.get_confidence_heatmap(),
         total_processing_time=bma_result.get_runtime_breakdown()["total_time"],
-        storage_consumption=bma_result.get_storage_consumption_breakdown(),
+        storage_consumption=bma_result.get_storage_consumption(),
         Dx=bma_result.get_Dx_and_sub_Dx()[0],
         sub_Dx=bma_result.get_Dx_and_sub_Dx()[1],
         wsi_name=bma_result.get_wsi_name(),
