@@ -14,7 +14,7 @@ from LLRunner.config import (
     slide_metadata_path,
     bma_diff_metadata_path,
 )
-from LLRunner.slide_transfer.sshos import SSHOS
+from LLRunner.slide_transfer.sshos import SSHOS, sftp_walk
 
 
 ####################################################################################################
@@ -1171,7 +1171,7 @@ class BMAResultSSH:
         num_cells = 0
         try:
             # Recursively list all files in the cells directory
-            for dirpath, dirnames, filenames in self.sftp_client.walk(cells_dir):
+            for dirpath, dirnames, filenames in sftp_walk(self.sftp_client, cells_dir):
                 num_cells += len([file for file in filenames if file.endswith(".jpg")])
         except FileNotFoundError:
             return 0  # If the directory does not exist, return 0

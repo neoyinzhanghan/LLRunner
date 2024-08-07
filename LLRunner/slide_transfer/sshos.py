@@ -3,9 +3,27 @@ import subprocess
 import time
 import stat
 import pandas as pd
+import os
 from time import sleep
 from LLRunner.config import slide_source_hostname, slide_source_username
 
+def sftp_walk(sftp, remotepath):
+    """Walks a remote directory tree using SFTP."""
+    files = []
+    directories = []
+    for item in sftp.listdir_attr(remotepath):
+        mode = item.st_mode
+        if stat.S_ISDIR(mode):
+            directories.append(item.filename)
+        else:
+            files.append(item.filename)
+    
+    yield remotepath, directories, files
+
+    for directory in directories:
+        new_path = os.path.join(remotepath, directory)
+        for x in sftp_walk(sftp, new_path):
+            yield x
 
 class SSHOS:
     def __init__(
