@@ -78,7 +78,11 @@ class BMAResult:
         assert result_dir.is_dir(), f"{result_dir} is not a valid directory."
 
         self.result_dir = result_dir
-        self.cell_info = pd.read_csv(result_dir / "cells" / "cells_info.csv")
+
+        if self.error:
+            return
+        else:
+            self.cell_info = pd.read_csv(result_dir / "cells" / "cells_info.csv")
 
     def get_stacked_differential(self):
         """In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
@@ -649,19 +653,20 @@ class BMAResultSSH:
 
         self.error = self.has_error()
 
-        if self.error:
-            pass  # TODO
-
         with SSHOS(hostname=self.hostname, username=self.username) as sshos:
             # check that the remote result directory exists
             assert sshos.isdir(
                 self.remote_result_dir
             ), f"Remote result directory {self.remote_result_dir} does not exist on the server {self.username}@{self.hostname}."
 
-        with self.sftp_client.open(
-            str(self.remote_result_dir / "cells" / "cells_info.csv"), "r"
-        ) as f:
-            self.cell_info = pd.read_csv(f)
+        if self.error:
+            return  # No need to read the cell_info if it's an error directory
+
+        else:
+            with self.sftp_client.open(
+                str(self.remote_result_dir / "cells" / "cells_info.csv"), "r"
+            ) as f:
+                self.cell_info = pd.read_csv(f)
 
     def get_stacked_differential(self):
         """In the cell_info dataframe there are columns corresponding to each cell type in the list cellnames.
