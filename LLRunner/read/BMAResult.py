@@ -1012,9 +1012,7 @@ class BMAResultSSH:
         }
 
         # Assuming bma_diff_metadata_path is defined or passed as an argument
-        with self.sftp_client.open(
-            str(self.remote_result_dir / "bma_diff_metadata.csv"), "r"
-        ) as f:
+        with self.sftp_client.open(bma_diff_metadata_path, "r") as f:
             bma_diff_metadata = pd.read_csv(f)
 
         # Get the row in the bma_diff_metadata dataframe that corresponds to the wsi_name
