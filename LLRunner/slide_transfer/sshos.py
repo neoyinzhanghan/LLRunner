@@ -1,6 +1,8 @@
 import paramiko
 import subprocess
 import time
+from time import sleep
+import pandas as pd
 from LLRunner.config import slide_source_hostname, slide_source_username
 
 
@@ -82,6 +84,11 @@ class SSHOS:
         remote_directory = f"{self.username}@{self.hostname}:{remote_dir}/"
         cmd = ["rsync", "-avz", "-e", "ssh", remote_directory, local_dir]
         subprocess.run(cmd, check=True)
+
+    def get_csv_as_df(self, remote_path):
+        """Get a remote CSV file as a pandas DataFrame."""
+        stdin, stdout, stderr = self.client.exec_command(f"cat {remote_path}")
+        return pd.read_csv(stdout)
 
 
 # Example usage:
