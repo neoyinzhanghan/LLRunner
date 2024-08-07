@@ -234,7 +234,7 @@ def get_mini_result_card(remote_result_dir, machine):
     # assert that the keys are the same between the reported and grouped differential
     assert set(reported_diff_dict.keys()) == set(
         grouped_diff_dict.keys()
-    ), "Keys in reported and grouped differential do not match."
+    ), f"Keys in reported and grouped differential do not match. Reported: {set(reported_diff_dict.keys())}, Grouped: {set(grouped_diff_dict.keys())}"
 
     num_regions = 100  # TODO bma_result.get_num_regions()
     num_cells = 1000  # TODO bma_result.get_num_cells()
