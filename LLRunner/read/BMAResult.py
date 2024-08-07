@@ -72,7 +72,7 @@ class BMAResult:
         self.datetime_processed = self.result_folder_name.split("_")[1]
 
         # second check if the result directory's folder name starts with "ERROR_"
-        self.error = self.has_error(self.result_folder_name)
+        self.error = self.has_error()
 
         # check that the result directory exists and is actually a directory
         assert result_dir.is_dir(), f"{result_dir} is not a valid directory."
