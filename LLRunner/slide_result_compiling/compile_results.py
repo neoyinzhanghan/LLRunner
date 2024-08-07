@@ -192,6 +192,9 @@ def compile_results():
 
             # print(f"Time taken for {remote_result_dir}: {time_taken:.2f} seconds.")
 
-    df = pd.DataFrame(df_dict)
+    tmp_df = pd.DataFrame(df_dict)
 
-    return df
+    tmp_df['datetime_processed'] = pd.to_datetime(tmp_df['datetime_processed'])
+
+
+    return tmp_df
