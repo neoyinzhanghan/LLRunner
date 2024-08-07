@@ -594,11 +594,11 @@ class BMAResultSSH:
         self.datetime_processed = self.result_folder_name.split("_")[1]
         self.error = self.has_error()
 
-        with SSHOS() as sshos:
-            # check that the remote result directory exists
-            assert sshos.isdir(
-                self.remote_result_dir
-            ), f"Remote result directory {self.remote_result_dir} does not exist on the server {self.username}@{self.hostname}."
+        # with SSHOS() as sshos:
+        #     # check that the remote result directory exists
+        #     assert sshos.isdir(
+        #         self.remote_result_dir
+        #     ), f"Remote result directory {self.remote_result_dir} does not exist on the server {self.username}@{self.hostname}."
 
         with self.sftp_client.open(
             str(self.remote_result_dir / "cells" / "cells_info.csv"), "r"
