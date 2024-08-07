@@ -118,8 +118,7 @@ def compile_results():
                 print(
                     f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}"
                 )
-                import sys
-                sys.exit()
+                raise e
 
             # look for the row in pipeline_run_history_df with the same pipeline and datetime_processed
             pipeline_run_history_row = pipeline_run_history_df[
