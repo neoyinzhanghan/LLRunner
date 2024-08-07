@@ -552,6 +552,32 @@ class BMAResult:
 
         return diff_dict
 
+    def get_num_regions(self):
+        """Count how many regio jpg images are in the high_mag_unannotated folder."""
+
+        high_mag_unannotated_dir = (
+            self.result_dir / "focus_regions" / "high_mag_unannotated"
+        )
+
+        return len(list(high_mag_unannotated_dir.glob("*.jpg")))
+
+    def get_num_cells(self):
+        """Recursively count how many jpg files are in the cells folder and its subfolders."""
+
+        cells_dir = self.result_dir / "cells"
+
+        num_cells = 0
+        for root, dirs, files in os.walk(cells_dir):
+            for file in files:
+                if file.endswith(".jpg"):
+                    num_cells += 1
+
+        return num_cells
+
+    def get_note(self):
+        """Return the note from the run history."""
+        return self.get_run_history()["note"]
+
 
 ####################################################################################################
 # SSH RESULT DIRECTORY IMPLEMENTATION
@@ -1054,6 +1080,42 @@ class BMAResultSSH:
             value = float(row.iloc[1])
             result_dict[key] = value
         return result_dict
+
+    def get_num_regions(self):
+        """Count how many region jpg images are in the high_mag_unannotated folder."""
+
+        high_mag_unannotated_dir = str(
+            self.remote_result_dir / "focus_regions" / "high_mag_unannotated"
+        )
+
+        try:
+            # List files in the directory using SFTP
+            files = self.sftp_client.listdir(high_mag_unannotated_dir)
+            # Filter out only .jpg files
+            jpg_files = [file for file in files if file.endswith(".jpg")]
+            return len(jpg_files)
+        except FileNotFoundError:
+            return 0  # If the directory does not exist, return 0
+
+    def get_num_cells(self):
+        """Recursively count how many jpg files are in the cell`s folder and its subfolders."""
+
+        cells_dir = str(self.remote_result_dir / "cells")
+
+        num_cells = 0
+        try:
+            # Recursively list all files in the cells directory
+            for dirpath, dirnames, filenames in self.sftp_client.walk(cells_dir):
+                num_cells += len([file for file in filenames if file.endswith(".jpg")])
+        except FileNotFoundError:
+            return 0  # If the directory does not exist, return 0
+
+        return num_cells
+
+    def get_note(self):
+        """Return the note from the run history."""
+
+        return self.get_run_history()["note"]
 
     def __del__(self):
         """Cleanup the SSH and SFTP connections."""

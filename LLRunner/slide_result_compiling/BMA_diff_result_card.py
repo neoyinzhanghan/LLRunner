@@ -260,8 +260,8 @@ def get_mini_result_card(remote_result_dir, machine):
         reported_diff_dict, grouped_diff_dict
     )
 
-    num_regions = 100  # TODO bma_result.get_num_regions()
-    num_cells = 1000  # TODO bma_result.get_num_cells()
+    num_regions = bma_result.get_num_regions()
+    num_cells = bma_result.get_num_cells()
 
     result_card = create_result_card_stacked_with_simple_theme(
         differential_comparison_image=plot_differential_comparison_image_light_futuristic(
@@ -287,5 +287,4 @@ if __name__ == "__main__":
     remote_result_dir = "/media/hdd3/neo/results_dir/BMA-diff_2024-07-31 23:06:08"
     machine = "glv2"
     result_card = get_mini_result_card(remote_result_dir, machine)
-    result_card.show()  # Display the result card
     result_card.save("result_card.png")  # Save the result card to a file
