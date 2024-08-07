@@ -25,7 +25,10 @@ def compile_result():
 
     df_dict = {
         "machine": [],
+        "hostname": [],
+        "username": [],
         "remote_result_dir": [],
+        "wsi_name": [],
         "pipeline": [],
         "Dx": [],
         "sub_Dx": [],
@@ -45,7 +48,10 @@ def compile_result():
 
             if not bma_result.has_error():
                 df_dict["machine"].append(machine)
+                df_dict["hostname"].append(ssh_config[machine]["hostname"])
+                df_dict["username"].append(ssh_config[machine]["username"])
                 df_dict["remote_result_dir"].append(remote_result_dir)
+                df_dict["wsi_name"].append(bma_result.get_wsi_name())
                 df_dict["pipeline"].append(bma_result.get_pipeline())
                 df_dict["Dx"].append(bma_result.get_Dx_and_sub_Dx()[0])
                 df_dict["sub_Dx"].append(bma_result.get_Dx_and_sub_Dx()[1])
