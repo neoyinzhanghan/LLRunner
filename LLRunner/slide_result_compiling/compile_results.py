@@ -148,12 +148,10 @@ def compile_results():
                 dx = slide_metadata_row["Dx"].iloc[0]
                 sub_dx = slide_metadata_row["sub_Dx"].iloc[0]
 
-                remote_result_path = os.path.join(results_dir, remote_result_dir)
-
                 df_dict["machine"].append(machine)
                 df_dict["hostname"].append(ssh_config[machine]["hostname"])
                 df_dict["username"].append(ssh_config[machine]["username"])
-                df_dict["remote_result_dir"].append(remote_result_path)
+                df_dict["remote_result_dir"].append(remote_result_dir)
                 df_dict["wsi_name"].append(wsi_name)
                 df_dict["pipeline"].append(pipeline)
                 df_dict["Dx"].append(dx)
