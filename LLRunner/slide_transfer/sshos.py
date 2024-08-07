@@ -43,16 +43,15 @@ class SSHOS:
 
     def isfile(self, remote_path):
         stdin, stdout, stderr = self.client.exec_command(
-            f"if [ -f {remote_path} ]; then echo 'True'; else echo 'False'; fi"
+            f"if [ -f \"{remote_path}\" ]; then echo 'True'; else echo 'False'; fi"
         )
         return stdout.read().decode().strip() == "True"
 
     def isdir(self, remote_path):
         stdin, stdout, stderr = self.client.exec_command(
-            f"if [ -d {remote_path} ]; then echo 'True'; else echo 'False'; fi"
+            f"if [ -d \"{remote_path}\" ]; then echo 'True'; else echo 'False'; fi"
         )
 
-        print(stdout.read().decode().strip())   
         return stdout.read().decode().strip() == "True"
 
     def rsync_file(self, remote_path, local_dir, retries=5, backoff_factor=1.5):
