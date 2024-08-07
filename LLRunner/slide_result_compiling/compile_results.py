@@ -3,6 +3,7 @@ import pandas as pd
 from LLRunner.config import results_dir, available_machines, ssh_config
 from LLRunner.read.BMAResult import BMAResultSSH
 from LLRunner.slide_transfer.sshos import SSHOS
+from tqdm import tqdm
 
 
 def all_result_dirs(machine):
@@ -39,7 +40,9 @@ def compile_results():
     for machine in available_machines:
         remote_result_dirs = all_result_dirs(machine)
 
-        for remote_result_dir in remote_result_dirs:
+        for remote_result_dir in tqdm(
+            remote_result_dirs, desc=f"Compiling Result Dirs on Machine: {machine}"
+        ):
 
             remote_result_dir = os.path.join(results_dir, remote_result_dir)
             try:
