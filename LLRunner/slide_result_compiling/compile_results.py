@@ -118,6 +118,9 @@ def compile_results():
                 print(
                     f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}"
                 )
+                # raise e while printing the remote_result_dir
+                e.args = (f"Error: {e}, occurred for remote_result_dir: {remote_result_dir}",)
+
                 raise e
 
             # look for the row in pipeline_run_history_df with the same pipeline and datetime_processed
