@@ -45,6 +45,9 @@ class SSHOS:
             self.client.close()
 
     def listdir(self, remote_path):
+
+        # make sure remote_path is a string
+        remote_path = str(remote_path)
         try:
             return self.sftp.listdir(remote_path)
         except IOError as e:
@@ -52,12 +55,18 @@ class SSHOS:
             return []
 
     def isfile(self, remote_path):
+
+        # make sure remote_path is a string
+        remote_path = str(remote_path)
         try:
             return stat.S_ISREG(self.sftp.stat(remote_path).st_mode)
         except IOError:
             return False
 
     def isdir(self, remote_path):
+
+        # make sure remote_path is a string
+        remote_path = str(remote_path)
         try:
             return stat.S_ISDIR(self.sftp.stat(remote_path).st_mode)
         except IOError:
