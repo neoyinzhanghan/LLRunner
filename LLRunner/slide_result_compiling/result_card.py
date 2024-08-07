@@ -7,6 +7,31 @@ from LLRunner.config import available_machines, ssh_config
 from PIL import Image
 
 
+def match_reported_and_grouped_differential(reported_diff_dict, grouped_diff_dict):
+    """First assert that the keys in grouped_diff_dict is a subset of the keys in reported_diff_dict. Then, for each key in grouped_diff_dict, if the value is None, set it to 0."""
+
+    assert set(grouped_diff_dict.keys()).issubset(
+        set(reported_diff_dict.keys())
+    ), f"Keys in grouped_diff_dict is not a subset of keys in reported_diff_dict. Reported: {set(reported_diff_dict.keys())}, Grouped: {set(grouped_diff_dict.keys())}"
+
+    # then for each key in reported_diff_dict, if the value is None, set it to 0
+    reported_diff_dict = {
+        k: v if v is not None else 0 for k, v in reported_diff_dict.items()
+    }
+
+    # then for each key in grouped_diff_dict, if the value is None, set it to 0
+    grouped_diff_dict = {
+        k: v if v is not None else 0 for k, v in grouped_diff_dict.items()
+    }
+
+    # only keep the keys that are in grouped_diff_dict
+    reported_diff_dict = {
+        k: v for k, v in reported_diff_dict.items() if k in grouped_diff_dict
+    }
+
+    return reported_diff_dict, grouped_diff_dict
+
+
 def plot_differential_comparison_image_light_futuristic(
     reported_diff_dict,
     grouped_diff_dict,
@@ -231,10 +256,9 @@ def get_mini_result_card(remote_result_dir, machine):
         k: v if v is not None else 0 for k, v in grouped_diff_dict.items()
     }
 
-    # assert that the keys are the same between the reported and grouped differential
-    assert set(reported_diff_dict.keys()) == set(
-        grouped_diff_dict.keys()
-    ), f"Keys in reported and grouped differential do not match. Reported: {set(reported_diff_dict.keys())}, Grouped: {set(grouped_diff_dict.keys())}"
+    reported_diff_dict, grouped_diff_dict = match_reported_and_grouped_differential(
+        reported_diff_dict, grouped_diff_dict
+    )
 
     num_regions = 100  # TODO bma_result.get_num_regions()
     num_cells = 1000  # TODO bma_result.get_num_cells()
@@ -256,6 +280,7 @@ def get_mini_result_card(remote_result_dir, machine):
     )
 
     return result_card
+
 
 if __name__ == "__main__":
     # Example usage
