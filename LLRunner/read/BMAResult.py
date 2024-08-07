@@ -1050,8 +1050,8 @@ class BMAResultSSH:
         result_dict = {}
         reader = pd.read_csv(file_obj)
         for _, row in reader.iterrows():
-            key = row[0]
-            value = float(row[1])
+            key = row.iloc[0]
+            value = float(row.iloc[1])
             result_dict[key] = value
         return result_dict
 
