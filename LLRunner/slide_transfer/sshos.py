@@ -41,7 +41,12 @@ class SSHOS:
 
     def listdir(self, remote_path):
         stdin, stdout, stderr = self.client.exec_command(f"ls -p {remote_path}")
-        return stdout.read().decode().splitlines()
+        output = stdout.read().decode().splitlines()
+
+        # Remove trailing slashes from directories
+        output = [line[:-1] if line.endswith("/") else line for line in output]
+
+        return output
 
     def isfile(self, remote_path):
         stdin, stdout, stderr = self.client.exec_command(
