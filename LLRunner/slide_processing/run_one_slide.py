@@ -72,8 +72,6 @@ def run_one_slide(wsi_name, pipeline, delete_slide=False, note="", **kwargs):
             result_dir, error = analyse_pbs(
                 slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
             )
-        else:
-            raise PipelineNotFoundError(pipeline)  # more coming soon!
 
         metadata_row_dct["datetime_processed"] = datetime.datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S"
