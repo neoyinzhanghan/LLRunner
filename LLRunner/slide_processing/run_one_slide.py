@@ -2,6 +2,7 @@ import os
 import datetime
 import pandas as pd
 from LLBMA.front_end.api import analyse_bma
+from LLPBS.front_end.api import analyse_pbs
 from LLRunner.slide_transfer.slides_management import (
     copy_slide_to_tmp,
     delete_slide_from_tmp,
@@ -63,6 +64,12 @@ def run_one_slide(wsi_name, pipeline, delete_slide=False, note="", **kwargs):
         if pipeline == "BMA-diff":
             slide_path = find_slide(wsi_name, copy_slide=True)
             result_dir, error = analyse_bma(
+                slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
+            )
+
+        if pipeline == "PB-diff":
+            slide_path = find_slide(wsi_name, copy_slide=True)
+            result_dir, error = analyse_pbs(
                 slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
             )
         else:

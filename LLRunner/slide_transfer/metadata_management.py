@@ -71,6 +71,13 @@ def get_slide_metadata_row(wsi_name):
     return row_dct
 
 
+def get_pbs_diff_metadata_row(wsi_name):
+
+    raise NotImplementedError(
+        "The function get_pbs_diff_metadata_row is not implemented."
+    )
+
+
 def get_bma_diff_metadata_row(wsi_name):
     """Get the differential counts from the BMA info."""
 
@@ -153,6 +160,31 @@ def update_slide_metadata(metadata_row_dct, overwrite=False):
 
     # save the df to replace the old metadata file
     df.to_csv(slide_metadata_path, index=False)
+
+
+def update_pbs_diff_metadata(metadata_row_dct, overwrite=False):
+    """Update the pbs diff metadata file by adding the new metadata row to the pbs diff metadata file.
+    If the row with the same slide name is already in the metadata file, then do nothing.
+    Unless overwrite is set to True, then overwrite the row in the metadata file.
+    """
+
+    df = pd.read_csv(pbs_diff_metadata_path)
+
+    wsi_name = metadata_row_dct["wsi_name"]
+
+    # turn the metadata_row_dct into a df
+    new_df_row = pd.DataFrame(metadata_row_dct, index=[0])
+
+    # check to see if there is a row with the same slide name first
+    if wsi_name in df["wsi_name"].values:
+        if overwrite:
+            df = df[df["wsi_name"] != wsi_name]
+            df = pd.concat([df, new_df_row], ignore_index=True)
+    else:
+        df = pd.concat([df, new_df_row], ignore_index=True)
+
+    # save the df to replace the old metadata file
+    df.to_csv(pbs_diff_metadata_path, index=False)
 
 
 def update_bma_diff_metadata(metadata_row_dct, overwrite=False):
@@ -239,6 +271,58 @@ def initialize_reported_bma_metadata(wsi_name_filter_func, overwrite=False):
         print(f"Number of Slides Missing Part Description: {missing_part_description}")
 
 
+def initialize_reported_pbs_metadata(wsi_name_filter_func, overwrite=False):
+    """Look for all the slides in the slide_source_dir and update the slide metadata file.
+    wsi_name_filter_func is a function that takes in a wsi_name and returns True if the slide should be updated in the metadata file.
+    """
+
+    with SSHOS() as sshos:
+
+        print("Looking for files in the slide source directory.")
+
+        # first get the list of all the slides in the slide_source_dir
+        files = sshos.listdir(slide_source_dir)
+        print("Looking for WSIs amongst the files.")
+
+        # only keep the slides such that the extension is in "allowed_extensions" and is a file
+        wsi_names = [
+            f for f in files if Path(f).suffix in allowed_extensions
+        ]  # checking for sshos.isfile(f) is redundant and super slow for large directories
+
+        print("Looking for slides that satisfy the specified conditions.")
+
+        # only keep the slides such that wsi_name_filter_func(wsi_name) is True
+        wsi_names = [f for f in wsi_names if wsi_name_filter_func(f)]
+
+        print(
+            f"{len(wsi_names)} slides are found satisfying the specified conditions. Beginning metadata pooling and update."
+        )
+
+        missing_Dx, missing_sub_Dx, missing_part_description = 0, 0, 0
+
+        for wsi_name in tqdm(wsi_names, desc="Pooling and updating metadata"):
+            metadata_row_dct = get_slide_metadata_row(wsi_name)
+            update_slide_metadata(metadata_row_dct, overwrite=overwrite)
+
+            # if metadata_row_dct["reported_BMA"]:
+            #     bma_metadata_row_dct = get_bma_diff_metadata_row(wsi_name)
+            #     update_bma_diff_metadata(
+            #         metadata_row_dct=bma_metadata_row_dct, overwrite=overwrite
+            #     )
+
+            if metadata_row_dct["Dx"] == "NA":
+                missing_Dx += 1
+            if metadata_row_dct["sub_Dx"] == "NA":
+                missing_sub_Dx += 1
+            if metadata_row_dct["part_description"] == "NA":
+                missing_part_description += 1
+
+        print(f"Finished updating metadata for {len(wsi_names)} slides.")
+        print(f"Number of Slides Missing Dx: {missing_Dx}")
+        print(f"Number of Slides Missing Sub Dx: {missing_sub_Dx}")
+        print(f"Number of Slides Missing Part Description: {missing_part_description}")
+
+
 def decide_what_to_run(wsi_name_filter_func, processing_filter_func, pipeline):
     """Decide what to run based on the processing_filter_func and the pipeline.
     The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
@@ -254,6 +338,12 @@ def decide_what_to_run(wsi_name_filter_func, processing_filter_func, pipeline):
         # only keep the rows in slide_md where reported_BMA is True
         slide_md = slide_md[
             slide_md["reported_BMA"]
+        ]  # TODO DEPRECATED once we implement specimen classificaiton
+
+    elif pipeline == "PBS-diff":
+        # only keep the rows in slide_md where reported_PB is True
+        slide_md = slide_md[
+            slide_md["reported_PB"]
         ]  # TODO DEPRECATED once we implement specimen classificaiton
 
     # use wsi_name_filter_func to filter the slide_md based on wsi_name column
