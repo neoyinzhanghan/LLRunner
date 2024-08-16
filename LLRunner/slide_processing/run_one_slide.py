@@ -67,7 +67,7 @@ def run_one_slide(wsi_name, pipeline, delete_slide=False, note="", **kwargs):
                 slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
             )
 
-        if pipeline == "PB-diff":
+        elif pipeline == "PBS-diff":
             slide_path = find_slide(wsi_name, copy_slide=True)
             result_dir, error = analyse_pbs(
                 slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
