@@ -50,7 +50,7 @@ if __name__ == "__main__":
             pipeline="PBS-diff",
             copy_slide=True,
             delete_slide=False,
-            note= "PBS pipeline test", #"Running PBS-diff Pipeline on H-even-year slides reported as PBS in part description.",
+            note="Running PBS-diff Pipeline on H-even-year slides reported as PBS in part description.",  # "Running PBS-diff Pipeline on H-even-year slides reported as PBS in part description.",
             hoarding=True,
             continue_on_error=True,
             do_extract_features=False,
