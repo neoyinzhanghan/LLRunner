@@ -25,10 +25,6 @@ bma_diff_results_path = os.path.join(results_dir, "bma_diff_results.csv")
 
 available_pipelines = ["BMA-diff", "PBS-diff"]
 
-pipeline_results_path_dict = {
-    "BMA-diff": os.path.join(results_dir, "BMA-diff_results.csv")
-}
-
 allowed_extensions = [".ndpi"]
 
 topview_level = 7
