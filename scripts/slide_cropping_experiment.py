@@ -164,7 +164,7 @@ if __name__ == "__main__":
         "/media/hdd3/neo/tmp_test_dir/H22-10657;S15;MSKB - 2024-07-11 03.00.18.ndpi"
     )
     save_dir = "/media/hdd3/neo/tmp_dump_dir/"
-    region_cropping_batch_size = 10  # Adjust batch size based on your requirements
+    region_cropping_batch_size = 256  # Adjust batch size based on your requirements
 
     crop_wsi_images(wsi_path, save_dir, region_cropping_batch_size)
 
