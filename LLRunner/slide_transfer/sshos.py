@@ -104,6 +104,8 @@ class SSHOS:
             try:
                 subprocess.run(cmd, check=True)
                 print("Rsync successful.")
+                # return the number of attempts it took to succeed
+                return attempt + 1
                 break
             except subprocess.CalledProcessError as e:
                 attempt += 1
