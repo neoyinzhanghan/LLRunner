@@ -14,7 +14,7 @@ from LLRunner.config import (
 from tqdm import tqdm
 
 # Configuration and parameters
-num_slides = 10
+num_slides = 3
 tmp_test_dir = "/media/hdd3/neo/tmp_test_dir"
 dzsave_dir = "/media/hdd3/neo/tmp_dzsave_dir"
 archive_dir = "/dmpisilon_tools/neo/test"
