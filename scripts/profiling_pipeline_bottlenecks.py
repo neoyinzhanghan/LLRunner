@@ -53,20 +53,27 @@ with SSHOS() as sshos:
 
         # Step 1: Rsync file to tmp_test_dir using SSHOS
         start_time = time.time()
+        print("Rsyncing to tmp")
         num_attempts = sshos.rsync_file(slide_path, tmp_test_dir)
         moving_to_tmp_time = time.time() - start_time
+        print(
+            f"Completed rsyncing to tmp in {moving_to_tmp_time} seconds with {num_attempts} attempts"
+        )
         profile_metadata["moving_to_tmp_time"].append(moving_to_tmp_time)
         profile_metadata["moving_to_tmp_num_attempts"].append(num_attempts)
 
         # Step 2: PyVips dzsave to dzsave_tmp_dir
         start_time = time.time()
+        print("Running dzsave")
         image = pyvips.Image.new_from_file(local_path)
         image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
         dzsave_time = time.time() - start_time
+        print(f"Completed dzsave in {dzsave_time} seconds")
         profile_metadata["dzsave_time"].append(dzsave_time)
 
         # Step 3: Zip the dzsave output
         start_time = time.time()
+        print("Zipping")
         with zipfile.ZipFile(zip_output_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(dzsave_output_path):
                 for file in files:
@@ -75,20 +82,25 @@ with SSHOS() as sshos:
                         os.path.relpath(os.path.join(root, file), dzsave_output_path),
                     )
         zipping_time = time.time() - start_time
+        print(f"Completed zipping in {zipping_time} seconds")
         profile_metadata["zipping_time"].append(zipping_time)
 
         # Step 4: Rsync the zip file to archive_dir using ordinary rsync
         start_time = time.time()
+        print("Rsyncing to archive")
         rsync_command = ["rsync", "-avz", zip_output_path, archive_dir]
         subprocess.run(rsync_command, check=True)
         moving_to_archive_time = time.time() - start_time
+        print(f"Completed rsyncing to archive in {moving_to_archive_time} seconds")
         profile_metadata["moving_to_archive_time"].append(moving_to_archive_time)
 
         # Step 5: Unzip the file in archive_dir
         start_time = time.time()
+        print("Unzipping")
         with zipfile.ZipFile(archive_path, "r") as zipf:
             zipf.extractall(archive_dir)
         unzipping_time = time.time() - start_time
+        print(f"Completed unzipping in {unzipping_time} seconds")
         profile_metadata["unzipping_time"].append(unzipping_time)
 
 # Convert profile_metadata to a DataFrame and save it
