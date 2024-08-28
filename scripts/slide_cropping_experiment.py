@@ -63,12 +63,18 @@ class WSICropManager:
             self.open_slide()
         return self.wsi.dimensions
 
-    def get_tile_coordinates(self, tile_size=256):
+    def get_level_N_dimensions(self, level):
+        """Get dimensions of the slide at level N."""
+        if self.wsi is None:
+            self.open_slide()
+        return self.wsi.level_dimensions[level]
+
+    def get_tile_coordinates(self, tile_size=256, level=0):
         """Generate a list of coordinates for 256x256 disjoint patches."""
         if self.wsi is None:
             self.open_slide()
 
-        width, height = self.get_level_0_dimensions()
+        width, height = self.get_level_N_dimensions(level)
         coordinates = []
 
         for y in range(0, height, tile_size):
@@ -99,8 +105,9 @@ class WSICropManager:
         for focus_region_coord in focus_region_coords:
             image = self.crop(focus_region_coord, level=0)
             # Save the image to a .jpeg file in save_dir
+            crop_size = focus_region_coord[2] - focus_region_coord[0]
             image.save(
-                f"{save_dir}/{focus_region_coord[0]}_{focus_region_coord[1]}.jpeg"
+                f"{save_dir}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg"
             )
             focus_regions.append(image)
 
@@ -108,7 +115,9 @@ class WSICropManager:
 
 
 # Main processing function
-def crop_wsi_images(wsi_path, save_dir, region_cropping_batch_size, verbose=True):
+def crop_wsi_images(
+    wsi_path, save_dir, region_cropping_batch_size, crop_size=256, level=0, verbose=True
+):
     num_croppers = num_cpus  # Number of croppers is the same as num_cpus
 
     if verbose:
@@ -117,7 +126,9 @@ def crop_wsi_images(wsi_path, save_dir, region_cropping_batch_size, verbose=True
     manager = WSICropManager.remote(wsi_path)
 
     # Get all the coordinates for 256x256 patches
-    focus_regions_coordinates = ray.get(manager.get_tile_coordinates.remote())
+    focus_regions_coordinates = ray.get(
+        manager.get_tile_coordinates.remote(tile_size=crop_size, level=level)
+    )
     list_of_batches = create_list_of_batches_from_list(
         focus_regions_coordinates, region_cropping_batch_size
     )
@@ -157,15 +168,20 @@ def crop_wsi_images(wsi_path, save_dir, region_cropping_batch_size, verbose=True
 if __name__ == "__main__":
 
     import time
+    import os
 
     # Example usage
     starttime = time.time()
-    wsi_path = (
-        "/media/hdd3/neo/tmp_test_dir/H22-10657;S15;MSKB - 2024-07-11 03.00.18.ndpi"
-    )
+    wsi_path = "/media/hdd3/neo/BMA_AML/H19-3465;S10;MSKB - 2023-09-21 13.52.50.ndpi"
     save_dir = "/media/hdd3/neo/tmp_dump_dir/"
-    region_cropping_batch_size = 256  # Adjust batch size based on your requirements
+    dz_dir = "/media/hdd3/neo/tmp_dz_dir/"
+    region_cropping_batch_size = 512  # Adjust batch size based on your requirements
 
-    crop_wsi_images(wsi_path, save_dir, region_cropping_batch_size)
+    for level in [0, 1, 2, 3, 4, 5, 6, 7]:
+        print(f"Level {level}")
+        save_dir_level = os.path.join(save_dir, f"level_{level}")
+        os.makedirs(save_dir_level, exist_ok=True)
+
+        crop_wsi_images(wsi_path, save_dir_level, region_cropping_batch_size)
 
     print(f"Time taken: {time.time() - starttime} seconds")
