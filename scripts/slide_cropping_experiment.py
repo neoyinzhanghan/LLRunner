@@ -2,10 +2,6 @@ import openslide
 import ray
 from tqdm import tqdm
 
-# Initialize Ray with the desired number of CPUs
-num_cpus = 128  # Number of CPUs for Ray
-ray.init(num_cpus=num_cpus)
-
 
 def create_list_of_batches_from_list(list, batch_size):
     """
@@ -170,18 +166,29 @@ if __name__ == "__main__":
     import time
     import os
 
+    # Initialize Ray with the desired number of CPUs
+    num_cpus = 128  # Number of CPUs for Ray
+    ray.init(num_cpus=num_cpus)
+
     # Example usage
     starttime = time.time()
     wsi_path = "/media/hdd3/neo/BMA_AML/H19-3465;S10;MSKB - 2023-09-21 13.52.50.ndpi"
     save_dir = "/media/hdd3/neo/tmp_dump_dir/"
     dz_dir = "/media/hdd3/neo/tmp_dz_dir/"
-    region_cropping_batch_size = 512  # Adjust batch size based on your requirements
+    region_cropping_batch_size = 256  # Adjust batch size based on your requirements
+    crop_size = 256  # Crop size in pixels
 
     for level in [0, 1, 2, 3, 4, 5, 6, 7]:
         print(f"Level {level}")
         save_dir_level = os.path.join(save_dir, f"level_{level}")
         os.makedirs(save_dir_level, exist_ok=True)
 
-        crop_wsi_images(wsi_path, save_dir_level, region_cropping_batch_size)
+        crop_wsi_images(
+            wsi_path,
+            save_dir_level,
+            region_cropping_batch_size,
+            crop_size=crop_size,
+            level=level,
+        )
 
     print(f"Time taken: {time.time() - starttime} seconds")
