@@ -3,7 +3,7 @@ import openslide
 import pandas as pd
 from tqdm import tqdm
 
-slide_dir = "/media/hdd2/michael_superdock"
+slide_dir = "/media/hdd2/michael_superdock_bad_slides"
 save_dir = "/media/hdd2/michael_superdock_bad_slides"
 
 # create the save directory if it doesn't exist
