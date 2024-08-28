@@ -66,7 +66,7 @@ with SSHOS() as sshos:
         start_time = time.time()
         print("Running dzsave")
         image = pyvips.Image.new_from_file(local_path)
-        image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
+        image.dzsave(dzsave_output_path, tile_size=512, overlap=0)
         dzsave_time = time.time() - start_time
         print(f"Completed dzsave in {dzsave_time} seconds")
         profile_metadata["dzsave_time"].append(dzsave_time)
