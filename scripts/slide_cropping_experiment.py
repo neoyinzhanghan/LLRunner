@@ -165,6 +165,7 @@ if __name__ == "__main__":
 
     import time
     import os
+    import pyvips
 
     # Initialize Ray with the desired number of CPUs
     num_cpus = 128  # Number of CPUs for Ray
@@ -190,5 +191,13 @@ if __name__ == "__main__":
             crop_size=crop_size,
             level=level,
         )
+
+    print(f"Time taken: {time.time() - starttime} seconds")
+
+    # test running dzsave on the slide and how long it takes ()
+    starttime = time.time()
+    image = pyvips.Image.new_from_file(wsi_path)
+    dzsave_output_path = dz_dir
+    image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
 
     print(f"Time taken: {time.time() - starttime} seconds")
