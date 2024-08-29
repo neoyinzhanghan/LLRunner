@@ -280,8 +280,8 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
         )
 
         print("Range debugging")
-        print(range(0, current_image.height, tile_size))
-        print(range(0, current_image.width, tile_size))
+        print(len(range(0, current_image.height, tile_size)))
+        print(len(range(0, current_image.width, tile_size)))
 
         # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
         for y in range(0, current_image.height, tile_size):
