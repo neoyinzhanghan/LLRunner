@@ -325,8 +325,8 @@ if __name__ == "__main__":
     # Example usage
     starttime = time.time()
     wsi_path = "/media/hdd3/neo/BMA_AML/H19-3465;S10;MSKB - 2023-09-21 13.52.50.ndpi"
-    save_dir = "/media/hdd3/neo/tmp_dump_dir/"
-    dz_dir = "/media/hdd3/neo/tmp_dz_dir/"
+    save_dir = "/media/hdd3/neo/tmp_dump_dir"
+    dz_dir = "/media/hdd3/neo/tmp_dz_dir"
     region_cropping_batch_size = 256  # Adjust batch size based on your requirements
     crop_size = 256  # Crop size in pixels
 
