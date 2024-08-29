@@ -92,8 +92,13 @@ class WSICropManager:
         for y in range(0, height, tile_size):
             for x in range(0, width, tile_size):
                 # Ensure that the patch is within the image boundaries
-                if x + tile_size <= width and y + tile_size <= height:
-                    coordinates.append(((x, y, x + tile_size, y + tile_size), level))
+
+                coordinates.append(
+                    (
+                        (x, y, min(x + tile_size, width), min(y + tile_size, height)),
+                        level,
+                    )
+                )
 
         return coordinates
 
@@ -111,21 +116,21 @@ class WSICropManager:
         image = image.convert("RGB")
         return image
 
-    def async_get_bma_focus_region_batch(self, focus_region_coords, save_dir):
-        """Save a list of focus regions."""
-        for focus_region_coord in focus_region_coords:
-            image = self.crop(focus_region_coord, level=0)
-            # Save the image to a .jpeg file in save_dir
-            crop_size = focus_region_coord[2] - focus_region_coord[0]
-            path = os.path.join(
-                save_dir,
-                f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
-            )
-            image.save(path)
-        return len(focus_region_coords)
+    # def async_get_bma_focus_region_batch(self, focus_region_coords, save_dir):
+    #     """Save a list of focus regions."""
+    #     for focus_region_coord in focus_region_coords:
+    #         image = self.crop(focus_region_coord, level=0)
+    #         # Save the image to a .jpeg file in save_dir
+    #         crop_size = focus_region_coord[2] - focus_region_coord[0]
+    #         path = os.path.join(
+    #             save_dir,
+    #             f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
+    #         )
+    #         image.save(path)
+    #     return len(focus_region_coords)
 
     def async_get_bma_focus_region_level_pair_batch(
-        self, focus_region_coords_level_pairs, save_dir
+        self, focus_region_coords_level_pairs, save_dir, crop_size=256
     ):
         """Save a list of focus regions."""
         for focus_region_coord_level_pair in focus_region_coords_level_pairs:
@@ -133,7 +138,6 @@ class WSICropManager:
 
             image = self.crop(focus_region_coord, level=level)
             # Save the image to a .jpeg file in save_dir
-            crop_size = focus_region_coord[2] - focus_region_coord[0]
 
             path = os.path.join(
                 save_dir,
@@ -237,7 +241,7 @@ def crop_wsi_images_all_levels(
     for i, batch in enumerate(list_of_batches):
         manager = task_managers[i % num_croppers]
         task = manager.async_get_bma_focus_region_level_pair_batch.remote(
-            batch, save_dir
+            batch, save_dir, crop_size=crop_size
         )
         tasks[task] = batch
 
@@ -275,6 +279,10 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
             (current_image.width // 2, current_image.height // 2)
         )
 
+        print("Range debugging")
+        print(range(0, current_image.height, tile_size))
+        print(range(0, current_image.width, tile_size))
+
         # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
         for y in range(0, current_image.height, tile_size):
             for x in range(0, current_image.width, tile_size):
@@ -295,10 +303,9 @@ def dzsave(
 ):
     # create the subdirectories for the different levels 0, ..., 18
     for i in range(19):
-        os.makedirs(f"{dz_dir}/{i}")
+        os.makedirs(os.path.join(dz_dir, str(i)), exist_ok=True)
 
     starttime = time.time()
-    image = openslide.OpenSlide(wsi_path)
 
     print("Cropping from NDPI")
     crop_wsi_images_all_levels(
