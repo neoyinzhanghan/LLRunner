@@ -309,7 +309,6 @@ def dzsave(
 
     time_taken = time.time() - starttime
 
-    print(f"Time taken: {time_taken} seconds")
     return time_taken
 
 
@@ -341,10 +340,12 @@ if __name__ == "__main__":
 
     print(f"Time taken: {time.time() - starttime} seconds")
 
-    # test running dzsave on the slide and how long it takes ()
-    starttime = time.time()
-    image = pyvips.Image.new_from_file(wsi_path)
-    dzsave_output_path = dz_dir
-    image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
+    # # test running dzsave on the slide and how long it takes ()
+    # starttime = time.time()
 
-    print(f"Time taken: {time.time() - starttime} seconds")
+    # print("Running dzsave on the slide and how long it takes")
+    # image = pyvips.Image.new_from_file(wsi_path)
+    # dzsave_output_path = dz_dir
+    # image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
+
+    # print(f"Time taken: {time.time() - starttime} seconds")
