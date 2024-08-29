@@ -133,7 +133,7 @@ class WSICropManager:
             crop_size = focus_region_coord[2] - focus_region_coord[0]
 
             image.save(
-                f"{save_dir}/{18-level}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}_level_{level}.jpeg"
+                f"{save_dir}/{18-level}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg"
             )
 
 
@@ -274,6 +274,9 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
 def dzsave(
     wsi_path, dz_dir, tile_size=256, num_cpus=128, region_cropping_batch_size=256
 ):
+    # create the subdirectories for the different levels 0, ..., 18
+    for i in range(19):
+        os.makedirs(f"{dz_dir}/{i}")
 
     starttime = time.time()
     image = openslide.OpenSlide(wsi_path)
