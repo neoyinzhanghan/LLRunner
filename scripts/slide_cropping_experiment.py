@@ -220,7 +220,7 @@ def crop_wsi_images_all_levels(
     # Get all the coordinates for 256x256 patches
     focus_regions_coordinates = []
 
-    for level in range(1, 8):
+    for level in range(0, 8):
         focus_regions_coordinates.extend(
             ray.get(
                 manager.get_tile_coordinates_level_pair.remote(
