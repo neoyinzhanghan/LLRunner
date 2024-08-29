@@ -264,7 +264,7 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
     image = image.convert("RGB")
 
     # use this image to crop out the rest of the tiles
-    for level in range(6, -1, -1):
+    for level in tqdm(range(6, -1, -1), desc="Cropping Lower Resolution Levels"):
         width, height = wsi.level_dimensions[level]
         for y in range(0, height, tile_size):
             for x in range(0, width, tile_size):
