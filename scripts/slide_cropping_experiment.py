@@ -312,7 +312,7 @@ if __name__ == "__main__":
 
     dzsave(
         wsi_path,
-        dz_dir,
+        save_dir,
         tile_size=crop_size,
         num_cpus=num_cpus,
         region_cropping_batch_size=region_cropping_batch_size,
