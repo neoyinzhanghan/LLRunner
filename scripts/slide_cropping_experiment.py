@@ -120,6 +120,7 @@ class WSICropManager:
             image.save(
                 f"{save_dir}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg"
             )
+        return len(focus_region_coords)
 
     def async_get_bma_focus_region_level_pair_batch(
         self, focus_region_coords_level_pairs, save_dir
@@ -135,6 +136,8 @@ class WSICropManager:
             image.save(
                 f"{save_dir}/{18-level}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg"
             )
+
+        return len(focus_region_coords_level_pairs)
 
 
 # Main processing function
@@ -180,7 +183,7 @@ def crop_wsi_images(
             for done_id in done_ids:
                 try:
                     batch = ray.get(done_id)
-                    pbar.update(len(batch))
+                    pbar.update(batch)
 
                 except ray.exceptions.RayTaskError as e:
                     print(f"Task for batch {tasks[done_id]} failed with error: {e}")
@@ -235,7 +238,7 @@ def crop_wsi_images_all_levels(
             for done_id in done_ids:
                 try:
                     batch = ray.get(done_id)
-                    pbar.update(len(batch))
+                    pbar.update(batch)
 
                 except ray.exceptions.RayTaskError as e:
                     print(f"Task for batch {tasks[done_id]} failed with error: {e}")
