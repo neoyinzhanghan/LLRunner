@@ -351,14 +351,14 @@ if __name__ == "__main__":
         region_cropping_batch_size=region_cropping_batch_size,
     )
 
-    print(f"Time taken: {time.time() - starttime} seconds")
+    print(f"Time taken using Neo's dzsave: {time.time() - starttime} seconds")
 
-    # # test running dzsave on the slide and how long it takes ()
-    # starttime = time.time()
+    # test running dzsave on the slide and how long it takes ()
+    starttime = time.time()
 
-    # print("Running dzsave on the slide and how long it takes")
-    # image = pyvips.Image.new_from_file(wsi_path)
-    # dzsave_output_path = dz_dir
-    # image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
+    print("Running dzsave on the slide and how long it takes")
+    image = pyvips.Image.new_from_file(wsi_path)
+    dzsave_output_path = dz_dir
+    image.dzsave(dzsave_output_path, tile_size=256, overlap=0)
 
-    # print(f"Time taken: {time.time() - starttime} seconds")
+    print(f"Time taken using pyvips dzsave: {time.time() - starttime} seconds")
