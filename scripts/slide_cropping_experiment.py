@@ -117,9 +117,11 @@ class WSICropManager:
             image = self.crop(focus_region_coord, level=0)
             # Save the image to a .jpeg file in save_dir
             crop_size = focus_region_coord[2] - focus_region_coord[0]
-            image.save(
-                f"{save_dir}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg"
+            path = os.path.join(
+                save_dir,
+                f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
             )
+            image.save(path)
         return len(focus_region_coords)
 
     def async_get_bma_focus_region_level_pair_batch(
@@ -133,9 +135,12 @@ class WSICropManager:
             # Save the image to a .jpeg file in save_dir
             crop_size = focus_region_coord[2] - focus_region_coord[0]
 
-            image.save(
-                f"{save_dir}/{18-level}/{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg"
+            path = os.path.join(
+                save_dir,
+                str(18 - level),
+                f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
             )
+            image.save(path)
 
         return len(focus_region_coords_level_pairs)
 
@@ -281,7 +286,8 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 patch = current_image.crop((x, y, right, bottom))
 
                 # Save the patch
-                patch.save(f"{save_dir}/{depth}/{x}_{y}.jpeg")
+                path = os.path.join(save_dir, str(depth), f"{x}_{y}.jpeg")
+                patch.save(path)
 
 
 def dzsave(
