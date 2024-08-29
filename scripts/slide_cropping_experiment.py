@@ -165,7 +165,6 @@ def crop_wsi_images(
     task_managers = [WSICropManager.remote(wsi_path) for _ in range(num_croppers)]
 
     tasks = {}
-    all_results = []
 
     for i, batch in enumerate(list_of_batches):
         manager = task_managers[i % num_croppers]
@@ -181,7 +180,6 @@ def crop_wsi_images(
             for done_id in done_ids:
                 try:
                     batch = ray.get(done_id)
-                    all_results.extend(batch)
                     pbar.update(len(batch))
 
                 except ray.exceptions.RayTaskError as e:
@@ -220,7 +218,6 @@ def crop_wsi_images_all_levels(
     task_managers = [WSICropManager.remote(wsi_path) for _ in range(num_croppers)]
 
     tasks = {}
-    all_results = []
 
     for i, batch in enumerate(list_of_batches):
         manager = task_managers[i % num_croppers]
@@ -238,7 +235,6 @@ def crop_wsi_images_all_levels(
             for done_id in done_ids:
                 try:
                     batch = ray.get(done_id)
-                    all_results.extend(batch)
                     pbar.update(len(batch))
 
                 except ray.exceptions.RayTaskError as e:
