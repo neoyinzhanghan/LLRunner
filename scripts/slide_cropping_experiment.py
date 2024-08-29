@@ -140,8 +140,6 @@ class WSICropManager:
                 str(18 - level),
                 f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
             )
-
-            print(path)
             image.save(path)
 
         return len(focus_region_coords_level_pairs)
