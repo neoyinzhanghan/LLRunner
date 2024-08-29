@@ -263,18 +263,25 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
     image = wsi.read_region((0, 0), 7, level_7_dimensions)
     image = image.convert("RGB")
 
-    # use this image to crop out the rest of the tiles
-    for level in tqdm(range(6, -1, -1), desc="Cropping Lower Resolution Levels"):
-        width, height = wsi.level_dimensions[level]
-        for y in range(0, height, tile_size):
-            for x in range(0, width, tile_size):
-                # Ensure that the patch is within the image boundaries
-                if x + tile_size <= width and y + tile_size <= height:
-                    image = wsi.read_region((x, y), level, (tile_size, tile_size))
-                    image = image.convert("RGB")
-                    image.save(
-                        f"{save_dir}/{level}/{int(x)}_{int(y)}_level_{level}.jpeg"
-                    )
+    current_image = image
+    for depth in range(10, -1):
+        # downsample the image by a factor of 2
+        current_image = current_image.resize(
+            (current_image.width // 2, current_image.height // 2)
+        )
+
+        # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
+        for y in range(0, current_image.height, tile_size):
+            for x in range(0, current_image.width, tile_size):
+                # Calculate the right and bottom coordinates ensuring they are within the image boundaries
+                right = min(x + tile_size, current_image.width)
+                bottom = min(y + tile_size, current_image.height)
+
+                # Crop the patch from the image starting at (x, y) to (right, bottom)
+                patch = current_image.crop((x, y, right, bottom))
+
+                # Save the patch
+                patch.save(f"{save_dir}/{depth}/{x}_{y}.jpeg")
 
 
 def dzsave(
