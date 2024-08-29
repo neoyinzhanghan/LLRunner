@@ -211,9 +211,16 @@ def crop_wsi_images_all_levels(
     manager = WSICropManager.remote(wsi_path)
 
     # Get all the coordinates for 256x256 patches
-    focus_regions_coordinates = ray.get(
-        manager.get_tile_coordinates_level_pair.remote(tile_size=crop_size, level=0)
-    )
+    focus_regions_coordinates = []
+
+    for level in range(1, 8):
+        focus_regions_coordinates.extend(
+            ray.get(
+                manager.get_tile_coordinates_level_pair.remote(
+                    tile_size=crop_size, level=level
+                )
+            )
+        )
     list_of_batches = create_list_of_batches_from_list(
         focus_regions_coordinates, region_cropping_batch_size
     )
@@ -279,6 +286,8 @@ def dzsave(
 
     starttime = time.time()
     image = openslide.OpenSlide(wsi_path)
+
+    print("Cropping from NDPI")
     crop_wsi_images_all_levels(
         wsi_path,
         dz_dir,
@@ -286,6 +295,8 @@ def dzsave(
         crop_size=tile_size,
         num_cpus=num_cpus,
     )
+
+    print("Cropping Lower Resolution Levels")
 
     get_depth_from_0_to_11(wsi_path, dz_dir, tile_size=tile_size)
 
