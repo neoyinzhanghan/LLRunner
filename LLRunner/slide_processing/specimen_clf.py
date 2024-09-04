@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # Load the model
     model = load_bma_specimen_clf_model()
 
-    test_image_path = "H19-3075;S10;MSKI - 2023-08-31 14.23.48.jpg"  # NOTE THAT THIS TEST IMAGE PATH ONLY APPLIES TO GLV3
+    test_image_path = "/media/hdd3/neo/tmp_slide_dir/topview/H19-3075;S10;MSKI - 2023-08-31 14.23.48.jpg"  # NOTE THAT THIS TEST IMAGE PATH ONLY APPLIES TO GLV3
 
     # Load the test image
     test_image = Image.open(test_image_path)
