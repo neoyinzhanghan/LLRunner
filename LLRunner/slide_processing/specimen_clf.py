@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
+import os
 from LLRunner.config import BMA_speciment_clf_ckpt_path
 from torchvision import transforms, models
 from PIL import Image
@@ -41,7 +42,7 @@ def predict_image(model, pil_image, device):
 
 
 def get_topview_bma_score(pil_image):
-    model = ResNeXtModel.load_from_checkpoint(BMA_speciment_clf_ckpt_path)
+    model = ResNeXtModel.load_from_checkpoint(BMA_speciment_clf_ckpt_path, strict=False)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     return predict_image(model, pil_image, device)
 
