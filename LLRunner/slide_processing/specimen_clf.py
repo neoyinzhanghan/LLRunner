@@ -53,7 +53,7 @@ def predict_image(model, pil_image, device):
     model.to(device)
     image = image.to(device)
     output = model(image)
-    positive_score = output[0][1].item()
+    positive_score = output[0][0].item(), output[0][1].item()
 
     return positive_score
 
