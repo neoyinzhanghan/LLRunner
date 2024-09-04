@@ -13,7 +13,9 @@ class ResNeXtModel(pl.LightningModule):
         self.model = models.resnext50_32x4d(pretrained=True)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
-        self.criterion = nn.CrossEntropyLoss(weight=class_weights)  # Class weights (if any)
+        self.criterion = nn.CrossEntropyLoss(
+            weight=class_weights
+        )  # Class weights (if any)
 
     def forward(self, x):
         return self.model(x)
@@ -53,7 +55,11 @@ def predict_image(model, pil_image, device):
     model.to(device)
     image = image.to(device)
     output = model(image)
-    positive_score = output[0][0].item(), output[0][1].item()
+
+    # apply softmax to get the positive score
+    softmax_output = nn.Softmax(dim=1)
+
+    positive_score = softmax_output[0][0].item(), softmax_output[0][1].item()
 
     return positive_score
 
