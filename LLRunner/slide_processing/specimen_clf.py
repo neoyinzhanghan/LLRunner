@@ -4,14 +4,14 @@ import pytorch_lightning as pl
 from LLRunner.config import BMA_speciment_clf_ckpt_path
 from torchvision import transforms, models
 from PIL import Image
-from torchvision.models import ResNeXt50_32x4D_Weights
+from torchvision.models import ResNeXt50_32X4D_Weights
 
 
 # Define the model class (must match the training script)
 class ResNeXtModel(pl.LightningModule):
     def __init__(self, num_classes=2, class_weights=None):
         super(ResNeXtModel, self).__init__()
-        self.model = models.resnext50_32x4d(weights=ResNeXt50_32x4D_Weights.DEFAULT)
+        self.model = models.resnext50_32x4d(weights=ResNeXt50_32X4D_Weights.DEFAULT)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
         self.criterion = nn.CrossEntropyLoss(
