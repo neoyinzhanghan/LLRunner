@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
-import os
 from LLRunner.config import BMA_speciment_clf_ckpt_path
 from torchvision import transforms, models
 from PIL import Image
@@ -14,6 +13,7 @@ class ResNeXtModel(pl.LightningModule):
         self.model = models.resnext50_32x4d(pretrained=True)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
+        self.criterion = nn.CrossEntropyLoss(weight=class_weights)  # Class weights (if any)
 
     def forward(self, x):
         return self.model(x)
@@ -29,11 +29,21 @@ test_transforms = transforms.Compose(
     ]
 )
 
-def load_bma_specimen_clf_model():  
-    checkpoint = torch.load(BMA_speciment_clf_ckpt_path)
-    if "criterion.weight" in checkpoint["state_dict"]:
-        del checkpoint["state_dict"]["criterion.weight"]
-    model = ResNeXtModel.load_from_checkpoint(checkpoint_path=None, map_location=None, state_dict=checkpoint["state_dict"])
+
+def load_bma_specimen_clf_model():
+    model = ResNeXtModel(num_classes=2)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    checkpoint = torch.load(BMA_speciment_clf_ckpt_path, map_location=device)
+
+    state_dict = checkpoint["state_dict"]
+    filtered_state_dict = {
+        k: v for k, v in state_dict.items() if k in model.state_dict()
+    }
+
+    # Load the filtered state_dict into the model
+    model.load_state_dict(filtered_state_dict, strict=False)
+    model.eval()
+
     return model
 
 
