@@ -1,22 +1,9 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, WeightedRandomSampler, Dataset
-from torchvision import datasets, transforms, models
 import pytorch_lightning as pl
-from pytorch_lightning import Trainer
-from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
-import os
-import openslide
-from PIL import Image
-import os
-import cv2
-import numpy as np
-import os
-import shutil
-from concurrent.futures import ProcessPoolExecutor
 from LLRunner.config import BMA_speciment_clf_ckpt_path
+from torchvision import transforms, models
+from PIL import Image
 
 
 # Define the model class (must match the training script)
@@ -26,9 +13,6 @@ class ResNeXtModel(pl.LightningModule):
         self.model = models.resnext50_32x4d(pretrained=True)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
-        self.criterion = nn.CrossEntropyLoss(
-            weight=class_weights
-        )  # Class weights (if any)
 
     def forward(self, x):
         return self.model(x)
