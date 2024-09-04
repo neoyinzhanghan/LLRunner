@@ -29,6 +29,13 @@ test_transforms = transforms.Compose(
     ]
 )
 
+def load_bma_specimen_clf_model():  
+    checkpoint = torch.load(BMA_speciment_clf_ckpt_path)
+    if "criterion.weight" in checkpoint["state_dict"]:
+        del checkpoint["state_dict"]["criterion.weight"]
+    model = ResNeXtModel.load_from_checkpoint(checkpoint_path=None, map_location=None, state_dict=checkpoint["state_dict"])
+    return model
+
 
 def predict_image(model, pil_image, device):
     image = test_transforms(pil_image).unsqueeze(0)
