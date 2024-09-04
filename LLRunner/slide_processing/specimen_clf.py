@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     # Minimal Usage Example
     # Load the model
-    model = ResNeXtModel.load_from_checkpoint(BMA_speciment_clf_ckpt_path)
+    model = load_bma_specimen_clf_model()
 
     test_image_path = "H19-3075;S10;MSKI - 2023-08-31 14.23.48.jpg"  # NOTE THAT THIS TEST IMAGE PATH ONLY APPLIES TO GLV3
 
