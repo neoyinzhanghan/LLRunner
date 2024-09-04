@@ -1,7 +1,7 @@
 import ray
 import os
 from LLBMA.resources.BMAassumptions import *
-from LLBMA.brain.HemeLabelLightningManager import *
+from LLBMA.brain.labeller.HemeLabelLightningManager import *
 from LLBMA.brain.utils import *
 from ray.exceptions import RayTaskError
 from tqdm import tqdm
