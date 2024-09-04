@@ -57,7 +57,9 @@ def predict_image(model, pil_image, device):
     output = model(image)
 
     # apply softmax to get the positive score
-    softmax_output = nn.Softmax(dim=1)
+    softmax_fn = nn.Softmax(dim=1)
+
+    softmax_output = softmax_fn(output)
 
     positive_score = softmax_output[0][0].item(), softmax_output[0][1].item()
 
