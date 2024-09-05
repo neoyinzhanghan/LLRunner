@@ -17,7 +17,7 @@ from LLRunner.slide_transfer.slides_management import (
 
 
 def main_concurrent_bma_processing(
-    wsi_name_filter_func, processing_filter_func, delete_slide=False
+    wsi_name_filter_func, processing_filter_func, delete_slide=True
 ):
     """Main function to run the overlapping BMA-diff pipeline on slides."""
 
