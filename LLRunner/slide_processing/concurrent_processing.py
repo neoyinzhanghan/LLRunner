@@ -250,6 +250,7 @@ if __name__ == "__main__":
     main_concurrent_bma_processing(
         wsi_name_filter_func=test_wsi_name_filter_func,
         processing_filter_func=identity_filter,
+        num_rync_workers=3,
         note="Testing concurrent processing",
         delete_slide=True,
     )
