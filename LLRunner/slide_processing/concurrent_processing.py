@@ -73,7 +73,7 @@ def main_concurrent_bma_processing(
 
     # Create a ThreadPoolExecutor for handling slide copying in parallel
     with ThreadPoolExecutor(
-        max_workers=2
+        max_workers=1
     ) as executor:  # You can adjust max_workers as needed
         slide_copy_futures = {}  # To track slide copying tasks
 
