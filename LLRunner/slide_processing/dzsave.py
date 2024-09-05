@@ -302,7 +302,7 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
     wsi_name_path = Path(wsi_name)
     wsi_path = os.path.join(tmp_slide_dir, wsi_name)
 
-    assert wsi_path.exists(), f"Error: {wsi_name} does not exist in the tmp_slide_dir."
+    assert os.path.exists(wsi_path), f"Error: {wsi_path} does not exist."
     wsi_name_no_ext = wsi_name_path.stem
 
     dzsave_subdir = os.path.join(dzsave_dir, wsi_name_no_ext)
