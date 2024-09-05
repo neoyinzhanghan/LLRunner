@@ -17,7 +17,7 @@ from LLRunner.slide_transfer.slides_management import (
 
 
 def main_concurrent_bma_processing(
-    wsi_name_filter_func, processing_filter_func, delete_slide=True
+    wsi_name_filter_func, processing_filter_func, note="", delete_slide=True
 ):
     """Main function to run the overlapping BMA-diff pipeline on slides."""
 
@@ -81,40 +81,40 @@ def main_concurrent_bma_processing(
                 find_slide, wsi_name, copy_slide=True
             )
 
-        # Process slides once copying is done
-        for wsi_name in tqdm(
-            wsi_names_to_run_union,
-            desc="Running BMA-diff and dzsave pipeline on slides",
-            total=len(wsi_names_to_run_union),
-        ):
+    # Process slides once copying is done
+    for wsi_name in tqdm(
+        wsi_names_to_run_union,
+        desc="Running BMA-diff and dzsave pipeline on slides",
+        total=len(wsi_names_to_run_union),
+    ):
 
-            # Wait for the slide copying to complete if it hasn't yet
-            slide_copy_future = slide_copy_futures[wsi_name]
-            if not slide_copy_future.done():
-                slide_copy_future.result()  # Wait for completion
+        # Wait for the slide copying to complete if it hasn't yet
+        slide_copy_future = slide_copy_futures[wsi_name]
+        if not slide_copy_future.done():
+            slide_copy_future.result()  # Wait for completion
 
-            # Continue with processing
-            slide_path = find_slide(
-                wsi_name, copy_slide=False
-            )  # Now it should be instantaneous
+        # Continue with processing
+        slide_path = find_slide(
+            wsi_name, copy_slide=False
+        )  # Now it should be instantaneous
 
-            if wsi_name in wsi_names_to_run_just_BMA_diff:
-                run_one_slide_with_specimen_clf(
-                    wsi_name,
-                    pipeline="BMA-diff",
-                    copy_slide=False,
-                    delete_slide=False,
-                    note="Running BMA-diff Pipeline on slides reported as BMA in part description.",
-                    hoarding=True,
-                    continue_on_error=True,
-                    do_extract_features=False,
-                    check_specimen_clf=False,
-                )
-            if wsi_name in wsi_names_to_run_just_dzsave:
-                dzsave_wsi_name(wsi_name)
+        if wsi_name in wsi_names_to_run_just_BMA_diff:
+            run_one_slide_with_specimen_clf(
+                wsi_name,
+                pipeline="BMA-diff",
+                copy_slide=False,
+                delete_slide=False,
+                note=note,
+                hoarding=True,
+                continue_on_error=True,
+                do_extract_features=False,
+                check_specimen_clf=False,
+            )
+        if wsi_name in wsi_names_to_run_just_dzsave:
+            dzsave_wsi_name(wsi_name)
 
-            if delete_slide:
-                delete_slide_from_tmp(wsi_name)
+        if delete_slide:
+            delete_slide_from_tmp(wsi_name)
 
 
 if __name__ == "__main__":
@@ -135,5 +135,6 @@ if __name__ == "__main__":
     main_concurrent_bma_processing(
         wsi_name_filter_func=test_wsi_name_filter_func,
         processing_filter_func=identity_filter,
+        note="Testing concurrent processing",
         delete_slide=False,
     )
