@@ -35,7 +35,7 @@ def delete_results_from_note(note, ask_for_confirmation=True):
         print(
             f"Results for note {note} deleted. Number of results deleted: {len(result_dirs_to_delete)}"
         )
-    else:
+    if ask_for_confirmation:
         # default is not to delete if the user fail to either enter y, Y, yes or Yes
         user_confirmation = input(
             f"Are you sure you want to delete the results for note {note}? (y/[n]): "
