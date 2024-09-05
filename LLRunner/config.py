@@ -6,6 +6,7 @@ slide_source_dir = "/pesgisipth/NDPI"
 
 tmp_slide_dir = "/media/hdd3/neo/tmp_slide_dir"
 results_dir = "/media/hdd3/neo/results_dir"
+dzsave_dir = "/media/hdd3/neo/dzsave_dir"
 
 ssh_config = {
     "glv2": {"hostname": "172.28.164.44", "username": "greg", "key_filename": None},
@@ -23,10 +24,13 @@ pipeline_run_history_path = os.path.join(results_dir, "pipeline_run_history.csv"
 
 bma_diff_results_path = os.path.join(results_dir, "bma_diff_results.csv")
 
+dzsave_metadata_path = os.path.join(dzsave_dir, "dzsave_metadata.csv")
+
 available_pipelines = ["BMA-diff", "PBS-diff"]
 
 allowed_extensions = [".ndpi"]
 
 topview_level = 7
 
-BMA_speciment_clf_ckpt_path = "/media/hdd3/neo/MODELS/2024-09-04 Riya-Specimen-Clf-BMA/resnext-epoch=18-val_acc=0.97.ckpt"
+BMA_specimen_clf_ckpt_path = "/media/hdd3/neo/MODELS/2024-09-04 Riya-Specimen-Clf-BMA/resnext-epoch=18-val_acc=0.97.ckpt"
+BMA_specimen_clf_threshold = 0.5

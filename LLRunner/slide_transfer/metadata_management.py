@@ -6,7 +6,11 @@ from LLRunner.read.BMAInfo import *
 from LLRunner.read.SST import *
 from LLRunner.read.SR import *
 from LLRunner.config import *
-from LLRunner.slide_transfer.sshos import SSHOS
+from LLRunner.slide_transfer.sshos import (
+    SSHOS,
+    get_pipeline_run_history_df,
+    get_dzsave_metadata_df,
+)
 from LLRunner.custom_errors import PipelineNotFoundError
 
 
@@ -364,6 +368,95 @@ def decide_what_to_run(wsi_name_filter_func, processing_filter_func, pipeline):
 
     for wsi_name in wsi_names:
         if wsi_name not in filtered_df["wsi_name"].values:
+            wsi_names_to_run.append(wsi_name)
+
+    return wsi_names_to_run
+
+
+def decide_what_to_run_with_specimen_clf_cross_machine(
+    wsi_name_filter_func, processing_filter_func, pipeline
+):
+    """Decide what to run based on the processing_filter_func and the pipeline.
+    The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
+
+    Instead basing on reported specimen, we will use the specimen classification model to decide what to run.
+    Which means that at the metadata data stage we do not look at reported part description.
+    Also make sure to check the pipeline_run_history_path for all machines
+    """
+
+    # first open the slide_metadata_path file
+    slide_md = pd.read_csv(slide_metadata_path)
+
+    if pipeline not in available_pipelines:
+        raise PipelineNotFoundError(pipeline)
+
+    # use wsi_name_filter_func to filter the slide_md based on wsi_name column
+    slide_md = slide_md[slide_md["wsi_name"].apply(wsi_name_filter_func)]
+
+    # open the pipeline_run_history_path file for all machines
+    pipeline_run_history_dfs = []
+    for machine in available_machines:
+        df = get_pipeline_run_history_df(machine)
+
+        # only keep the rows in the pipeline_run_history_path for the specified pipeline
+        df = df[df["pipeline"] == pipeline]
+
+        filtered_df = processing_filter_func(df)
+
+        pipeline_run_history_dfs.append(filtered_df)
+
+    # concatenate all the dfs
+    df = pd.concat(pipeline_run_history_dfs, ignore_index=True)
+
+    # look for all the wsi_names in slide_md that are not in the filtered_df
+    wsi_names = slide_md["wsi_name"].values
+
+    wsi_names_to_run = []
+
+    for wsi_name in wsi_names:
+        if wsi_name not in df["wsi_name"].values:
+            wsi_names_to_run.append(wsi_name)
+
+    return wsi_names_to_run
+
+
+def decide_what_to_run_dzsave_across_machines(
+    wsi_name_filter_func,
+    processing_filter_func,
+):
+    """Decide what to run based on the processing_filter_func and the pipeline.
+    The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
+
+    Instead basing on reported specimen, we will use the specimen classification model to decide what to run.
+    Which means that at the metadata data stage we do not look at reported part description.
+    Also make sure to check the pipeline_run_history_path for all machines
+    """
+
+    # first open the slide_metadata_path file
+    slide_md = pd.read_csv(slide_metadata_path)
+
+    # use wsi_name_filter_func to filter the slide_md based on wsi_name column
+    slide_md = slide_md[slide_md["wsi_name"].apply(wsi_name_filter_func)]
+
+    # open the pipeline_run_history_path file for all machines
+    dzsave_history_dfs = []
+    for machine in available_machines:
+        df = get_dzsave_metadata_df(machine)
+
+        filtered_df = processing_filter_func(df)
+
+        dzsave_history_dfs.append(filtered_df)
+
+    # concatenate all the dfs
+    df = pd.concat(dzsave_history_dfs, ignore_index=True)
+
+    # look for all the wsi_names in slide_md that are not in the filtered_df
+    wsi_names = slide_md["wsi_name"].values
+
+    wsi_names_to_run = []
+
+    for wsi_name in wsi_names:
+        if wsi_name not in df["wsi_name"].values:
             wsi_names_to_run.append(wsi_name)
 
     return wsi_names_to_run

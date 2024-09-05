@@ -5,7 +5,13 @@ import stat
 import pandas as pd
 import os
 from time import sleep
-from LLRunner.config import slide_source_hostname, slide_source_username
+from LLRunner.config import (
+    slide_source_hostname,
+    slide_source_username,
+    available_machines,
+    pipeline_run_history_path,
+    dzsave_metadata_path,
+)
 
 
 def sftp_walk(sftp, remotepath):
@@ -139,3 +145,39 @@ class SSHOS:
 # is_file = ssh_os.isfile("/pesgisipth/NDPI/somefile.ndpi")
 # print(is_file)
 # ssh_os.disconnect()
+
+
+def get_pipeline_run_history_df(machine):
+    # first check if machine is in available machines
+    assert (
+        machine in available_machines
+    ), f"Machine {machine} not in available machines in list {available_machines}."
+
+    # get the ssh config for the machine
+    hostname = available_machines[machine]["hostname"]
+    username = available_machines[machine]["username"]
+
+    # create an SSHOS object
+    with SSHOS(hostname=hostname, username=username) as sshos:
+        # get the pipeline run history as a DataFrame
+        df = sshos.get_csv_as_df(remote_path=pipeline_run_history_path)
+
+    return df
+
+
+def get_dzsave_metadata_df(machine):
+    # first check if machine is in available machines
+    assert (
+        machine in available_machines
+    ), f"Machine {machine} not in available machines in list {available_machines}."
+
+    # get the ssh config for the machine
+    hostname = available_machines[machine]["hostname"]
+    username = available_machines[machine]["username"]
+
+    # create an SSHOS object
+    with SSHOS(hostname=hostname, username=username) as sshos:
+        # get the dzsave metadata as a DataFrame
+        df = sshos.get_csv_as_df(remote_path=dzsave_metadata_path)
+
+    return df

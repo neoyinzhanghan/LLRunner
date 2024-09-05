@@ -1,8 +1,8 @@
 import ray
 import os
-from LLBMA.resources.BMAassumptions import *
-from LLBMA.brain.labeller.HemeLabelLightningManager import *
-from LLBMA.brain.utils import *
+from LLBMA.resources.BMAassumptions import cell_clf_batch_size, num_labellers, HemeLabel_ckpt_path
+from LLBMA.brain.labeller.HemeLabelLightningManager import HemeLabelLightningManager
+from LLBMA.brain.utils import create_list_of_batches_from_list
 from ray.exceptions import RayTaskError
 from tqdm import tqdm
 
