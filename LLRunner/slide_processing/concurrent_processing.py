@@ -242,8 +242,8 @@ if __name__ == "__main__":
     print("Reinitializing dzsave_dir and results_dir")
     os.system("rm -r /media/hdd3/neo/dzsave_dir")
     initialize_dzsave_dir()
-    delete_results_from_note(note="Testing concurrent processing")
-    delete_results_from_note(note="Testing serial processing")
+    delete_results_from_note(note="Testing concurrent processing", ask_for_confirmation=False)
+    delete_results_from_note(note="Testing serial processing", ask_for_confirmation=False)
 
     print("Starting concurrent processing")
     start_time = time.time()
@@ -262,9 +262,9 @@ if __name__ == "__main__":
     print("Reinitializing dzsave_dir and results_dir")
     os.system("rm -r /media/hdd3/neo/dzsave_dir")
     initialize_dzsave_dir()
-    delete_results_from_note(note="Testing concurrent processing")
-    delete_results_from_note(note="Testing serial processing")
-
+    delete_results_from_note(note="Testing concurrent processing", ask_for_confirmation=False)
+    delete_results_from_note(note="Testing serial processing", ask_for_confirmation=False)
+  
     print("Starting serial processing")
     start_time = time.time()
     main_serial_bma_processing(
