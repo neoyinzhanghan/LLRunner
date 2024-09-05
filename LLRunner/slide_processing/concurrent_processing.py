@@ -90,6 +90,7 @@ def main_concurrent_bma_processing(
 
         # Wait for the slide copying to complete if it hasn't yet
         slide_copy_future = slide_copy_futures[wsi_name]
+        print(slide_copy_future)
         while not slide_copy_future.done():
             print(f"Waiting for slide {wsi_name} to be copied...")
             slide_copy_future.result()  # Wait for completion
