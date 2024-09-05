@@ -11,6 +11,7 @@ from LLRunner.config import (
     available_machines,
     pipeline_run_history_path,
     dzsave_metadata_path,
+    ssh_config
 )
 
 
@@ -154,8 +155,8 @@ def get_pipeline_run_history_df(machine):
     ), f"Machine {machine} not in available machines in list {available_machines}."
 
     # get the ssh config for the machine
-    hostname = available_machines[machine]["hostname"]
-    username = available_machines[machine]["username"]
+    hostname = ssh_config[machine]["hostname"]
+    username = ssh_config[machine]["username"]
 
     # create an SSHOS object
     with SSHOS(hostname=hostname, username=username) as sshos:
@@ -172,8 +173,8 @@ def get_dzsave_metadata_df(machine):
     ), f"Machine {machine} not in available machines in list {available_machines}."
 
     # get the ssh config for the machine
-    hostname = available_machines[machine]["hostname"]
-    username = available_machines[machine]["username"]
+    hostname = ssh_config[machine]["hostname"]
+    username = ssh_config[machine]["username"]
 
     # create an SSHOS object
     with SSHOS(hostname=hostname, username=username) as sshos:
