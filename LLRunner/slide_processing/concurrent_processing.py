@@ -138,5 +138,5 @@ if __name__ == "__main__":
         wsi_name_filter_func=test_wsi_name_filter_func,
         processing_filter_func=identity_filter,
         note="Testing concurrent processing",
-        delete_slide=False,
+        delete_slide=True,
     )
