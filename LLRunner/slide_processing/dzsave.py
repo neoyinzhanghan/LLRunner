@@ -342,16 +342,19 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
 
         dzsave_metadata_df = pd.read_csv(dzsave_metadata_path)
 
+        new_row = {
+            "wsi_name": wsi_name,
+            "tile_size": tile_size,
+            "processing_time": processing_time,
+            "datetime_processed": datetime_processed,
+            "error": error,
+        }
+
+        new_row_df = pd.DataFrame([new_row])
+
         # Add a row to the dataframe
-        dzsave_metadata_df = dzsave_metadata_df.append(
-            {
-                "wsi_name": wsi_name,
-                "tile_size": tile_size,
-                "processing_time": processing_time,
-                "datetime_processed": datetime_processed,
-                "error": error,
-            },
-            ignore_index=True,
+        dzsave_metadata_df = pd.concat(
+            [dzsave_metadata_df, new_row_df], ignore_index=True
         )
 
         # Save the dataframe back to the dzsave_metadata_path
