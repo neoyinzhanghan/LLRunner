@@ -36,7 +36,6 @@ def main_concurrent_bma_processing(
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
-        pipeline="BMA-diff",
     )
 
     # get the union of the two lists
