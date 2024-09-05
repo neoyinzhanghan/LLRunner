@@ -15,6 +15,8 @@ from LLRunner.slide_transfer.slides_management import (
     delete_slide_from_tmp,
 )
 
+from LLRunner.slide_processing.dzsave import initialize_dzsave_dir
+
 
 def main_concurrent_bma_processing(
     wsi_name_filter_func, processing_filter_func, note="", delete_slide=True
@@ -214,7 +216,7 @@ def main_serial_bma_processing(
 
 
 if __name__ == "__main__":
-
+    import os
     import time
 
     test_slides = [
@@ -231,6 +233,12 @@ if __name__ == "__main__":
     def identity_filter(pipeline_history_df):
         return pipeline_history_df
 
+    # first delete the folder /media/hdd3/neo/dzsave_dir
+    print("Reinitializing dzsave_dir")
+    os.system("rm -r /media/hdd3/neo/dzsave_dir")
+    initialize_dzsave_dir()
+
+    print("Starting concurrent processing")
     start_time = time.time()
     main_concurrent_bma_processing(
         wsi_name_filter_func=test_wsi_name_filter_func,
@@ -240,7 +248,14 @@ if __name__ == "__main__":
     )
 
     concurrent_processing_time = time.time() - start_time
+    print("Finished concurrent processing")
 
+    # first delete the folder /media/hdd3/neo/dzsave_dir
+    print("Reinitializing dzsave_dir")
+    os.system("rm -r /media/hdd3/neo/dzsave_dir")
+    initialize_dzsave_dir()
+
+    print("Starting serial processing")
     start_time = time.time()
     main_serial_bma_processing(
         wsi_name_filter_func=test_wsi_name_filter_func,
@@ -248,6 +263,7 @@ if __name__ == "__main__":
         note="Testing serial processing",
         delete_slide=True,
     )
+    print("Finished serial processing")
 
     serial_processing_time = time.time() - start_time
 
