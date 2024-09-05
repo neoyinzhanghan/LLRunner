@@ -95,25 +95,26 @@ def main_concurrent_bma_processing(
                 print(f"Waiting for slide {wsi_name} to be copied...")
                 slide_copy_future.result()  # Wait for completion
 
-            # Continue with processing
-            slide_path = find_slide(
-                wsi_name, copy_slide=False
-            )  # Now it should be instantaneous
+            # # Continue with processing
+            # slide_path = find_slide(
+            #     wsi_name, copy_slide=False
+            # )  # Now it should be instantaneous
 
-            if wsi_name in wsi_names_to_run_BMA_diff:
-                print(f"Running BMA-diff pipeline on {wsi_name}")
-                run_one_slide_with_specimen_clf(
-                    wsi_name,
-                    pipeline="BMA-diff",
-                    copy_slide=False,
-                    delete_slide=False,
-                    note=note,
-                    hoarding=True,
-                    continue_on_error=True,
-                    do_extract_features=False,
-                    check_specimen_clf=False,
-                )
-                print(f"Finished running BMA-diff pipeline on {wsi_name}")
+            # if wsi_name in wsi_names_to_run_BMA_diff:
+            #     print(f"Running BMA-diff pipeline on {wsi_name}")
+            #     run_one_slide_with_specimen_clf(
+            #         wsi_name,
+            #         pipeline="BMA-diff",
+            #         copy_slide=False,
+            #         delete_slide=False,
+            #         note=note,
+            #         hoarding=True,
+            #         continue_on_error=True,
+            #         do_extract_features=False,
+            #         check_specimen_clf=False,
+            #     )
+            #     print(f"Finished running BMA-diff pipeline on {wsi_name}")
+
             if wsi_name in wsi_names_to_run_dzsave:
                 print(f"Running dzsave pipeline on {wsi_name}")
                 dzsave_wsi_name(wsi_name)
