@@ -101,6 +101,7 @@ def main_concurrent_bma_processing(
             )  # Now it should be instantaneous
 
             if wsi_name in wsi_names_to_run_BMA_diff:
+                print(f"Running BMA-diff pipeline on {wsi_name}")
                 run_one_slide_with_specimen_clf(
                     wsi_name,
                     pipeline="BMA-diff",
@@ -112,8 +113,11 @@ def main_concurrent_bma_processing(
                     do_extract_features=False,
                     check_specimen_clf=False,
                 )
+                print(f"Finished running BMA-diff pipeline on {wsi_name}")
             if wsi_name in wsi_names_to_run_dzsave:
+                print(f"Running dzsave pipeline on {wsi_name}")
                 dzsave_wsi_name(wsi_name)
+                print(f"Finished dzsaving {wsi_name}")
 
             if delete_slide:
                 delete_slide_from_tmp(wsi_name)
