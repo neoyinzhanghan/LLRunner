@@ -16,10 +16,15 @@ from LLRunner.slide_transfer.slides_management import (
 )
 
 from LLRunner.slide_processing.dzsave import initialize_dzsave_dir
+from LLRunner.deletion.delete_slide_results import delete_results_from_note
 
 
 def main_concurrent_bma_processing(
-    wsi_name_filter_func, processing_filter_func, note="", delete_slide=True
+    wsi_name_filter_func,
+    processing_filter_func,
+    num_rync_workers=1,
+    note="",
+    delete_slide=True,
 ):
     """Main function to run the overlapping BMA-diff pipeline on slides."""
 
@@ -73,7 +78,7 @@ def main_concurrent_bma_processing(
 
     # Create a ThreadPoolExecutor for handling slide copying in parallel
     with ThreadPoolExecutor(
-        max_workers=1
+        max_workers=num_rync_workers
     ) as executor:  # You can adjust max_workers as needed
         slide_copy_futures = {}  # To track slide copying tasks
 
@@ -234,9 +239,11 @@ if __name__ == "__main__":
         return pipeline_history_df
 
     # first delete the folder /media/hdd3/neo/dzsave_dir
-    print("Reinitializing dzsave_dir")
+    print("Reinitializing dzsave_dir and results_dir")
     os.system("rm -r /media/hdd3/neo/dzsave_dir")
     initialize_dzsave_dir()
+    delete_results_from_note(note="Testing concurrent processing")
+    delete_results_from_note(note="Testing serial processing")
 
     print("Starting concurrent processing")
     start_time = time.time()
@@ -251,16 +258,18 @@ if __name__ == "__main__":
     print("Finished concurrent processing")
 
     # first delete the folder /media/hdd3/neo/dzsave_dir
-    print("Reinitializing dzsave_dir")
+    print("Reinitializing dzsave_dir and results_dir")
     os.system("rm -r /media/hdd3/neo/dzsave_dir")
     initialize_dzsave_dir()
+    delete_results_from_note(note="Testing concurrent processing")
+    delete_results_from_note(note="Testing serial processing")
 
     print("Starting serial processing")
     start_time = time.time()
     main_serial_bma_processing(
         wsi_name_filter_func=test_wsi_name_filter_func,
         processing_filter_func=identity_filter,
-        note="Testing serial processing",
+        note="Testing concurrent processing",
         delete_slide=True,
     )
     print("Finished serial processing")
