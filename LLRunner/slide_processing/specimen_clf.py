@@ -93,7 +93,7 @@ def update_bma_specimen_clf_result(wsi_name):
     wsi_name_path = Path(wsi_name)
     topview_path = Path(tmp_slide_dir) / "topview" / (wsi_name_path.stem + ".jpg")
 
-    assert topview_path.exists(), f"Error: Topview for {wsi_name} does not exist."
+    # assert topview_path.exists(), f"Error: Topview for {wsi_name} does not exist." # DEPRECATED
 
     # now check if the wsi_name is in the slide_metadata_df
     assert (
