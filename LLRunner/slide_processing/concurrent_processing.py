@@ -22,7 +22,7 @@ from LLRunner.deletion.delete_slide_results import delete_results_from_note
 def main_concurrent_bma_processing(
     wsi_name_filter_func,
     processing_filter_func,
-    num_rync_workers=1,
+    num_rsync_workers=1,
     note="",
     delete_slide=True,
 ):
@@ -78,7 +78,7 @@ def main_concurrent_bma_processing(
 
     # Create a ThreadPoolExecutor for handling slide copying in parallel
     with ThreadPoolExecutor(
-        max_workers=num_rync_workers
+        max_workers=num_rsync_workers
     ) as executor:  # You can adjust max_workers as needed
         slide_copy_futures = {}  # To track slide copying tasks
 
@@ -464,7 +464,7 @@ if __name__ == "__main__":
     # main_concurrent_bma_processing(
     #     wsi_name_filter_func=test_wsi_name_filter_func,
     #     processing_filter_func=identity_filter,
-    #     num_rync_workers=32,
+    #     num_rsync_workers=32,
     #     note="Testing concurrent processing",
     #     delete_slide=True,
     # )
