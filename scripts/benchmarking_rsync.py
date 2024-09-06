@@ -270,10 +270,9 @@ def measure_rsync_time_and_cpu(num_workers):
     cpu_monitor_thread.join()
 
     elapsed_time = end_time - start_time
-    return elapsed_time, peak_cpu_usage[0]
-
     print(f"Time taken with {num_workers} workers: {elapsed_time:.2f} seconds")
     print(f"Peak CPU usage with {num_workers} workers: {peak_cpu_usage[0]:.2f}%")
+    return elapsed_time, peak_cpu_usage[0]
 
 
 # List of num_rsync_workers to test
