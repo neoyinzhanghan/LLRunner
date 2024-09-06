@@ -220,6 +220,7 @@ test_slides = [
 
 # List of test slides filenames
 test_slides = test_slides[:2]
+print(f"Testing with {len(test_slides)} slides")
 
 source_dir = "/pesgisipth/NDPI"
 destination_dir = "/media/hdd3/neo/test_slides_rsync"
