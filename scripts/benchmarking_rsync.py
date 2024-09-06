@@ -219,7 +219,7 @@ test_slides = [
 
 
 # List of test slides filenames
-test_slides = test_slides[:2]
+test_slides = test_slides[:4]
 print(f"Testing with {len(test_slides)} slides")
 
 source_dir = "/pesgisipth/NDPI"
@@ -279,7 +279,7 @@ def measure_rsync_time_and_cpu(num_workers):
 
 
 # List of num_rsync_workers to test
-num_rsync_workers_list = [1, 2]  # , 4, 8, 16, 32]
+num_rsync_workers_list = [1, 2, 4]  # , 4, 8, 16, 32]
 
 # Measure and print time and peak CPU usage for each worker configuration
 for num_workers in num_rsync_workers_list:
