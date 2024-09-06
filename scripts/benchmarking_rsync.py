@@ -219,7 +219,7 @@ test_slides = [
 
 
 # List of test slides filenames
-test_slides = test_slides[:4]
+test_slides = test_slides[:32]
 print(f"Testing with {len(test_slides)} slides")
 
 source_dir = "/pesgisipth/NDPI"
@@ -262,16 +262,16 @@ def measure_rsync_time_and_cpu(num_workers):
 
     shutil.rmtree(os.path.join(destination_dir), ignore_errors=True)
     os.makedirs(destination_dir, exist_ok=True)
-    
+
     # Start rsync operations and track futures
     start_time = time.time()
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         slide_copy_futures = {}
-        
+
         # Start copying slides in parallel
         for slide in test_slides:
             slide_copy_futures[slide] = executor.submit(rsync_file, slide)
-        
+
         # Wait for each slide to finish copying
         for future in as_completed(slide_copy_futures.values()):
             try:
@@ -292,7 +292,7 @@ def measure_rsync_time_and_cpu(num_workers):
 
 
 # List of num_rsync_workers to test
-num_rsync_workers_list = [1, 2, 4]
+num_rsync_workers_list = [1, 2, 4, 8, 16, 32]
 
 # Measure and print time and peak CPU usage for each worker configuration
 for num_workers in num_rsync_workers_list:
