@@ -435,6 +435,11 @@ if __name__ == "__main__":
         "H24-737;S12;MSKZ - 2024-05-13 11.02.53.ndpi",
     ]
 
+    for test_slide in tqdm(test_slides, desc="Deleting slides to tmp_slide_dir"):
+        # if the test slide already exist in the tmp_slide_dir, delete it
+        if os.path.exists(f"/media/hdd3/neo/tmp_slide_dir/{test_slide}"):
+            delete_slide_from_tmp(test_slide)
+
     test_slides = test_slides[:100]
 
     def test_wsi_name_filter_func(wsi_name):
