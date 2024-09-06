@@ -448,51 +448,53 @@ if __name__ == "__main__":
     def identity_filter(pipeline_history_df):
         return pipeline_history_df
 
-    # first delete the folder /media/hdd3/neo/dzsave_dir
-    print("Reinitializing dzsave_dir and results_dir")
-    os.system("rm -r /media/hdd3/neo/dzsave_dir")
-    initialize_dzsave_dir()
-    delete_results_from_note(
-        note="Testing concurrent processing", ask_for_confirmation=False
-    )
-    delete_results_from_note(
-        note="Testing serial processing", ask_for_confirmation=False
-    )
-
-    print("Starting concurrent processing")
-    start_time = time.time()
-    main_concurrent_bma_processing(
-        wsi_name_filter_func=test_wsi_name_filter_func,
-        processing_filter_func=identity_filter,
-        num_rync_workers=32,
-        note="Testing concurrent processing",
-        delete_slide=True,
-    )
-
-    concurrent_processing_time = time.time() - start_time
-    print("Finished concurrent processing")
-
     # # first delete the folder /media/hdd3/neo/dzsave_dir
     # print("Reinitializing dzsave_dir and results_dir")
     # os.system("rm -r /media/hdd3/neo/dzsave_dir")
     # initialize_dzsave_dir()
-    # delete_results_from_note(note="Testing concurrent processing", ask_for_confirmation=False)
-    # delete_results_from_note(note="Testing serial processing", ask_for_confirmation=False)
+    # delete_results_from_note(
+    #     note="Testing concurrent processing", ask_for_confirmation=False
+    # )
+    # delete_results_from_note(
+    #     note="Testing serial processing", ask_for_confirmation=False
+    # )
 
-    # print("Starting serial processing")
+    # print("Starting concurrent processing")
     # start_time = time.time()
-    # main_serial_bma_processing(
+    # main_concurrent_bma_processing(
     #     wsi_name_filter_func=test_wsi_name_filter_func,
     #     processing_filter_func=identity_filter,
+    #     num_rync_workers=32,
     #     note="Testing concurrent processing",
     #     delete_slide=True,
     # )
-    # print("Finished serial processing")
 
-    # serial_processing_time = time.time() - start_time
+    # concurrent_processing_time = time.time() - start_time
+    # print("Finished concurrent processing")
 
-    serial_processing_time = 190 * len(test_slides)
+    # first delete the folder /media/hdd3/neo/dzsave_dir
+    print("Reinitializing dzsave_dir and results_dir")
+    os.system("rm -r /media/hdd3/neo/dzsave_dir")
+    initialize_dzsave_dir()
+    delete_results_from_note(note="Testing concurrent processing", ask_for_confirmation=False)
+    delete_results_from_note(note="Testing serial processing", ask_for_confirmation=False)
 
-    print(
-        f"Concurrent processing took {concurrent_processing_time} seconds, while serial processing would have taken and estimated {serial_processing_time} seconds."
+    print("Starting serial processing")
+    start_time = time.time()
+    main_serial_bma_processing(
+        wsi_name_filter_func=test_wsi_name_filter_func,
+        processing_filter_func=identity_filter,
+        note="Testing concurrent processing",
+        delete_slide=True,
     )
+    print("Finished serial processing")
+
+    serial_processing_time = time.time() - start_time
+
+    # serial_processing_time = 190 * len(test_slides)
+
+    # print(
+    #     f"Concurrent processing took {concurrent_processing_time} seconds, while serial processing would have taken and estimated {serial_processing_time} seconds."
+    # )
+
+    print(f"Serial processing took {serial_processing_time} seconds.")
