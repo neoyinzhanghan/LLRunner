@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import threading
 import psutil
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 test_slides = [
     "H24-00033-1A-1 - 2024-07-17 13.47.29.ndpi",
@@ -262,10 +262,23 @@ def measure_rsync_time_and_cpu(num_workers):
 
     shutil.rmtree(os.path.join(destination_dir), ignore_errors=True)
     os.makedirs(destination_dir, exist_ok=True)
-    # Start rsync operations
+    
+    # Start rsync operations and track futures
     start_time = time.time()
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        executor.map(rsync_file, test_slides)
+        slide_copy_futures = {}
+        
+        # Start copying slides in parallel
+        for slide in test_slides:
+            slide_copy_futures[slide] = executor.submit(rsync_file, slide)
+        
+        # Wait for each slide to finish copying
+        for future in as_completed(slide_copy_futures.values()):
+            try:
+                future.result()  # This will raise any exceptions that occurred during execution
+            except Exception as e:
+                print(f"Slide copy failed with exception: {e}")
+
     end_time = time.time()
 
     # Stop CPU monitoring
@@ -279,7 +292,7 @@ def measure_rsync_time_and_cpu(num_workers):
 
 
 # List of num_rsync_workers to test
-num_rsync_workers_list = [1, 2, 4]  # , 4, 8, 16, 32]
+num_rsync_workers_list = [1, 2, 4]
 
 # Measure and print time and peak CPU usage for each worker configuration
 for num_workers in num_rsync_workers_list:
