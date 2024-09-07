@@ -182,3 +182,18 @@ def get_dzsave_metadata_df(machine):
         df = sshos.get_csv_as_df(remote_path=dzsave_metadata_path)
 
     return df
+
+# Rsync function for a single file
+def rsync_file_local(file, source_dir, destination_dir):
+    source_file = os.path.join(source_dir, file)
+    destination_file = os.path.join(destination_dir, file)
+
+    try:
+        subprocess.run(
+            ["rsync", "-av", source_file, destination_file],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error rsyncing {file}: {e}")

@@ -17,7 +17,7 @@ from LLRunner.config import (
     slide_metadata_path,
     topview_level,
 )
-from LLRunner.slide_transfer.sshos import SSHOS
+from LLRunner.slide_transfer.sshos import SSHOS, rsync_file_local
 
 
 def get_topview(wsi_name):
@@ -89,9 +89,12 @@ def copy_slide_to_tmp(wsi_name, overwrite=False, overwrite_topview=False):
         if overwrite:
             os.remove(slide_path)
 
-            with SSHOS() as sshos:
-                source_slide_path = os.path.join(slide_source_dir, wsi_name)
-                sshos.rsync_file(remote_path=source_slide_path, local_dir=tmp_slide_dir)
+            source_slide_path = os.path.join(slide_source_dir, wsi_name)
+            rsync_file_local(
+                file=wsi_name,
+                source_dir=slide_source_dir,
+                destination_dir=tmp_slide_dir,
+            )
 
             # update the slide metadata
             slide_metadata_row = get_slide_metadata_row(wsi_name)
