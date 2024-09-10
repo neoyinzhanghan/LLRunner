@@ -11,7 +11,7 @@ from LLRunner.slide_processing.specimen_clf import (
 from tqdm import tqdm
 
 tmp_topview_dir = os.path.join(tmp_slide_dir, "topview")
-save_dir = os.path.join(tmp_slide_dir, "save_dir")
+save_dir = "specimen_clf_sanity_check"
 
 is_bma_path = os.path.join(save_dir, "is_bma")
 is_pbs_path = os.path.join(save_dir, "is_pbs")
