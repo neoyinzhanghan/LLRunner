@@ -21,6 +21,12 @@ is_not_bma_path = os.path.join(save_dir, "is_not_bma")
 is_not_pbs_path = os.path.join(save_dir, "is_not_pbs")
 is_both_path = os.path.join(save_dir, "is_both")
 
+os.makedirs(is_bma_path, exist_ok=True)
+os.makedirs(is_pbs_path, exist_ok=True)
+os.makedirs(is_not_bma_path, exist_ok=True)
+os.makedirs(is_not_pbs_path, exist_ok=True)
+os.makedirs(is_both_path, exist_ok=True)
+
 bma_model = load_bma_specimen_clf_model()
 pbs_model = load_pbs_specimen_clf_model()
 
