@@ -37,6 +37,8 @@ metadata = {
     "pbs_score": [],
 }
 
+current_idx = 0
+
 # get the path to all the jpg images in the topview directory
 topview_images = [
     os.path.join(tmp_topview_dir, f)
@@ -50,23 +52,27 @@ for image_path in tqdm(topview_images):
     bma_score = predict_image(bma_model, image, device=device)
     pbs_score = predict_image(pbs_model, image, device=device)
     
-    metadata["idx"].append(os.path.basename(image_path).split(".")[0])
+    metadata["idx"].append(current_idx)
     metadata["topview_path"].append(image_path)
     metadata["bma_score"].append(bma_score)
     metadata["pbs_score"].append(pbs_score)
+
+    # save name will the idx.jpg
+    save_name = f"{current_idx}.jpg"
     
     if bma_score > BMA_specimen_clf_threshold:
-        os.symlink(image_path, os.path.join(is_bma_path, os.path.basename(image_path)))
+        os.symlink(image_path, os.path.join(is_bma_path, save_name))
     else:
-        os.symlink(image_path, os.path.join(is_not_bma_path, os.path.basename(image_path)))
+        os.symlink(image_path, os.path.join(is_not_bma_path, save_name))
 
     if pbs_score > PBS_specimen_clf_threshold:
-        os.symlink(image_path, os.path.join(is_pbs_path, os.path.basename(image_path)))
+        os.symlink(image_path, os.path.join(is_pbs_path, save_name))
     else:
-        os.symlink(image_path, os.path.join(is_not_pbs_path, os.path.basename(image_path)))
-
+        os.symlink(image_path, os.path.join(is_not_pbs_path, save_name))    
     if bma_score > BMA_specimen_clf_threshold and pbs_score > PBS_specimen_clf_threshold:
-        os.symlink(image_path, os.path.join(is_both_path, os.path.basename(image_path)))
+        os.symlink(image_path, os.path.join(is_both_path, save_name))
+
+    current_idx += 1
 
 metadata_df = pd.DataFrame(metadata)
 metadata_df.to_csv(os.path.join(save_dir, "specimen_clf_metadata.csv"), index=False)
