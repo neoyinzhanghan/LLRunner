@@ -5,6 +5,7 @@ import pandas as pd
 from pathlib import Path
 from LLRunner.config import (
     BMA_specimen_clf_ckpt_path,
+    PBS_specimen_clf_ckpt_path,
     slide_metadata_path,
     tmp_slide_dir,
 )
@@ -55,8 +56,27 @@ def load_bma_specimen_clf_model():
 
     return model
 
+def load_pbs_specimen_clf_model():
+    model = ResNeXtModel(num_classes=2)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    checkpoint = torch.load(PBS_specimen_clf_ckpt_path, map_location=device)
+
+    state_dict = checkpoint["state_dict"]
+    filtered_state_dict = {
+        k: v for k, v in state_dict.items() if k in model.state_dict()
+    }
+
+    # Load the filtered state_dict into the model
+    model.load_state_dict(filtered_state_dict, strict=False)
+    model.eval()
+
+    return model
+
 
 def predict_image(model, pil_image, device):
+    """
+    Predict the class of an image using the given model. Return the positive score.
+    """
     image = test_transforms(pil_image).unsqueeze(0)
     model.eval()
     model.to(device)

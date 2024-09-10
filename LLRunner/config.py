@@ -34,3 +34,6 @@ topview_level = 7
 
 BMA_specimen_clf_ckpt_path = "/media/hdd3/neo/MODELS/2024-09-04 Riya-Specimen-Clf-BMA/resnext-epoch=18-val_acc=0.97.ckpt"
 BMA_specimen_clf_threshold = 0.5
+
+PBS_specimen_clf_ckpt_path = "/media/hdd3/neo/MODELS/2024-09-10 Riya-Specimen-Clf-PBS/resnext-epoch=45-val_acc=0.96.ckpt"
+PBS_specimen_clf_threshold = 0.5
