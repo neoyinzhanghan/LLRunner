@@ -6,7 +6,8 @@ from LLRunner.config import tmp_slide_dir, BMA_specimen_clf_threshold, PBS_speci
 from LLRunner.slide_processing.specimen_clf import (
     load_bma_specimen_clf_model,
     load_pbs_specimen_clf_model,
-    predict_image,
+    predict_image_bma,
+    predict_image_pbs,
 )
 from tqdm import tqdm
 
@@ -49,8 +50,8 @@ topview_images = [
 for image_path in tqdm(topview_images):
     image = Image.open(image_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    bma_score = predict_image(bma_model, image, device=device)
-    pbs_score = predict_image(pbs_model, image, device=device)
+    bma_score = predict_image_bma(bma_model, image, device=device)
+    pbs_score = predict_image_pbs(pbs_model, image, device=device)
     
     metadata["idx"].append(current_idx)
     metadata["topview_path"].append(image_path)

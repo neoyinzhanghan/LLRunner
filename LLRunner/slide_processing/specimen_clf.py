@@ -73,7 +73,7 @@ def load_pbs_specimen_clf_model():
     return model
 
 
-def predict_image(model, pil_image, device):
+def predict_image_bma(model, pil_image, device):
     """
     Predict the class of an image using the given model. Return the positive score.
     """
@@ -92,11 +92,30 @@ def predict_image(model, pil_image, device):
 
     return positive_score
 
+def predict_image_pbs(model, pil_image, device):
+    """
+    Predict the class of an image using the given model. Return the positive score.
+    """
+    image = test_transforms(pil_image).unsqueeze(0)
+    model.eval()
+    model.to(device)
+    image = image.to(device)
+    output = model(image)
+
+    # apply softmax to get the positive score
+    softmax_fn = nn.Softmax(dim=1)
+
+    softmax_output = softmax_fn(output)
+
+    positive_score = softmax_output[0][1].item()
+
+    return positive_score
+
 
 def get_topview_bma_score(pil_image):
     model = ResNeXtModel.load_from_checkpoint(BMA_specimen_clf_ckpt_path, strict=False)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    return predict_image(model, pil_image, device)
+    return predict_image_bma(model, pil_image, device)
 
 
 def update_bma_specimen_clf_result(wsi_name):
