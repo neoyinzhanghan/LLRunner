@@ -39,8 +39,8 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     glv_zipping_time = time.time() - starttime
 
     starttime = time.time()
-    # Copy the zip file to the isilon archive directory using shutil.copy
-    shutil.copy(zip_file_path, archive_dir)
+    # Use sudo rsync command for transferring the zip file
+    os.system(f"sudo rsync -av {zip_file_path} {archive_dir}")
     rsync_time = time.time() - starttime
     
     # Unzip the file on the isilon using zipfile
