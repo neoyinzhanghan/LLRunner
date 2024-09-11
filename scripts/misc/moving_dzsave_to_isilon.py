@@ -31,6 +31,8 @@ subdirs_names = [subdir_name for subdir_name in subdir_names if subdir_name not 
 # now check if the subdir is actually a directory
 subdirs = [os.path.join(dzsave_dir, subdir_name) for subdir_name in subdirs_names if os.path.isdir(os.path.join(dzsave_dir, subdir_name))]
 
+subdirs = [subdirs[0]]
+
 # print the number of rows with errors
 print(f"Number of rows with errors: {len(error_rows)}")
 
