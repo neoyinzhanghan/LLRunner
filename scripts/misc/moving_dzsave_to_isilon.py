@@ -1,6 +1,8 @@
 import os
 import time
 import pandas as pd
+import shutil
+import zipfile
 from LLRunner.config import dzsave_dir, dzsave_metadata_path
 from tqdm import tqdm
 
@@ -30,18 +32,21 @@ profile_metadata = {
 
 for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     starttime = time.time()
-    # zip the directory
-    os.system(f"zip -r {subdir}.zip {subdir}")
+    
+    # Create a zip file using shutil
+    zip_file_path = f"{subdir}.zip"
+    shutil.make_archive(subdir, 'zip', subdir)
     glv_zipping_time = time.time() - starttime
 
     starttime = time.time()
-    # rsync the zip file to the isilon
-    os.system(f"rsync -av {subdir}.zip {archive_dir}")  
+    # Copy the zip file to the isilon archive directory using shutil.copy
+    shutil.copy(zip_file_path, archive_dir)
     rsync_time = time.time() - starttime
     
-    # unzip the file on the isilon
+    # Unzip the file on the isilon using zipfile
     starttime = time.time()
-    os.system(f"unzip {archive_dir}/{subdir}.zip -d {archive_dir}")
+    with zipfile.ZipFile(os.path.join(archive_dir, f"{os.path.basename(subdir)}.zip"), 'r') as zip_ref:
+        zip_ref.extractall(os.path.join(archive_dir, os.path.basename(subdir)))
     isilon_unzipping_time = time.time() - starttime
 
     profile_metadata["subdir"].append(subdir)
@@ -49,5 +54,6 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     profile_metadata["rsync_time"].append(rsync_time)
     profile_metadata["isilon_unzipping_time"].append(isilon_unzipping_time)
 
+# Save the profiling metadata
 profile_metadata_df = pd.DataFrame(profile_metadata)
 profile_metadata_df.to_csv(os.path.join(dzsave_dir, "archive_profile_metadata.csv"), index=False)
