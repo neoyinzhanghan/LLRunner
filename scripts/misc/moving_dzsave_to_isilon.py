@@ -42,6 +42,7 @@ profile_metadata = {
     "rsync_time": [],
     "isilon_unzipping_time": [],
     "direct_rsync_time": [],
+    "folder_size": [],
 }
 
 subdirs = [subdirs[0]]
@@ -68,10 +69,6 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     os.system(f"sudo unzip \'{os.path.join(archive_dir, os.path.basename(subdir))}.zip\' -d \'{archive_dir}\'")
     isilon_unzipping_time = time.time() - starttime
 
-    profile_metadata["subdir"].append(subdir)
-    profile_metadata["glv_zipping_time"].append(glv_zipping_time)
-    profile_metadata["rsync_time"].append(rsync_time)
-    profile_metadata["isilon_unzipping_time"].append(isilon_unzipping_time)
 
     # now sudo remove the zip file and the unzipped directory
     os.system(f"sudo rm \'{subdir}.zip\'")
@@ -83,10 +80,25 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     os.system(f"sudo rsync -av \'{subdir}\' \'{archive_dir}\'")
     direct_rsync_time = time.time() - starttime
 
+    # get the size of subdir in Mb
+    folder_size = sum(
+        sum(os.path.getsize(os.path.join(dirpath, filename)) for filename in filenames)
+        for dirpath, dirnames, filenames in os.walk(subdir)
+    )
+    folder_size = folder_size / (1024 * 1024)
+
+    profile_metadata["subdir"].append(subdir)
+    profile_metadata["glv_zipping_time"].append(glv_zipping_time)
+    profile_metadata["rsync_time"].append(rsync_time)
+    profile_metadata["isilon_unzipping_time"].append(isilon_unzipping_time)
+    profile_metadata["direct_rsync_time"].append(direct_rsync_time)
+    profile_metadata["folder_size"].append(folder_size)
+
     print(f"Zipping time: {glv_zipping_time}")
     print(f"Rsync time: {rsync_time}")
     print(f"Isilon unzipping time: {isilon_unzipping_time}")
     print(f"Direct rsync time: {direct_rsync_time}")
+    print(f"Folder size: {folder_size} Mb")
 
 
 # Save the profiling metadata
