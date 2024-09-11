@@ -28,6 +28,8 @@ profile_metadata = {
     "isilon_unzipping_time": [],
 }
 
+subdirs = [subdirs[0]]
+
 for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     starttime = time.time()
     print(f"Zipping {subdir}")
@@ -56,8 +58,6 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     print(f"Rsync time: {rsync_time}")
     print(f"Isilon unzipping time: {isilon_unzipping_time}")
 
-    import sys
-    sys.exit()
 
 # Save the profiling metadata
 profile_metadata_df = pd.DataFrame(profile_metadata)
