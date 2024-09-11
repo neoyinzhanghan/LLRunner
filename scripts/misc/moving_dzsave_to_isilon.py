@@ -56,6 +56,9 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     print(f"Rsync time: {rsync_time}")
     print(f"Isilon unzipping time: {isilon_unzipping_time}")
 
+    import sys
+    sys.exit()
+
 # Save the profiling metadata
 profile_metadata_df = pd.DataFrame(profile_metadata)
 profile_metadata_df.to_csv(os.path.join(dzsave_dir, "archive_profile_metadata.csv"), index=False)
