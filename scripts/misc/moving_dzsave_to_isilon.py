@@ -1,8 +1,6 @@
 import os
 import time
 import pandas as pd
-import shutil
-import zipfile
 from LLRunner.config import dzsave_dir, dzsave_metadata_path
 from tqdm import tqdm
 
@@ -33,22 +31,20 @@ profile_metadata = {
 for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     starttime = time.time()
     print(f"Zipping {subdir}")
-    # Create a zip file using shutil
-    zip_file_path = f"{subdir}.zip"
-    shutil.make_archive(subdir, 'zip', subdir)
+    # Use sudo zip command for zipping the directory
+    os.system(f"sudo zip -r \'{subdir}.zip\' \'{subdir}\'")
     glv_zipping_time = time.time() - starttime
 
     starttime = time.time()
-    print(f"Transferring {zip_file_path}")
+    print(f"Transferring {subdir}.zip")
     # Use sudo rsync command for transferring the zip file
-    os.system(f"sudo rsync -av \'{zip_file_path}\' \'{archive_dir}\'")
+    os.system(f"sudo rsync -av \'{subdir}.zip\' \'{archive_dir}\'")
     rsync_time = time.time() - starttime
     
-    # Unzip the file on the isilon using zipfile
+    # Unzip the file on the isilon using sudo unzip
     starttime = time.time()
-    print(f"Unzipping {zip_file_path}") 
-    with zipfile.ZipFile(os.path.join(archive_dir, f"{os.path.basename(subdir)}.zip"), 'r') as zip_ref:
-        zip_ref.extractall(os.path.join(archive_dir, os.path.basename(subdir)))
+    print(f"Unzipping {subdir}.zip") 
+    os.system(f"sudo unzip \'{os.path.join(archive_dir, os.path.basename(subdir))}.zip\' -d \'{archive_dir}\'")
     isilon_unzipping_time = time.time() - starttime
 
     profile_metadata["subdir"].append(subdir)
