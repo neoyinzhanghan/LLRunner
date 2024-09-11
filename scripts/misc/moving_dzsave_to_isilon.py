@@ -1,14 +1,15 @@
 import os
 import time
 import pandas as pd
+from pathlib import Path
 from LLRunner.config import dzsave_dir, dzsave_metadata_path
 from tqdm import tqdm
 
 archive_dir = "/dmpisilon_tools/neo/test_archive"
 os.makedirs(archive_dir, exist_ok=True)
 
-# find all the subdirectories in dzsave_dir
-subdirs = [f.path for f in os.scandir(dzsave_dir) if f.is_dir()]
+# Get the list of subdirectories in the dzsave directory
+subdir_names = os.listdir(dzsave_dir)
 
 # first clean the directory, load the metadata
 dzsave_metadata_df = pd.read_csv(dzsave_metadata_path)
@@ -18,6 +19,18 @@ error_rows = dzsave_metadata_df[
     (dzsave_metadata_df["error"].notnull()) & (dzsave_metadata_df["error"] != "")
 ]
 
+# find the list the wsi_name column of the error rows
+error_wsi_names = error_rows["wsi_name"].tolist()
+
+# remove the .ndpi at the end of the wsi_name
+error_wsi_names = [wsi_name[:-5] for wsi_name in error_wsi_names]
+
+# for each error wsi_name, remove the corresponding subdirectory
+subdirs_names = [subdir_name for subdir_name in subdir_names if subdir_name not in error_wsi_names]
+
+# now check if the subdir is actually a directory
+subdirs = [os.path.join(dzsave_dir, subdir_name) for subdir_name in subdirs_names if os.path.isdir(os.path.join(dzsave_dir, subdir_name))]
+
 # print the number of rows with errors
 print(f"Number of rows with errors: {len(error_rows)}")
 
@@ -26,11 +39,19 @@ profile_metadata = {
     "glv_zipping_time": [],
     "rsync_time": [],
     "isilon_unzipping_time": [],
+    "direct_rsync_time": [],
 }
 
 subdirs = [subdirs[0]]
 
 for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
+    subdir_path = Path(subdir)
+    subdir_name = subdir_path.name
+
+    print(subdir_name)
+
+    import sys
+    sys.exit()
     starttime = time.time()
     print(f"Zipping {subdir}")
     # Use sudo zip command for zipping the directory
@@ -53,6 +74,10 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     profile_metadata["glv_zipping_time"].append(glv_zipping_time)
     profile_metadata["rsync_time"].append(rsync_time)
     profile_metadata["isilon_unzipping_time"].append(isilon_unzipping_time)
+
+    # now sudo remove the zip file and the unzipped directory
+    os.system(f"sudo rm \'{subdir}.zip\'")
+    os.system(f"sudo rm \'{os.path.join(archive_dir, os.path.basename(subdir))}.zip\'")
 
     print(f"Zipping time: {glv_zipping_time}")
     print(f"Rsync time: {rsync_time}")
