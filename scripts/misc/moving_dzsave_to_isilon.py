@@ -32,19 +32,21 @@ profile_metadata = {
 
 for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     starttime = time.time()
-    
+    print(f"Zipping {subdir}")
     # Create a zip file using shutil
     zip_file_path = f"{subdir}.zip"
     shutil.make_archive(subdir, 'zip', subdir)
     glv_zipping_time = time.time() - starttime
 
     starttime = time.time()
+    print(f"Transferring {zip_file_path}")
     # Use sudo rsync command for transferring the zip file
-    os.system(f"sudo rsync -av {zip_file_path} {archive_dir}")
+    os.system(f"sudo rsync -av \'{zip_file_path}\' \'{archive_dir}\'")
     rsync_time = time.time() - starttime
     
     # Unzip the file on the isilon using zipfile
     starttime = time.time()
+    print(f"Unzipping {zip_file_path}") 
     with zipfile.ZipFile(os.path.join(archive_dir, f"{os.path.basename(subdir)}.zip"), 'r') as zip_ref:
         zip_ref.extractall(os.path.join(archive_dir, os.path.basename(subdir)))
     isilon_unzipping_time = time.time() - starttime
