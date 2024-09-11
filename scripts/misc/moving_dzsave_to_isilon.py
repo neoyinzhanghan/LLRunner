@@ -48,10 +48,6 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
     subdir_path = Path(subdir)
     subdir_name = subdir_path.name
 
-    print(subdir_name)
-
-    import sys
-    sys.exit()
     starttime = time.time()
     print(f"Zipping {subdir}")
     # Use sudo zip command for zipping the directory
@@ -77,11 +73,18 @@ for subdir in tqdm(subdirs, desc="Profilling dzsave archiving"):
 
     # now sudo remove the zip file and the unzipped directory
     os.system(f"sudo rm \'{subdir}.zip\'")
-    os.system(f"sudo rm \'{os.path.join(archive_dir, os.path.basename(subdir))}.zip\'")
+    os.system(f"sudo rm \'{os.path.join(archive_dir, subdir_name)}.zip\'")
+
+    starttime = time.time()
+    print(f"Directly transferring {subdir}")
+    # Use sudo rsync command for transferring the directory
+    os.system(f"sudo rsync -av \'{subdir}\' \'{archive_dir}\'")
+    direct_rsync_time = time.time() - starttime
 
     print(f"Zipping time: {glv_zipping_time}")
     print(f"Rsync time: {rsync_time}")
     print(f"Isilon unzipping time: {isilon_unzipping_time}")
+    print(f"Direct rsync time: {direct_rsync_time}")
 
 
 # Save the profiling metadata
