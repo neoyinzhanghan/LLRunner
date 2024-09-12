@@ -374,7 +374,7 @@ def decide_what_to_run(wsi_name_filter_func, processing_filter_func, pipeline):
 
 
 def decide_what_to_run_with_specimen_clf_cross_machine(
-    wsi_name_filter_func, processing_filter_func, pipeline
+    wsi_name_filter_func, processing_filter_func, pipelines
 ):
     """Decide what to run based on the processing_filter_func and the pipeline.
     The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
@@ -387,8 +387,9 @@ def decide_what_to_run_with_specimen_clf_cross_machine(
     # first open the slide_metadata_path file
     slide_md = pd.read_csv(slide_metadata_path)
 
-    if pipeline not in available_pipelines:
-        raise PipelineNotFoundError(pipeline)
+    for pipeline in pipelines:
+        if pipeline not in available_pipelines:
+            raise PipelineNotFoundError(pipeline)
 
     # use wsi_name_filter_func to filter the slide_md based on wsi_name column
     slide_md = slide_md[slide_md["wsi_name"].apply(wsi_name_filter_func)]
@@ -399,7 +400,7 @@ def decide_what_to_run_with_specimen_clf_cross_machine(
         df = get_pipeline_run_history_df(machine)
 
         # only keep the rows in the pipeline_run_history_path for the specified pipeline
-        df = df[df["pipeline"] == pipeline]
+        df = df[df["pipeline"] in pipeline]
 
         filtered_df = processing_filter_func(df)
 

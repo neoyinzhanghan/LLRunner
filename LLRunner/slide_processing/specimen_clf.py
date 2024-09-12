@@ -113,9 +113,14 @@ def predict_image_pbs(model, pil_image, device):
 
 
 def get_topview_bma_score(pil_image):
-    model = ResNeXtModel.load_from_checkpoint(BMA_specimen_clf_ckpt_path, strict=False)
+    model = load_bma_specimen_clf_model()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     return predict_image_bma(model, pil_image, device)
+
+def get_topview_pbs_score(pil_image):
+    model = load_pbs_specimen_clf_model()   
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return predict_image_pbs(model, pil_image, device)
 
 
 def update_bma_specimen_clf_result(wsi_name):
@@ -127,6 +132,12 @@ def update_bma_specimen_clf_result(wsi_name):
     # first make sure that the csv file at slide_metadata_path has columns named BMA_specimen_clf_score and BMA_specimen_clf_error
     # if not then create that column with None as the value for all the rows, if the column already exists then do nothing
     slide_metadata_df = pd.read_csv(slide_metadata_path)
+
+    # check if the metadatafile has teh BMP_specimen_clf_score and BMA_specimen_clf_error columns
+    if "BMA_specimen_clf_score" not in slide_metadata_df.columns:
+        slide_metadata_df["BMA_specimen_clf_score"] = None
+    if "BMA_specimen_clf_error" not in slide_metadata_df.columns:
+        slide_metadata_df["BMA_specimen_clf_error"] = None
 
     # use pathlib to replace the extension of wsi_name with .jpg and check if the file exists in the topview subfolder of the tmp_slide_dir
     wsi_name_path = Path(wsi_name)
@@ -167,6 +178,60 @@ def update_bma_specimen_clf_result(wsi_name):
 
     return score, error
 
+def update_pbs_specimen_clf_result(wsi_name):
+    """First check that the topview for the wsi_name exists, if not raise an error.
+    Second check that the wsi_name is already in the slide_metadata_path, if not then raise an error.
+    Also check that the slide_metadata_path exists and has the column, if not then create them.
+    """
+
+    # first make sure that the csv file at slide_metadata_path has columns named PBS_specimen_clf_score and PBS_specimen_clf_error
+    # if not then create that column with None as the value for all the rows, if the column already exists then do nothing
+    slide_metadata_df = pd.read_csv(slide_metadata_path)
+
+    # check if the metadatafile has teh BMP_specimen_clf_score and BMA_specimen_clf_error columns
+    if "PBS_specimen_clf_score" not in slide_metadata_df.columns:
+        slide_metadata_df["PBS_specimen_clf_score"] = None
+    if "PBS_specimen_clf_error" not in slide_metadata_df.columns:
+        slide_metadata_df["PBS_specimen_clf_error"] = None
+
+    # use pathlib to replace the extension of wsi_name with .jpg and check if the file exists in the topview subfolder of the tmp_slide_dir
+    wsi_name_path = Path(wsi_name)
+    topview_path = Path(tmp_slide_dir) / "topview" / (wsi_name_path.stem + ".jpg")
+
+    # assert topview_path.exists(), f"Error: Topview for {wsi_name} does not exist." # DEPRECATED
+
+    # now check if the wsi_name is in the slide_metadata_df
+    assert (
+        wsi_name in slide_metadata_df["wsi_name"].values
+    ), f"Error: {wsi_name} not found in slide_metadata_df."
+
+    if "PBS_specimen_clf_score" not in slide_metadata_df.columns:
+        slide_metadata_df["PBS_specimen_clf_score"] = None
+    if "PBS_specimen_clf_error" not in slide_metadata_df.columns:
+        slide_metadata_df["PBS_specimen_clf_error"] = None
+
+    # now open the topview image and get the score
+    error = None
+    try:
+        topview_image = Image.open(topview_path)
+        score = get_topview_pbs_score(topview_image)
+    except Exception as e:
+        error = str(e)
+        score = None
+
+    # now update the slide_metadata_df with the score and error
+    slide_metadata_df.loc[
+        slide_metadata_df["wsi_name"] == wsi_name, "PBS_specimen_clf_score"
+    ] = score
+
+    slide_metadata_df.loc[
+        slide_metadata_df["wsi_name"] == wsi_name, "PBS_specimen_clf_error"
+    ] = error
+
+    # now save the slide_metadata_df back to the slide_metadata_path
+    slide_metadata_df.to_csv(slide_metadata_path, index=False)
+
+    return score, error
 
 if __name__ == "__main__":
 

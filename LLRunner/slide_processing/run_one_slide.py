@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 from PIL import Image
 from pathlib import Path
-from LLRunner.slide_processing.specimen_clf import update_bma_specimen_clf_result
+from LLRunner.slide_processing.specimen_clf import update_bma_specimen_clf_result, update_pbs_specimen_clf_result
 from LLBMA.front_end.api import analyse_bma
 from LLPBS.front_end.api import analyse_pbs
 from LLRunner.slide_transfer.slides_management import (
@@ -100,73 +100,80 @@ def run_one_slide(wsi_name, pipeline, delete_slide=False, note="", **kwargs):
 
 
 def run_one_slide_with_specimen_clf(
-    wsi_name, pipeline, delete_slide=False, note="", **kwargs
+    wsi_name, delete_slide=False, note="", **kwargs
 ):  # TODO: add the specimen clf stuff
     """Run the specified pipeline for one slide.
     The pipeline running code here should be minimal directly through the pipeline api.
     """
+    
+    # now check and update the specimen classification for bma
+    bma_specimen_clf_score, bma_specimen_clf_error = update_bma_specimen_clf_result(
+        wsi_name
+    )
 
-    if pipeline not in available_pipelines:
-        raise PipelineNotFoundError(pipeline)
+    pbs_specimen_clf_score, pbs_specimen_clf_error = update_pbs_specimen_clf_result(
+        wsi_name
+    )
+
+    if bma_specimen_clf_score is None or bma_specimen_clf_error is not None:
+        print(
+            f"Skipping {wsi_name} because error in specimen clf: {bma_specimen_clf_error}"
+        )
+
+    elif bma_specimen_clf_score >= 0.5:
+        pipeline = "BMA-diff"
+    elif pbs_specimen_clf_error >= 0.5:
+        pipeline = "PBS-diff"
+
+    metadata_row_dct = {
+        "wsi_name": wsi_name,
+        "pipeline": pipeline,
+        "datetime_processed": None,
+        "result_dir": None,
+        "error": False,
+        "note": note,
+        "kwargs": str(kwargs),
+    }
+    if pipeline == "BMA-diff":
+        slide_path = find_slide(wsi_name, copy_slide=True)
+
+        result_dir, error = analyse_bma(
+            slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
+        )
+
+        ran = True
+
+    elif pipeline == "PBS-diff":
+        slide_path = find_slide(wsi_name, copy_slide=True)
+
+        result_dir, error = analyse_pbs(
+            slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
+        )
+
+        ran = True
+
     else:
-        metadata_row_dct = {
-            "wsi_name": wsi_name,
-            "pipeline": pipeline,
-            "datetime_processed": None,
-            "result_dir": None,
-            "error": False,
-            "note": note,
-            "kwargs": str(kwargs),
-        }
-        if pipeline == "BMA-diff":
-            slide_path = find_slide(wsi_name, copy_slide=True)
+        ran = False
 
-            # now check and update the specimen classification for bma
-            specimen_clf_score, specimen_clf_error = update_bma_specimen_clf_result(
-                wsi_name
-            )
+    if ran:
+        metadata_row_dct["datetime_processed"] = datetime.datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
-            if specimen_clf_score is None or specimen_clf_error is not None:
-                print(
-                    f"Skipping {wsi_name} because error in specimen clf: {specimen_clf_error}"
-                )
+        # the new result_dir is the results_dir/newname where newname is the pipeline followed by datatime_processed
+        new_result_dir = os.path.join(
+            results_dir, f"{pipeline}_{metadata_row_dct['datetime_processed']}"
+        )
+        os.rename(result_dir, new_result_dir)
 
-                ran = False
-            elif specimen_clf_score < 0.5:
-                print(
-                    f"Skipping {wsi_name} because specimen clf score is {specimen_clf_score} which means the slide if not a bone marrow aspirate. "
-                )
+        metadata_row_dct["result_dir"] = new_result_dir
+        metadata_row_dct["error"] = error
 
-                ran = False
-            else:
-                result_dir, error = analyse_bma(
-                    slide_path, dump_dir=results_dir, **kwargs  # then just kwargs
-                )
+        new_df_row = pd.DataFrame([metadata_row_dct])
+        df = pd.read_csv(pipeline_run_history_path)
 
-                ran = True
+        df = pd.concat([df, new_df_row], ignore_index=True)
+        df.to_csv(pipeline_run_history_path, index=False)
 
-        elif pipeline == "PBS-diff":
-            raise NotImplementedError("PBS-diff pipeline not implemented yet.")
-
-        if ran:
-            metadata_row_dct["datetime_processed"] = datetime.datetime.now().strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-
-            # the new result_dir is the results_dir/newname where newname is the pipeline followed by datatime_processed
-            new_result_dir = os.path.join(
-                results_dir, f"{pipeline}_{metadata_row_dct['datetime_processed']}"
-            )
-            os.rename(result_dir, new_result_dir)
-
-            metadata_row_dct["result_dir"] = new_result_dir
-            metadata_row_dct["error"] = error
-
-            new_df_row = pd.DataFrame([metadata_row_dct])
-            df = pd.read_csv(pipeline_run_history_path)
-
-            df = pd.concat([df, new_df_row], ignore_index=True)
-            df.to_csv(pipeline_run_history_path, index=False)
-
-        if delete_slide:
-            delete_slide_from_tmp(wsi_name)
+    if delete_slide:
+        delete_slide_from_tmp(wsi_name)

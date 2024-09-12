@@ -34,10 +34,10 @@ def main_concurrent_bma_processing(
     )
 
     # then call decide_what_to_run_with_specimen_clf_cross_machine
-    wsi_names_to_run_BMA_diff = decide_what_to_run_with_specimen_clf_cross_machine(
+    wsi_names_to_run_diff = decide_what_to_run_with_specimen_clf_cross_machine(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
-        pipeline="BMA-diff",
+        pipeline=["BMA-diff", "PBS-diff"],
     )
 
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
@@ -47,22 +47,22 @@ def main_concurrent_bma_processing(
 
     # get the union of the two lists
     wsi_names_to_run_union = list(
-        set(wsi_names_to_run_BMA_diff + wsi_names_to_run_dzsave)
+        set(wsi_names_to_run_diff + wsi_names_to_run_dzsave)
     )
 
     # get the intersection of the two lists
     wsi_names_to_run_intersection = list(
-        set(wsi_names_to_run_BMA_diff) & set(wsi_names_to_run_dzsave)
+        set(wsi_names_to_run_diff) & set(wsi_names_to_run_dzsave)
     )
 
     # get the list of slides to run the BMA speciment classification and BMA-diff pipeline on but not the dzsave pipeline
-    wsi_names_to_run_just_BMA_diff = list(
-        set(wsi_names_to_run_BMA_diff) - set(wsi_names_to_run_dzsave)
+    wsi_names_to_run_just_diff = list(
+        set(wsi_names_to_run_diff) - set(wsi_names_to_run_dzsave)
     )
 
     # get the list of slides to run the dzsave pipeline on but not the BMA-diff pipeline
     wsi_names_to_run_just_dzsave = list(
-        set(wsi_names_to_run_dzsave) - set(wsi_names_to_run_BMA_diff)
+        set(wsi_names_to_run_dzsave) - set(wsi_names_to_run_diff)
     )
 
     print(f"Found {len(wsi_names_to_run_union)} slides in total to be processed.")
@@ -70,7 +70,7 @@ def main_concurrent_bma_processing(
         f"Found {len(wsi_names_to_run_intersection)} slides to run both the BMA-diff and dzsave pipelines on."
     )
     print(
-        f"Found {len(wsi_names_to_run_just_BMA_diff)} slides to run just the BMA-diff pipeline on."
+        f"Found {len(wsi_names_to_run_just_diff)} slides to run just the BMA-diff pipeline on."
     )
     print(
         f"Found {len(wsi_names_to_run_just_dzsave)} slides to run just the dzsave pipeline on."
@@ -91,7 +91,7 @@ def main_concurrent_bma_processing(
         # Process slides once copying is done
         for wsi_name in tqdm(
             wsi_names_to_run_union,
-            desc="Running BMA-diff and dzsave pipeline on slides",
+            desc="Running BMA or PBS diff and dzsave pipeline on slides",
             total=len(wsi_names_to_run_union),
         ):
 
@@ -107,11 +107,10 @@ def main_concurrent_bma_processing(
             #     wsi_name, copy_slide=False
             # )  # Now it should be instantaneous
 
-            if wsi_name in wsi_names_to_run_BMA_diff:
-                print(f"Running BMA-diff pipeline on {wsi_name}")
+            if wsi_name in wsi_names_to_run_diff:
+                print(f"Running BMA or PBS diff pipeline on {wsi_name}")
                 run_one_slide_with_specimen_clf(
                     wsi_name,
-                    pipeline="BMA-diff",
                     copy_slide=False,
                     delete_slide=False,
                     note=note,
@@ -472,29 +471,29 @@ if __name__ == "__main__":
     concurrent_processing_time = time.time() - start_time
     print("Finished concurrent processing")
 
-    # first delete the folder /media/hdd3/neo/dzsave_dir
-    print("Reinitializing dzsave_dir and results_dir")
-    os.system("rm -r /media/hdd3/neo/dzsave_dir")
-    initialize_dzsave_dir()
-    delete_results_from_note(
-        note="Testing concurrent processing", ask_for_confirmation=False
-    )
-    delete_results_from_note(
-        note="Testing serial processing", ask_for_confirmation=False
-    )
+    # # first delete the folder /media/hdd3/neo/dzsave_dir
+    # print("Reinitializing dzsave_dir and results_dir")
+    # os.system("rm -r /media/hdd3/neo/dzsave_dir")
+    # initialize_dzsave_dir()
+    # delete_results_from_note(
+    #     note="Testing concurrent processing", ask_for_confirmation=False
+    # )
+    # delete_results_from_note(
+    #     note="Testing serial processing", ask_for_confirmation=False
+    # )
 
-    print("Starting serial processing")
-    start_time = time.time()
-    main_serial_bma_processing(
-        wsi_name_filter_func=test_wsi_name_filter_func,
-        processing_filter_func=identity_filter,
-        note="Testing concurrent processing",
-        delete_slide=True,
-    )
-    print("Finished serial processing")
+    # print("Starting serial processing")
+    # start_time = time.time()
+    # main_serial_bma_processing(
+    #     wsi_name_filter_func=test_wsi_name_filter_func,
+    #     processing_filter_func=identity_filter,
+    #     note="Testing concurrent processing",
+    #     delete_slide=True,
+    # )
+    # print("Finished serial processing")
 
-    serial_processing_time = time.time() - start_time
+    # serial_processing_time = time.time() - start_time
 
     print(
-        f"Concurrent processing took {concurrent_processing_time} seconds, while serial processing took {serial_processing_time} seconds."
+        f"Concurrent processing took {concurrent_processing_time} seconds"
     )
