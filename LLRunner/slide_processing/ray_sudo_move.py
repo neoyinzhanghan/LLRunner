@@ -12,8 +12,6 @@ directory_to_copy = "/media/hdd3/neo/dzsave_dir/H24-1514;S15;MSKW - 2024-07-10 2
 save_dir = "/dmpisilon_tools/neo/test_archive"  # Directory to move to
 
 # Escape file paths for safe usage in shell commands
-directory_to_copy = shlex.quote(directory_to_copy)
-save_dir = shlex.quote(save_dir)
 
 print(f"Copying files from {directory_to_copy} to {save_dir}")
 
