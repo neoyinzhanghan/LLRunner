@@ -326,7 +326,7 @@ if __name__ == "__main__":
     # Example usage
     starttime = time.time()
     wsi_path = "/media/hdd3/neo/BMA_AML/H19-3465;S10;MSKB - 2023-09-21 13.52.50.ndpi"
-    save_dir = "/media/hdd3/neo/dzsave_test"
+    save_dir = "/media/hdd3/neo/dzsave_test_2"
     # save_dir = "/dmpisilon_tools/neo/dzsave_test"
     subprocess.run(['sudo', 'mkdir', '-p', save_dir])
     folder_name = "my_slide"
