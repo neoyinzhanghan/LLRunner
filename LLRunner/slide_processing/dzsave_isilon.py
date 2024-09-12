@@ -3,6 +3,7 @@ import ray
 import time
 import openslide
 import pandas as pd
+import subprocess
 from pathlib import Path
 from tqdm import tqdm
 from LLRunner.config import dzsave_dir, dzsave_metadata_path, tmp_slide_dir
@@ -143,10 +144,10 @@ class WSICropManager:
             image.save(tmp_path)
 
             # sudo mv the image to save_dir
-            os.system(f"sudo mv {tmp_path} {save_subdir}")
+            subprocess.run(['sudo', 'mv', tmp_path, save_subdir])
 
             # delete the image in tmp_dir using sudo rm
-            os.system(f"sudo rm {tmp_path}")
+            subprocess.run(['sudo', 'rm', tmp_path])
 
         return len(focus_region_coords_level_pairs)
 
@@ -246,10 +247,10 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 patch.save(tmp_path)
 
                 # sudo mv the image to save_dir
-                os.system(f"sudo mv {tmp_path} {save_subdir}")
+                subprocess.run(['sudo', 'mv', tmp_path, save_subdir])
 
                 # delete the image in tmp_dir using sudo rm
-                os.system(f"sudo rm {tmp_path}")
+                subprocess.run(['sudo', 'rm', tmp_path])
 
 
 def dzsave(
@@ -271,13 +272,16 @@ def dzsave(
 
     print(f"Width: {width}, Height: {height}")
 
+    # Create the main directory
     dz_dir = os.path.join(save_dir, f"{folder_name}_files")
-    os.makedirs(dz_dir, exist_ok=True)
     dzi_path = os.path.join(save_dir, f"{folder_name}.dzi")
 
-    os.makedirs(dz_dir, exist_ok=True)
+    subprocess.run(['sudo', 'mkdir', '-p', dz_dir])
+
+    # Create subdirectories for i in range(19)
     for i in range(19):
-        os.makedirs(os.path.join(dz_dir, str(i)), exist_ok=True)
+        sub_dir = os.path.join(dz_dir, str(i))
+        subprocess.run(['sudo', 'mkdir', '-p', sub_dir])
 
     # </Image>
 
