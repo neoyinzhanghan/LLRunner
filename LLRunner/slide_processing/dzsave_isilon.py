@@ -320,7 +320,7 @@ def dzsave(
 
 if __name__ == "__main__":
     # Initialize Ray with the desired number of CPUs
-    num_cpus = 96  # Number of CPUs for Ray
+    num_cpus = 96*2  # Number of CPUs for Ray
     ray.init(num_cpus=num_cpus)
 
     # Example usage
