@@ -276,7 +276,7 @@ def dzsave(
     dz_dir = os.path.join(save_dir, f"{folder_name}_files")
     dzi_path = os.path.join(tmp_dir, f"{folder_name}.dzi")
 
-    tmp_dz_dir = os.path.join(tmp_dir, f"{folder_name}_files")
+    tmp_dz_dir = os.path.join(tmp_dir)
     for i in range(19):
         sub_dir = os.path.join(tmp_dz_dir, str(i))
         os.makedirs(sub_dir, exist_ok=True)
