@@ -7,8 +7,8 @@ import shlex  # For safely escaping file paths
 
 # Define the source and destination directories
 directory_to_copy = "/media/hdd3/neo/dzsave_dir/H24-1514;S15;MSKW - 2024-07-10 23.01.33"  # Directory to move to Isilon
-save_dir = "/dmpisilon_tools/neo/test_archive_2"  # Directory to move to
-batch_size = 10  # Adjust based on system capacity and optimal performance
+save_dir = "/dmpisilon_tools/neo/test_archive"  # Directory to move to
+batch_size = 128  # Adjust based on system capacity and optimal performance
 
 # Ensure the destination directory exists
 if not os.path.exists(save_dir):
@@ -26,13 +26,13 @@ print(f"Number of files found: {len(files)}")
 # Initialize Ray with the available number of CPUs
 ray.init(num_cpus=128)  # Adjust based on available CPUs
 
-# Function to copy a batch of files using rsync for better performance
+# Function to copy a batch of files using rsync in quiet mode for better performance
 @ray.remote
 def copy_files(files, save_dir):
     # Escape and join the file paths for the rsync command
     files = ' '.join([shlex.quote(file) for file in files])
-    # Use rsync to copy files efficiently
-    os.system(f"sudo rsync -av {files} {save_dir}")
+    # Use rsync to copy files efficiently, with the -q option for quiet mode
+    os.system(f"sudo rsync -aq {files} {save_dir}")
     return files  # Return the batch of files copied
 
 # Handle KeyboardInterrupt to stop Ray properly
