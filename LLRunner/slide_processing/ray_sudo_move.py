@@ -16,9 +16,7 @@ save_dir = "/dmpisilon_tools/neo/test_archive"  # Directory to move to
 print(f"Copying files from {directory_to_copy} to {save_dir}")
 
 files = []
-for (dirpath, dirnames, filenames) in os.walk(directory_to_copy):
-    print(f"Traversing directory: {dirpath}")  # Print directories
-    print(f"Files: {filenames}")  # Print filenames
+for (dirpath, dirnames, filenames) in tqdm(os.walk(directory_to_copy)):
     files += [os.path.join(dirpath, file) for file in filenames]
 
 print(f"Number of files found: {len(files)}")  # Output total number of files found
