@@ -7,7 +7,7 @@ import shlex  # For safely escaping file paths
 
 # Define the source and destination directories
 directory_to_copy = "/media/hdd3/neo/dzsave_dir/H24-1514;S15;MSKW - 2024-07-10 23.01.33"  # Directory to move to Isilon
-save_dir = "/dmpisilon_tools/neo/test_archive"  # Directory to move to
+save_dir = "/dmpisilon_tools/neo/test_archive_2"  # Directory to move to
 batch_size = 10  # Adjust based on system capacity and optimal performance
 
 # Ensure the destination directory exists
