@@ -146,9 +146,6 @@ class WSICropManager:
             # sudo mv the image to save_dir
             subprocess.run(['sudo', 'mv', tmp_path, save_subdir])
 
-            # delete the image in tmp_dir using sudo rm
-            subprocess.run(['sudo', 'rm', tmp_path])
-
         return len(focus_region_coords_level_pairs)
 
 
@@ -248,10 +245,6 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
 
                 # sudo mv the image to save_dir
                 subprocess.run(['sudo', 'mv', tmp_path, save_subdir])
-
-                # delete the image in tmp_dir using sudo rm
-                subprocess.run(['sudo', 'rm', tmp_path])
-
 
 def dzsave(
     wsi_path,
