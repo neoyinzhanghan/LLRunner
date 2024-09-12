@@ -5,6 +5,7 @@ import sys
 from tqdm import tqdm
 import shlex
 
+# Define the source and destination directories
 directory_to_copy = "/media/hdd3/neo/dzsave_dir/H24-1514;S15;MSKW - 2024-07-10 23.01.33"
 save_dir = "/dmpisilon_tools/neo/test_archive"
 
@@ -12,9 +13,18 @@ save_dir = "/dmpisilon_tools/neo/test_archive"
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
+# Escape the directory path to handle special characters
+escaped_directory_to_copy = shlex.quote(directory_to_copy)
+escaped_save_dir = shlex.quote(save_dir)
+
+# Ensure the source directory is not empty before creating the tarball
+if len(os.listdir(directory_to_copy)) == 0:
+    print("The source directory is empty. Exiting.")
+    sys.exit(1)
+
 # Archive all the files into a single tarball
 tarball_path = "/tmp/temp_archive.tar"
-os.system(f"tar -cf {tarball_path} -C {directory_to_copy} .")  # Create the tarball
+os.system(f"tar -cf {tarball_path} -C {escaped_directory_to_copy} .")  # Create the tarball
 
 # Use Ray to parallelize the copying of the archive
 ray.init(num_cpus=128)
@@ -51,4 +61,4 @@ except KeyboardInterrupt:
 
 # Shutdown Ray and extract the tarball at the destination
 ray.shutdown()
-os.system(f"tar -xf {os.path.join(save_dir, 'temp_archive.tar')} -C {save_dir}")
+os.system(f"tar -xf {os.path.join(save_dir, 'temp_archive.tar')} -C {escaped_save_dir}")
