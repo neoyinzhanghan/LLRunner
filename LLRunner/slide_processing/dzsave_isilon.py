@@ -7,6 +7,9 @@ from pathlib import Path
 from tqdm import tqdm
 from LLRunner.config import dzsave_dir, dzsave_metadata_path, tmp_slide_dir
 
+tmp_dir  = "/media/hdd3/neo/tmp"
+os.makedirs(tmp_dir, exist_ok=True)
+
 
 def create_list_of_batches_from_list(list, batch_size):
     """
@@ -130,12 +133,20 @@ class WSICropManager:
             image = self.crop(focus_region_coord, level=level)
             # Save the image to a .jpeg file in save_dir
 
-            path = os.path.join(
-                save_dir,
+            tmp_path = os.path.join(
+                tmp_dir,
                 str(18 - level),
                 f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
             )
-            image.save(path)
+
+            save_subdir = os.path.join(save_dir, str(18 - level))
+            image.save(tmp_path)
+
+            # sudo mv the image to save_dir
+            os.system(f"sudo mv {tmp_path} {save_subdir}")
+
+            # delete the image in tmp_dir using sudo rm
+            os.system(f"sudo rm {tmp_path}")
 
         return len(focus_region_coords_level_pairs)
 
@@ -230,8 +241,15 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 patch = current_image.crop((x, y, right, bottom))
 
                 # Save the patch
-                path = os.path.join(save_dir, str(depth), f"{x}_{y}.jpeg")
-                patch.save(path)
+                tmp_path = os.path.join(tmp_path, str(depth), f"{x}_{y}.jpeg")
+                save_subdir = os.path.join(save_dir, str(depth))
+                patch.save(tmp_path)
+
+                # sudo mv the image to save_dir
+                os.system(f"sudo mv {tmp_path} {save_subdir}")
+
+                # delete the image in tmp_dir using sudo rm
+                os.system(f"sudo rm {tmp_path}")
 
 
 def dzsave(
@@ -294,81 +312,6 @@ def dzsave(
     return time_taken
 
 
-def dzsave_wsi_name(wsi_name, tile_size=256):
-    """Check if the wsi_name is in the dzsave_metadata_path. If not then create a subfolder in dzsave_dir with the wsi_name with out the extention
-    The in that folder save the wsi_name_files folder and the wsi_name.dzi file.
-    Add the processing time and datetime processed to the dzsave_metadata_path.
-    """
-    wsi_name_path = Path(wsi_name)
-    wsi_path = os.path.join(tmp_slide_dir, wsi_name)
-
-    assert os.path.exists(wsi_path), f"Error: {wsi_path} does not exist."
-    wsi_name_no_ext = wsi_name_path.stem
-
-    dzsave_subdir = os.path.join(dzsave_dir, wsi_name_no_ext)
-
-    # check if the dzsave_subdir exists, if not then create it
-    if os.path.exists(dzsave_subdir):
-        print(
-            f"UserWarning: {dzsave_subdir} already exists. Skipping. This should not be intended behavior and is a sign that something could be wrong."
-        )
-    else:
-        os.makedirs(dzsave_subdir, exist_ok=True)
-
-        folder_name = wsi_name_no_ext
-        save_dir = dzsave_subdir
-
-        starttime = time.time()
-
-        try:
-            dzsave(
-                wsi_path=wsi_path,
-                save_dir=save_dir,
-                folder_name=folder_name,
-                tile_size=tile_size,
-                num_cpus=128,
-                region_cropping_batch_size=256,
-            )
-            error = None
-
-        except Exception as e:
-            error = str(e)
-            print(
-                f"UserWarningL: Error: {error} occurred while processing {wsi_name}. While continue on error is on, the error should not be ignored if it happens to too many slides."
-            )
-
-        processing_time = time.time() - starttime
-        datetime_processed = time.strftime("%Y-%m-%d %H:%M:%S")
-
-        dzsave_metadata_df = pd.read_csv(dzsave_metadata_path)
-
-        new_row = {
-            "wsi_name": wsi_name,
-            "tile_size": tile_size,
-            "processing_time": processing_time,
-            "datetime_processed": datetime_processed,
-            "error": error,
-        }
-
-        new_row_df = pd.DataFrame([new_row])
-
-        # Add a row to the dataframe
-        dzsave_metadata_df = pd.concat(
-            [dzsave_metadata_df, new_row_df], ignore_index=True
-        )
-
-        # Save the dataframe back to the dzsave_metadata_path
-        dzsave_metadata_df.to_csv(dzsave_metadata_path, index=False)
-
-
-def initialize_dzsave_dir():
-    os.makedirs(dzsave_dir, exist_ok=True)
-    # if the dzsave_metadata_path does not exist, then create it
-    if not os.path.exists(dzsave_metadata_path):
-        with open(dzsave_metadata_path, "w") as f:
-            f.write("wsi_name,tile_size,processing_time,datetime_processed,error\n")
-
-
 if __name__ == "__main__":
     # Initialize Ray with the desired number of CPUs
     num_cpus = 96  # Number of CPUs for Ray
@@ -394,5 +337,3 @@ if __name__ == "__main__":
 
     print(f"Time taken using Neo's dzsave: {time.time() - starttime} seconds")
     ray.shutdown()
-
-    # initialize_dzsave_dir()
