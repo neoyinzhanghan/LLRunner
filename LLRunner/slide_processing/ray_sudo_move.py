@@ -3,12 +3,17 @@ from tqdm import tqdm
 import ray
 import signal
 import sys
+import shlex  # For safely escaping file paths
 
 # Initialize Ray
 ray.init(num_cpus=128)  # Adjust based on the number of CPUs available
 
 directory_to_copy = "/media/hdd3/neo/dzsave_dir/H24-1514;S15;MSKW - 2024-07-10 23.01.33"  # Directory to move to Isilon
 save_dir = "/dmpisilon_tools/neo/test_archive"  # Directory to move to
+
+# Escape file paths for safe usage in shell commands
+directory_to_copy = shlex.quote(directory_to_copy)
+save_dir = shlex.quote(save_dir)
 
 # Get a list of all files in the dzsave directory and subdirectories
 files = []
@@ -19,6 +24,8 @@ print(f"Number of files to copy: {len(files)}")
 
 @ray.remote
 def copy_file(file, save_dir):
+    # Escape file paths for the system command
+    file = shlex.quote(file)
     os.system(f"sudo cp {file} {save_dir}")
     return file  # Return file for progress tracking
 
