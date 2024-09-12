@@ -19,9 +19,6 @@ for (dirpath, dirnames, filenames) in tqdm(os.walk(directory_to_copy)):
 
 print(f"Number of files found: {len(files)}")  # Output total number of files found
 
-import sys
-sys.exit(0) 
-
 # Initialize Ray
 ray.init(num_cpus=128)  # Adjust based on the number of CPUs available
 
