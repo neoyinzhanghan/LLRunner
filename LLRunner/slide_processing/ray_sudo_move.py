@@ -17,12 +17,13 @@ save_dir = shlex.quote(save_dir)
 
 print(f"Copying files from {directory_to_copy} to {save_dir}")
 
-# Get a list of all files in the dzsave directory and subdirectories
 files = []
 for (dirpath, dirnames, filenames) in os.walk(directory_to_copy):
+    print(f"Traversing directory: {dirpath}")  # Print directories
+    print(f"Files: {filenames}")  # Print filenames
     files += [os.path.join(dirpath, file) for file in filenames]
 
-print(f"Number of files to copy: {len(files)}")
+print(f"Number of files found: {len(files)}")  # Output total number of files found
 
 @ray.remote
 def copy_file(file, save_dir):
