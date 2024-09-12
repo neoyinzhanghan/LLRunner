@@ -15,6 +15,8 @@ save_dir = "/dmpisilon_tools/neo/test_archive"  # Directory to move to
 directory_to_copy = shlex.quote(directory_to_copy)
 save_dir = shlex.quote(save_dir)
 
+print(f"Copying files from {directory_to_copy} to {save_dir}")
+
 # Get a list of all files in the dzsave directory and subdirectories
 files = []
 for (dirpath, dirnames, filenames) in os.walk(directory_to_copy):
