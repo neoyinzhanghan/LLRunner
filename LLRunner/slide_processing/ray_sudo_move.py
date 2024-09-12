@@ -21,6 +21,9 @@ for (dirpath, dirnames, filenames) in tqdm(os.walk(directory_to_copy)):
 
 print(f"Number of files found: {len(files)}")  # Output total number of files found
 
+import sys
+sys.exit(0) 
+
 @ray.remote
 def copy_file(file, save_dir):
     # Escape file paths for the system command
