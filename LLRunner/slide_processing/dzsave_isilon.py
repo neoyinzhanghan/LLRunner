@@ -274,7 +274,7 @@ def dzsave(
 
     # Create the main directory
     dz_dir = os.path.join(save_dir, f"{folder_name}_files")
-    dzi_path = os.path.join(save_dir, f"{folder_name}.dzi")
+    dzi_path = os.path.join(tmp_dir, f"{folder_name}.dzi")
 
     subprocess.run(['sudo', 'mkdir', '-p', dz_dir])
 
@@ -298,6 +298,10 @@ def dzsave(
         />
         </Image>"""
         f.write(dzi_message)
+
+    subprocess.run(['sudo', 'mv', dzi_path, save_dir])
+    # now remove the dzi file from tmp_dir
+    subprocess.run(['sudo', 'rm', dzi_path])
 
     starttime = time.time()
 
