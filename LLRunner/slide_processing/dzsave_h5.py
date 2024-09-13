@@ -326,7 +326,8 @@ def dzsave(
 
     starttime = time.time()
 
-    h5_path = os.path.join(save_dir, h5_name)   
+    h5_path = os.path.join(save_dir, f"{h5_name}.h5")
+
     initialize_h5py_file(
         h5_path=h5_path,
         img_height=height,
