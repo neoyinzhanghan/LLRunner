@@ -383,3 +383,5 @@ if __name__ == "__main__":
     initialize_h5py_file(os.path.join(dzsave_dir, "test.h5"), patch_size=256)
 
     # now read the h5 file and print out the name of the databases
+    with h5py.File(os.path.join(dzsave_dir, "test.h5"), "r") as f:
+        print(f.keys())
