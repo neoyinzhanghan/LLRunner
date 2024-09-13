@@ -1,6 +1,7 @@
 import os
 import ray
 import time
+import h5py
 import openslide
 import pandas as pd
 from pathlib import Path
@@ -139,6 +140,14 @@ class WSICropManager:
 
         return len(focus_region_coords_level_pairs)
 
+
+def initialize_h5py_file(h5_path, patch_size=256):
+    """ Create an h5py file with databases with names 0-18, at h5_path, raise an error if the file already exists."""
+    assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
+
+    with h5py.File(h5_path, "w") as f:
+        for i in range(19):
+            f.create_dataset(str(i), (0, patch_size, patch_size, 3), maxshape=(None, patch_size, patch_size, 3))
 
 def crop_wsi_images_all_levels(
     wsi_path,
@@ -370,29 +379,5 @@ def initialize_dzsave_dir():
 
 
 if __name__ == "__main__":
-    # # Initialize Ray with the desired number of CPUs
-    # num_cpus = 96  # Number of CPUs for Ray
-    # ray.init(num_cpus=num_cpus)
-
-    # # Example usage
-    # starttime = time.time()
-    # wsi_path = "/media/hdd3/neo/BMA_AML/H19-3465;S10;MSKB - 2023-09-21 13.52.50.ndpi"
-    # save_dir = "/media/hdd3/neo/tmp_dump_dir"
-    # os.makedirs(save_dir, exist_ok=True)
-    # folder_name = "my_slide"
-    # region_cropping_batch_size = 256  # Adjust batch size based on your requirements
-    # crop_size = 256  # Crop size in pixels
-
-    # dzsave(
-    #     wsi_path=wsi_path,
-    #     save_dir=save_dir,
-    #     folder_name=folder_name,
-    #     tile_size=crop_size,
-    #     num_cpus=num_cpus,
-    #     region_cropping_batch_size=region_cropping_batch_size,
-    # )
-
-    # print(f"Time taken using Neo's dzsave: {time.time() - starttime} seconds")
-    # ray.shutdown()
-
     initialize_dzsave_dir()
+    initialize_h5py_file(os.path.join(dzsave_dir, "test.h5"), patch_size=256)
