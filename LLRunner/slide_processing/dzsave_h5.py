@@ -65,22 +65,23 @@ def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
             shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3), 
             dtype='uint8'
         )
+
+    # create dataset Heights, Widths, TileSize, Overlap, Format
+    with h5py.File(h5_path, "a") as f:
+        f.create_dataset("Heights", data=img_height)
+        f.create_dataset("Widths", data=img_width)
+        f.create_dataset("TileSize", data=patch_size)
+        f.create_dataset("Overlap", data=0)
+        f.create_dataset("Format", data="jpeg")
     
     print(f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles.")
 
-def add_patch_to_h5py(h5_path, patch, row, column):
+def add_patch_to_h5py(h5_path, level, patch, row, column):
     """
-    Add a patch to an HDF5 file at the specified row and column.
-    
-    Parameters:
-        h5_path (str): Path to the HDF5 file.
-        patch (np.ndarray): The image patch to add.
-        row (int): The row index of the patch.
-        column (int): The column index of the patch.
+    Add a patch to an HDF5 file at the specified row and column at the dataste named str(level).
     """
     with h5py.File(h5_path, "a") as f:
-        f["tiles"][row, column] = patch
-
+        f[f"{level}"][row, column] = patch
 
 @ray.remote
 class WSICropManager:
@@ -162,7 +163,7 @@ class WSICropManager:
         return image
 
     def async_get_bma_focus_region_level_pair_batch(
-        self, focus_region_coords_level_pairs, save_dir, crop_size=256
+        self, focus_region_coords_level_pairs, h5_path, crop_size=256
     ):
         """Save a list of focus regions."""
         for focus_region_coord_level_pair in focus_region_coords_level_pairs:
@@ -176,7 +177,8 @@ class WSICropManager:
             x, y = int(focus_region_coord[0] // crop_size), int(focus_region_coord[1] // crop_size)
 
             add_patch_to_h5py(
-                os.path.join(save_dir, f"{18 - level}.h5"),
+                h5_path,
+                level,
                 np.array(padded_image),
                 x,
                 y
@@ -204,7 +206,7 @@ def padding_image(image, patch_size=256):
 
 def crop_wsi_images_all_levels(
     wsi_path,
-    save_dir,
+    h5_path,
     region_cropping_batch_size,
     crop_size=256,
     verbose=True,
@@ -239,7 +241,7 @@ def crop_wsi_images_all_levels(
     for i, batch in enumerate(list_of_batches):
         manager = task_managers[i % num_croppers]
         task = manager.async_get_bma_focus_region_level_pair_batch.remote(
-            batch, save_dir, crop_size=crop_size
+            batch, h5_path, crop_size=crop_size
         )
         tasks[task] = batch
 
@@ -306,7 +308,7 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
 def dzsave(
     wsi_path,
     save_dir,
-    folder_name,
+    h5_name,
     tile_size=256,
     num_cpus=96,
     region_cropping_batch_size=256,
@@ -322,42 +324,26 @@ def dzsave(
 
     print(f"Width: {width}, Height: {height}")
 
-    dz_dir = os.path.join(save_dir, f"{folder_name}_files")
-    os.makedirs(dz_dir, exist_ok=True)
-    dzi_path = os.path.join(save_dir, f"{folder_name}.dzi")
-
-    os.makedirs(dz_dir, exist_ok=True)
-    for i in range(19):
-        os.makedirs(os.path.join(dz_dir, str(i)), exist_ok=True)
-
-    # </Image>
-
-    with open(dzi_path, "w") as f:
-        dzi_message = f"""<?xml version="1.0" encoding="UTF-8"?>
-        <Image xmlns="http://schemas.microsoft.com/deepzoom/2008"
-        Format="jpeg"
-        Overlap="0"
-        TileSize={tile_size}
-        >
-        <Size
-            Height={height}
-            Width={width}
-        />
-        </Image>"""
-        f.write(dzi_message)
-
     starttime = time.time()
+
+    h5_path = os.path.join(save_dir, h5_name)   
+    initialize_h5py_file(
+        h5_path=h5_path,
+        img_height=height,
+        img_width=width,
+        patch_size=tile_size,
+    )
 
     print("Cropping from NDPI")
     crop_wsi_images_all_levels(
         wsi_path,
-        dz_dir,
+        h5_path,
         region_cropping_batch_size=region_cropping_batch_size,
         crop_size=tile_size,
         num_cpus=num_cpus,
     )
     print("Cropping Lower Resolution Levels")
-    get_depth_from_0_to_11(wsi_path, dz_dir, tile_size=tile_size)
+    get_depth_from_0_to_11(wsi_path, h5_path, tile_size=tile_size)
     time_taken = time.time() - starttime
 
     return time_taken
@@ -440,11 +426,5 @@ def initialize_dzsave_dir():
 
 if __name__ == "__main__":
     initialize_dzsave_dir()
-    initialize_h5py_file(os.path.join(dzsave_dir, "test.h5"), patch_size=256)
-
-    # now read the h5 file and print out the name of the databases
-    with h5py.File(os.path.join(dzsave_dir, "test.h5"), "r") as f:
-        print(f.keys())
-
-    # now remove the h5 file
-    os.remove(os.path.join(dzsave_dir, "test.h5"))
+    
+    dzsave_wsi_name('H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi', tile_size=256)
