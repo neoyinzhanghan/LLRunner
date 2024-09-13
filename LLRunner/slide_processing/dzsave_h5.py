@@ -361,24 +361,20 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
     assert os.path.exists(wsi_path), f"Error: {wsi_path} does not exist."
     wsi_name_no_ext = wsi_name_path.stem
 
-    dzsave_subdir = os.path.join(dzsave_dir, wsi_name_no_ext)
+    h5_path = os.path.join(dzsave_dir, f"{wsi_name_no_ext}.h5")
 
     # check if the dzsave_subdir exists, if not then create it
-    if os.path.exists(dzsave_subdir):
+    if os.path.exists(h5_path):
         print(
-            f"UserWarning: {dzsave_subdir} already exists. Skipping. This should not be intended behavior and is a sign that something could be wrong."
+            f"UserWarning: {h5_path} already exists. Skipping. This should not be intended behavior and is a sign that something could be wrong."
         )
     else:
-        os.makedirs(dzsave_subdir, exist_ok=True)
-
-        save_dir = dzsave_subdir
-
         starttime = time.time()
 
         try:
             dzsave(
                 wsi_path=wsi_path,
-                save_dir=save_dir,
+                save_dir=dzsave_dir,
                 h5_name=f"{wsi_name_no_ext}.h5",
                 tile_size=tile_size,
                 num_cpus=128,
