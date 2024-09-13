@@ -385,3 +385,6 @@ if __name__ == "__main__":
     # now read the h5 file and print out the name of the databases
     with h5py.File(os.path.join(dzsave_dir, "test.h5"), "r") as f:
         print(f.keys())
+
+    # now remove the h5 file
+    os.remove(os.path.join(dzsave_dir, "test.h5"))
