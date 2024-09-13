@@ -122,7 +122,7 @@ def run_one_slide_with_specimen_clf(
 
     elif bma_specimen_clf_score >= 0.5:
         pipeline = "BMA-diff"
-    elif pbs_specimen_clf_error >= 0.5:
+    elif pbs_specimen_clf_score >= 0.5:
         pipeline = "PBS-diff"
 
     metadata_row_dct = {

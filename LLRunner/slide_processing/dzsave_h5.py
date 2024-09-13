@@ -4,6 +4,7 @@ import time
 import h5py
 import openslide
 import pandas as pd
+from PIL import Image
 from pathlib import Path
 from tqdm import tqdm
 from LLRunner.config import dzsave_dir, dzsave_metadata_path, tmp_slide_dir
@@ -131,23 +132,66 @@ class WSICropManager:
             image = self.crop(focus_region_coord, level=level)
             # Save the image to a .jpeg file in save_dir
 
+            padded_image = padding_image(image, patch_size=crop_size)
+
+            x, y = int(focus_region_coord[0] // crop_size), int(focus_region_coord[1] // crop_size)
+
             path = os.path.join(
                 save_dir,
                 str(18 - level),
-                f"{int(focus_region_coord[0]//crop_size)}_{int(focus_region_coord[1]//crop_size)}.jpeg",
+                f"{x}_{y}.jpeg",
             )
             image.save(path)
 
         return len(focus_region_coords_level_pairs)
 
 
-def initialize_h5py_file(h5_path, patch_size=256):
-    """ Create an h5py file with databases with names 0-18, at h5_path, raise an error if the file already exists."""
+def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
+    """
+    Create an HDF5 file with a dataset that stores tiles, indexed by row and column.
+    
+    Parameters:
+        h5_path (str): Path where the HDF5 file will be created.
+        image_shape (tuple): Shape of the full image (height, width, channels).
+        patch_size (int): The size of each image patch (default: 256).
+    
+    Raises:
+        AssertionError: If the file already exists at h5_path.
+    """
     assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
-
+    
+    
+    # Calculate the number of rows and columns of tiles
+    num_tile_rows = int(np.ceil(img_height / patch_size))
+    num_tile_columns = int(np.ceil(img_width / patch_size))
+    
+    # Create the HDF5 file and dataset
     with h5py.File(h5_path, "w") as f:
-        for i in range(19):
-            f.create_dataset(str(i), (0, patch_size, patch_size, 3), maxshape=(None, patch_size, patch_size, 3))
+        # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
+        f.create_dataset(
+            "tiles", 
+            shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3), 
+            dtype='uint8'
+        )
+    
+    print(f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles.")
+
+def padding_image(image, patch_size=256):
+    """First check that both dim of the image is <= patch_size, if not raise an error.
+    Then pad the image to make it patch_size x patch_size by adding black pixels to the right and bottom.
+    """
+
+    image_width = image.width
+    image_height = image.height
+    assert image_width <= patch_size, f"Error: Image width {image.width} is greater than patch_size {patch_size}."
+    assert image_height <= patch_size, f"Error: Image height {image.height} is greater than patch_size {patch_size}."
+
+    if image_height == patch_size and image_width == patch_size:
+        return image
+    else:
+        new_image = Image.new("RGB", (patch_size, patch_size), (0, 0, 0))
+        new_image.paste(image, (0, 0))
+    return new_image
 
 def crop_wsi_images_all_levels(
     wsi_path,

@@ -119,7 +119,7 @@ def main_concurrent_bma_processing(
                     do_extract_features=False,
                     check_specimen_clf=False,
                 )
-                print(f"Finished running BMA-diff pipeline on {wsi_name}")
+                print(f"Finished running BMA or PBS diff pipeline on {wsi_name}")
 
             # if wsi_name in wsi_names_to_run_dzsave: #TODO we are not going to run dzsave until we fix the dzsave isilon archiving problem
             #     print(f"Running dzsave pipeline on {wsi_name}")
@@ -130,93 +130,93 @@ def main_concurrent_bma_processing(
                 delete_slide_from_tmp(wsi_name)
 
 
-def main_serial_bma_processing(
-    wsi_name_filter_func, processing_filter_func, note="", delete_slide=True
-):
-    """Main function to run the overlapping BMA-diff pipeline on slides in a serial manner."""
+# def main_serial_bma_processing(
+#     wsi_name_filter_func, processing_filter_func, note="", delete_slide=True
+# ):
+#     """Main function to run the overlapping BMA-diff pipeline on slides in a serial manner."""
 
-    # first initialize the reported BMA metadata
-    initialize_reported_bma_metadata(
-        wsi_name_filter_func=wsi_name_filter_func, overwrite=False
-    )
+#     # first initialize the reported BMA metadata
+#     initialize_reported_bma_metadata(
+#         wsi_name_filter_func=wsi_name_filter_func, overwrite=False
+#     )
 
-    # then call decide_what_to_run_with_specimen_clf_cross_machine
-    wsi_names_to_run_BMA_diff = decide_what_to_run_with_specimen_clf_cross_machine(
-        wsi_name_filter_func=wsi_name_filter_func,
-        processing_filter_func=processing_filter_func,
-        pipelines=["BMA-diff", "PBS-diff"],
-    )
+#     # then call decide_what_to_run_with_specimen_clf_cross_machine
+#     wsi_names_to_run_BMA_diff = decide_what_to_run_with_specimen_clf_cross_machine(
+#         wsi_name_filter_func=wsi_name_filter_func,
+#         processing_filter_func=processing_filter_func,
+#         pipelines=["BMA-diff", "PBS-diff"],
+#     )
 
-    wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
-        wsi_name_filter_func=wsi_name_filter_func,
-        processing_filter_func=processing_filter_func,
-    )
+#     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
+#         wsi_name_filter_func=wsi_name_filter_func,
+#         processing_filter_func=processing_filter_func,
+#     )
 
-    # get the union of the two lists
-    wsi_names_to_run_union = list(
-        set(wsi_names_to_run_BMA_diff + wsi_names_to_run_dzsave)
-    )
+#     # get the union of the two lists
+#     wsi_names_to_run_union = list(
+#         set(wsi_names_to_run_BMA_diff + wsi_names_to_run_dzsave)
+#     )
 
-    # get the intersection of the two lists
-    wsi_names_to_run_intersection = list(
-        set(wsi_names_to_run_BMA_diff) & set(wsi_names_to_run_dzsave)
-    )
+#     # get the intersection of the two lists
+#     wsi_names_to_run_intersection = list(
+#         set(wsi_names_to_run_BMA_diff) & set(wsi_names_to_run_dzsave)
+#     )
 
-    # get the list of slides to run the BMA specimen classification and BMA-diff pipeline on but not the dzsave pipeline
-    wsi_names_to_run_just_BMA_diff = list(
-        set(wsi_names_to_run_BMA_diff) - set(wsi_names_to_run_dzsave)
-    )
+#     # get the list of slides to run the BMA specimen classification and BMA-diff pipeline on but not the dzsave pipeline
+#     wsi_names_to_run_just_BMA_diff = list(
+#         set(wsi_names_to_run_BMA_diff) - set(wsi_names_to_run_dzsave)
+#     )
 
-    # get the list of slides to run the dzsave pipeline on but not the BMA-diff pipeline
-    wsi_names_to_run_just_dzsave = list(
-        set(wsi_names_to_run_dzsave) - set(wsi_names_to_run_BMA_diff)
-    )
+#     # get the list of slides to run the dzsave pipeline on but not the BMA-diff pipeline
+#     wsi_names_to_run_just_dzsave = list(
+#         set(wsi_names_to_run_dzsave) - set(wsi_names_to_run_BMA_diff)
+#     )
 
-    print(f"Found {len(wsi_names_to_run_union)} slides in total to be processed.")
-    print(
-        f"Found {len(wsi_names_to_run_intersection)} slides to run both the BMA-diff and dzsave pipelines on."
-    )
-    print(
-        f"Found {len(wsi_names_to_run_just_BMA_diff)} slides to run just the BMA-diff pipeline on."
-    )
-    print(
-        f"Found {len(wsi_names_to_run_just_dzsave)} slides to run just the dzsave pipeline on."
-    )
+#     print(f"Found {len(wsi_names_to_run_union)} slides in total to be processed.")
+#     print(
+#         f"Found {len(wsi_names_to_run_intersection)} slides to run both the BMA-diff and dzsave pipelines on."
+#     )
+#     print(
+#         f"Found {len(wsi_names_to_run_just_BMA_diff)} slides to run just the BMA-diff pipeline on."
+#     )
+#     print(
+#         f"Found {len(wsi_names_to_run_just_dzsave)} slides to run just the dzsave pipeline on."
+#     )
 
-    # Process slides serially
-    for wsi_name in tqdm(
-        wsi_names_to_run_union,
-        desc="Running BMA-diff and dzsave pipeline on slides",
-        total=len(wsi_names_to_run_union),
-    ):
-        # Find the slide and ensure it's ready for processing
-        slide_path = find_slide(wsi_name, copy_slide=True)
+#     # Process slides serially
+#     for wsi_name in tqdm(
+#         wsi_names_to_run_union,
+#         desc="Running BMA-diff and dzsave pipeline on slides",
+#         total=len(wsi_names_to_run_union),
+#     ):
+#         # Find the slide and ensure it's ready for processing
+#         slide_path = find_slide(wsi_name, copy_slide=True)
 
-        # Run the BMA-diff pipeline if required
-        if wsi_name in wsi_names_to_run_BMA_diff:
-            print(f"Running BMA-diff pipeline on {wsi_name}")
-            run_one_slide_with_specimen_clf(
-                wsi_name,
-                pipeline="BMA-diff",
-                copy_slide=False,
-                delete_slide=False,
-                note=note,
-                hoarding=True,
-                continue_on_error=True,
-                do_extract_features=False,
-                check_specimen_clf=False,
-            )
-            print(f"Finished running BMA-diff pipeline on {wsi_name}")
+#         # Run the BMA-diff pipeline if required
+#         if wsi_name in wsi_names_to_run_BMA_diff:
+#             print(f"Running BMA-diff pipeline on {wsi_name}")
+#             run_one_slide_with_specimen_clf(
+#                 wsi_name,
+#                 pipeline="BMA-diff",
+#                 copy_slide=False,
+#                 delete_slide=False,
+#                 note=note,
+#                 hoarding=True,
+#                 continue_on_error=True,
+#                 do_extract_features=False,
+#                 check_specimen_clf=False,
+#             )
+#             print(f"Finished running BMA-diff pipeline on {wsi_name}")
 
-        # Run the dzsave pipeline if required
-        if wsi_name in wsi_names_to_run_dzsave:
-            print(f"Running dzsave pipeline on {wsi_name}")
-            dzsave_wsi_name(wsi_name)
-            print(f"Finished dzsaving {wsi_name}")
+#         # Run the dzsave pipeline if required
+#         if wsi_name in wsi_names_to_run_dzsave:
+#             print(f"Running dzsave pipeline on {wsi_name}")
+#             dzsave_wsi_name(wsi_name)
+#             print(f"Finished dzsaving {wsi_name}")
 
-        # Optionally delete the slide after processing
-        if delete_slide:
-            delete_slide_from_tmp(wsi_name)
+#         # Optionally delete the slide after processing
+#         if delete_slide:
+#             delete_slide_from_tmp(wsi_name)
 
 
 if __name__ == "__main__":
