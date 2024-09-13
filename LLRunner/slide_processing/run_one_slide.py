@@ -124,6 +124,8 @@ def run_one_slide_with_specimen_clf(
         pipeline = "BMA-diff"
     elif pbs_specimen_clf_score >= 0.5:
         pipeline = "PBS-diff"
+    else:
+        pipeline = None
 
     metadata_row_dct = {
         "wsi_name": wsi_name,
