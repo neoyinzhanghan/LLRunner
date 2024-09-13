@@ -37,7 +37,7 @@ def main_concurrent_bma_processing(
     wsi_names_to_run_diff = decide_what_to_run_with_specimen_clf_cross_machine(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
-        pipeline=["BMA-diff", "PBS-diff"],
+        pipelines=["BMA-diff", "PBS-diff"],
     )
 
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
@@ -144,7 +144,7 @@ def main_serial_bma_processing(
     wsi_names_to_run_BMA_diff = decide_what_to_run_with_specimen_clf_cross_machine(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
-        pipeline="BMA-diff",
+        pipelines=["BMA-diff", "PBS-diff"],
     )
 
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
