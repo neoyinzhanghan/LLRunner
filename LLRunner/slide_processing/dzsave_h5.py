@@ -4,6 +4,7 @@ import time
 import h5py
 import openslide
 import pandas as pd
+import numpy as np
 from PIL import Image
 from pathlib import Path
 from tqdm import tqdm
@@ -37,10 +38,48 @@ def create_list_of_batches_from_list(list, batch_size):
     return list_of_batches
 
 
-if __name__ == "__main__":
-    import doctest
+def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
+    """
+    Create an HDF5 file with a dataset that stores tiles, indexed by row and column.
+    
+    Parameters:
+        h5_path (str): Path where the HDF5 file will be created.
+        image_shape (tuple): Shape of the full image (height, width, channels).
+        patch_size (int): The size of each image patch (default: 256).
+    
+    Raises:
+        AssertionError: If the file already exists at h5_path.
+    """
+    assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
+    
+    
+    # Calculate the number of rows and columns of tiles
+    num_tile_rows = int(np.ceil(img_height / patch_size))
+    num_tile_columns = int(np.ceil(img_width / patch_size))
+    
+    # Create the HDF5 file and dataset
+    with h5py.File(h5_path, "w") as f:
+        # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
+        f.create_dataset(
+            "tiles", 
+            shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3), 
+            dtype='uint8'
+        )
+    
+    print(f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles.")
 
-    doctest.testmod()
+def add_patch_to_h5py(h5_path, patch, row, column):
+    """
+    Add a patch to an HDF5 file at the specified row and column.
+    
+    Parameters:
+        h5_path (str): Path to the HDF5 file.
+        patch (np.ndarray): The image patch to add.
+        row (int): The row index of the patch.
+        column (int): The column index of the patch.
+    """
+    with h5py.File(h5_path, "a") as f:
+        f["tiles"][row, column] = patch
 
 
 @ray.remote
@@ -136,45 +175,15 @@ class WSICropManager:
 
             x, y = int(focus_region_coord[0] // crop_size), int(focus_region_coord[1] // crop_size)
 
-            path = os.path.join(
-                save_dir,
-                str(18 - level),
-                f"{x}_{y}.jpeg",
+            add_patch_to_h5py(
+                os.path.join(save_dir, f"{18 - level}.h5"),
+                np.array(padded_image),
+                x,
+                y
             )
-            image.save(path)
 
         return len(focus_region_coords_level_pairs)
 
-
-def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
-    """
-    Create an HDF5 file with a dataset that stores tiles, indexed by row and column.
-    
-    Parameters:
-        h5_path (str): Path where the HDF5 file will be created.
-        image_shape (tuple): Shape of the full image (height, width, channels).
-        patch_size (int): The size of each image patch (default: 256).
-    
-    Raises:
-        AssertionError: If the file already exists at h5_path.
-    """
-    assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
-    
-    
-    # Calculate the number of rows and columns of tiles
-    num_tile_rows = int(np.ceil(img_height / patch_size))
-    num_tile_columns = int(np.ceil(img_width / patch_size))
-    
-    # Create the HDF5 file and dataset
-    with h5py.File(h5_path, "w") as f:
-        # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
-        f.create_dataset(
-            "tiles", 
-            shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3), 
-            dtype='uint8'
-        )
-    
-    print(f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles.")
 
 def padding_image(image, patch_size=256):
     """First check that both dim of the image is <= patch_size, if not raise an error.
@@ -282,10 +291,17 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 # Crop the patch from the image starting at (x, y) to (right, bottom)
                 patch = current_image.crop((x, y, right, bottom))
 
-                # Save the patch
-                path = os.path.join(save_dir, str(depth), f"{x}_{y}.jpeg")
-                patch.save(path)
 
+                padded_patch = padding_image(patch, patch_size=tile_size)
+
+                x, y = int(x // tile_size), int(y // tile_size)
+
+                add_patch_to_h5py(
+                    os.path.join(save_dir, f"{depth}.h5"),
+                    np.array(padded_patch),
+                    x,
+                    y
+                )
 
 def dzsave(
     wsi_path,
