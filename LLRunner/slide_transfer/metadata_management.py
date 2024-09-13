@@ -400,7 +400,7 @@ def decide_what_to_run_with_specimen_clf_cross_machine(
         df = get_pipeline_run_history_df(machine)
 
         # only keep the rows in the pipeline_run_history_path for the specified pipeline
-        df = df[df["pipeline"] in pipeline]
+        df = df[df["pipeline"] in pipelines]
 
         filtered_df = processing_filter_func(df)
 
