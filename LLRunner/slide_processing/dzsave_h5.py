@@ -370,7 +370,6 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
     else:
         os.makedirs(dzsave_subdir, exist_ok=True)
 
-        folder_name = wsi_name_no_ext
         save_dir = dzsave_subdir
 
         starttime = time.time()
@@ -379,7 +378,7 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
             dzsave(
                 wsi_path=wsi_path,
                 save_dir=save_dir,
-                folder_name=folder_name,
+                h5_name=f"{wsi_name_no_ext}.h5",
                 tile_size=tile_size,
                 num_cpus=128,
                 region_cropping_batch_size=256,
