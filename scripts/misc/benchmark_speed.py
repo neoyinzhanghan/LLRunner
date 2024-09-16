@@ -22,15 +22,19 @@ create_random_h5_file("random_data.h5", 400, 400, 32)
 
 
 def create_random_image_folder(folder_path, rows, columns, patch_size):
-    # create the folder if it does not exist
+    # Ensure patch_size is valid
+    if patch_size < 2:
+        raise ValueError("patch_size must be at least 2.")
+
+    # Create the folder if it does not exist
     os.makedirs(folder_path, exist_ok=True)
-    # fill the folder with random images
+    
+    # Fill the folder with random images
     for i in tqdm(range(rows), desc="Creating random image folder"):
         for j in tqdm(range(columns), leave=False):
-            image = np.random.randint(0, 256, (patch_size, patch_size, 3))
+            image = np.random.randint(0, 256, (patch_size, patch_size, 3), dtype=np.uint8)
             image_path = os.path.join(folder_path, f"image_{i}_{j}.png")
             Image.fromarray(image).save(image_path)
-
 
 create_random_image_folder("random_images", 400, 400, 32)
 
