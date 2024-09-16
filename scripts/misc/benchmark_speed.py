@@ -88,7 +88,7 @@ os.system(f"sudo rsync -av {hdd_h5_path} {isilon_h5_path}")
 h5_network_copy_time = time.time() - starttime
 
 starttime = time.time()
-os.system(f"sudo rsync -av {hdd_folder_path} {isilon_folder_path}")
+os.system(f"sudo rsync -av {hdd_folder_path} {"/dmpisilon_tools/neo/dzsave_test"}")
 folder_network_copy_time = time.time() - starttime
 
 h5_network_loading_time = benchmark_loading_h5(isilon_h5_path, 10000)

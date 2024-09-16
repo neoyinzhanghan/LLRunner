@@ -3,7 +3,10 @@ import datetime
 import pandas as pd
 from PIL import Image
 from pathlib import Path
-from LLRunner.slide_processing.specimen_clf import update_bma_specimen_clf_result, update_pbs_specimen_clf_result
+from LLRunner.slide_processing.specimen_clf import (
+    update_bma_specimen_clf_result,
+    update_pbs_specimen_clf_result,
+)
 from LLBMA.front_end.api import analyse_bma
 from LLPBS.front_end.api import analyse_pbs
 from LLRunner.slide_transfer.slides_management import (
@@ -105,7 +108,7 @@ def run_one_slide_with_specimen_clf(
     """Run the specified pipeline for one slide.
     The pipeline running code here should be minimal directly through the pipeline api.
     """
-    
+
     # now check and update the specimen classification for bma
     bma_specimen_clf_score, bma_specimen_clf_error = update_bma_specimen_clf_result(
         wsi_name
@@ -115,10 +118,15 @@ def run_one_slide_with_specimen_clf(
         wsi_name
     )
 
-    if bma_specimen_clf_score is None or bma_specimen_clf_error is not None:
+    pipeline = None
+
+    if (bma_specimen_clf_score is None or bma_specimen_clf_error is not None) or (
+        pbs_specimen_clf_score is None or pbs_specimen_clf_error is not None
+    ):
         print(
             f"Skipping {wsi_name} because error in specimen clf: {bma_specimen_clf_error}"
         )
+        pipeline = None
 
     elif bma_specimen_clf_score >= 0.5:
         pipeline = "BMA-diff"
