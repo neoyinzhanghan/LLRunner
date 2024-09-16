@@ -449,7 +449,7 @@ from LLRunner.config import dzsave_dir, dzsave_metadata_path, tmp_slide_dir
 def create_list_of_batches_from_list(lst, batch_size):
     list_of_batches = []
     for i in range(0, len(lst), batch_size):
-        batch = lst[i: i + batch_size]
+        batch = lst[i : i + batch_size]
         list_of_batches.append(batch)
     return list_of_batches
 
@@ -464,8 +464,8 @@ def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256, levels=
 
     with h5py.File(h5_path, "w") as f:
         for level in range(levels):
-            level_height = max(1, img_height // (2 ** level))
-            level_width = max(1, img_width // (2 ** level))
+            level_height = max(1, img_height // (2**level))
+            level_width = max(1, img_width // (2**level))
             num_tile_rows = int(np.ceil(level_height / patch_size))
             num_tile_columns = int(np.ceil(level_width / patch_size))
 
@@ -534,10 +534,10 @@ class WSICropManager:
             self.open_slide()
 
         coords_level_0 = (
-            coords[0] * (2 ** level),
-            coords[1] * (2 ** level),
-            coords[2] * (2 ** level),
-            coords[3] * (2 ** level),
+            coords[0] * (2**level),
+            coords[1] * (2**level),
+            coords[2] * (2**level),
+            coords[3] * (2**level),
         )
 
         image = self.wsi.read_region(
@@ -550,7 +550,7 @@ class WSICropManager:
         return image
 
     def async_get_bma_focus_region_level_pair_batch(
-            self, focus_region_coords_level_pairs, h5_path, crop_size=256
+        self, focus_region_coords_level_pairs, h5_path, crop_size=256
     ):
         for focus_region_coord_level_pair in focus_region_coords_level_pairs:
             focus_region_coord, level = focus_region_coord_level_pair
@@ -571,10 +571,10 @@ def padding_image(image, patch_size=256):
     image_width = image.width
     image_height = image.height
     assert (
-            image_width <= patch_size
+        image_width <= patch_size
     ), f"Error: Image width {image.width} is greater than patch_size {patch_size}."
     assert (
-            image_height <= patch_size
+        image_height <= patch_size
     ), f"Error: Image height {image.height} is greater than patch_size {patch_size}."
 
     if image_height == patch_size and image_width == patch_size:
@@ -586,12 +586,12 @@ def padding_image(image, patch_size=256):
 
 
 def crop_wsi_images_all_levels(
-        wsi_path,
-        h5_path,
-        region_cropping_batch_size,
-        crop_size=256,
-        verbose=True,
-        num_cpus=96,
+    wsi_path,
+    h5_path,
+    region_cropping_batch_size,
+    crop_size=256,
+    verbose=True,
+    num_cpus=96,
 ):
     num_croppers = num_cpus
 
@@ -624,7 +624,9 @@ def crop_wsi_images_all_levels(
         manager = task_managers[i % num_croppers]
 
         tmp_h5_path = os.path.join(tmp_dir, f"tmp_{i}.h5")
-        initialize_h5py_file(tmp_h5_path, *ray.get(manager.get_level_0_dimensions.remote()), crop_size)
+        initialize_h5py_file(
+            tmp_h5_path, *ray.get(manager.get_level_0_dimensions.remote()), crop_size
+        )
 
         task = manager.async_get_bma_focus_region_level_pair_batch.remote(
             batch, tmp_h5_path, crop_size=crop_size
@@ -632,7 +634,7 @@ def crop_wsi_images_all_levels(
         tasks[task] = tmp_h5_path
 
     with tqdm(
-            total=len(focus_regions_coordinates), desc="Cropping focus regions"
+        total=len(focus_regions_coordinates), desc="Cropping focus regions"
     ) as pbar:
         while tasks:
             done_ids, _ = ray.wait(list(tasks.keys()))
@@ -650,17 +652,21 @@ def crop_wsi_images_all_levels(
 
     merge_h5_files(tmp_dir, h5_path)
 
+    print("Removing temporary h5 files")
     shutil.rmtree(tmp_dir)
 
 
 def merge_h5_files(tmp_dir, h5_path):
+    print("Merging temporary h5 files")
     with h5py.File(h5_path, "a") as main_h5:
-        for tmp_file in os.listdir(tmp_dir):
+        for tmp_file in tqdm(os.listdir(tmp_dir), desc="Merging temporary h5 files"):
             tmp_h5_path = os.path.join(tmp_dir, tmp_file)
             with h5py.File(tmp_h5_path, "r") as tmp_h5:
                 for level in tmp_h5.keys():
                     if level in main_h5:
-                        main_h5[level][:] = np.maximum(main_h5[level][:], tmp_h5[level][:])
+                        main_h5[level][:] = np.maximum(
+                            main_h5[level][:], tmp_h5[level][:]
+                        )
 
 
 def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
@@ -694,12 +700,12 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
 
 
 def dzsave(
-        wsi_path,
-        save_dir,
-        h5_name,
-        tile_size=256,
-        num_cpus=96,
-        region_cropping_batch_size=256,
+    wsi_path,
+    save_dir,
+    h5_name,
+    tile_size=256,
+    num_cpus=96,
+    region_cropping_batch_size=256,
 ):
     wsi = openslide.OpenSlide(wsi_path)
     height, width = wsi.dimensions
