@@ -1,8 +1,8 @@
 import numpy as np
 import h5py
 import os
-import imageio
 from tqdm import tqdm
+from PIL import Image
 
 
 def create_random_h5_file(h5_path, rows, columns, patch_size):
@@ -29,7 +29,8 @@ def create_random_image_folder(folder_path, rows, columns, patch_size):
         for j in tqdm(range(columns), leave=False):
             image = np.random.randint(0, 256, (patch_size, patch_size, 3))
             image_path = os.path.join(folder_path, f"image_{i}_{j}.png")
-            imageio.imwrite(image_path, image)
+            Image.fromarray(image).save(image_path)
+
 
 create_random_image_folder("random_images", 400, 400, 32)
 
@@ -51,7 +52,7 @@ def benchmark_loading_folder(folder_path, rows, columns):
     for i in tqdm(range(rows), desc="Benchmarking loading folder"):
         for j in tqdm(range(columns), leave=False):
             image_path = os.path.join(folder_path, f"image_{i}_{j}.png")
-            image = imageio.imread(image_path)
+            image = np.array(Image.open(image_path))
     return time.time() - start
 
 
