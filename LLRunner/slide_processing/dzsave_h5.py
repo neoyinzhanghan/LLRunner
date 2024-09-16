@@ -41,29 +41,28 @@ def create_list_of_batches_from_list(list, batch_size):
 def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
     """
     Create an HDF5 file with a dataset that stores tiles, indexed by row and column.
-    
+
     Parameters:
         h5_path (str): Path where the HDF5 file will be created.
         image_shape (tuple): Shape of the full image (height, width, channels).
         patch_size (int): The size of each image patch (default: 256).
-    
+
     Raises:
         AssertionError: If the file already exists at h5_path.
     """
     assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
-    
-    
+
     # Calculate the number of rows and columns of tiles
     num_tile_rows = int(np.ceil(img_height / patch_size))
     num_tile_columns = int(np.ceil(img_width / patch_size))
-    
+
     # Create the HDF5 file and dataset
     with h5py.File(h5_path, "w") as f:
         # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
         f.create_dataset(
-            "tiles", 
-            shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3), 
-            dtype='uint8'
+            "tiles",
+            shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3),
+            dtype="uint8",
         )
 
     # create dataset Heights, Widths, TileSize, Overlap, Format
@@ -73,8 +72,11 @@ def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
         f.create_dataset("TileSize", data=patch_size)
         f.create_dataset("Overlap", data=0)
         f.create_dataset("Format", data="jpeg")
-    
-    print(f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles.")
+
+    print(
+        f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles."
+    )
+
 
 def add_patch_to_h5py(h5_path, level, patch, row, column):
     """
@@ -82,6 +84,7 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
     """
     with h5py.File(h5_path, "a") as f:
         f[f"{level}"][row, column] = patch
+
 
 @ray.remote
 class WSICropManager:
@@ -174,15 +177,11 @@ class WSICropManager:
 
             padded_image = padding_image(image, patch_size=crop_size)
 
-            x, y = int(focus_region_coord[0] // crop_size), int(focus_region_coord[1] // crop_size)
-
-            add_patch_to_h5py(
-                h5_path,
-                level,
-                np.array(padded_image),
-                x,
-                y
+            x, y = int(focus_region_coord[0] // crop_size), int(
+                focus_region_coord[1] // crop_size
             )
+
+            add_patch_to_h5py(h5_path, level, np.array(padded_image), x, y)
 
         return len(focus_region_coords_level_pairs)
 
@@ -194,8 +193,12 @@ def padding_image(image, patch_size=256):
 
     image_width = image.width
     image_height = image.height
-    assert image_width <= patch_size, f"Error: Image width {image.width} is greater than patch_size {patch_size}."
-    assert image_height <= patch_size, f"Error: Image height {image.height} is greater than patch_size {patch_size}."
+    assert (
+        image_width <= patch_size
+    ), f"Error: Image width {image.width} is greater than patch_size {patch_size}."
+    assert (
+        image_height <= patch_size
+    ), f"Error: Image height {image.height} is greater than patch_size {patch_size}."
 
     if image_height == patch_size and image_width == patch_size:
         return image
@@ -203,6 +206,7 @@ def padding_image(image, patch_size=256):
         new_image = Image.new("RGB", (patch_size, patch_size), (0, 0, 0))
         new_image.paste(image, (0, 0))
     return new_image
+
 
 def crop_wsi_images_all_levels(
     wsi_path,
@@ -293,17 +297,14 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 # Crop the patch from the image starting at (x, y) to (right, bottom)
                 patch = current_image.crop((x, y, right, bottom))
 
-
                 padded_patch = padding_image(patch, patch_size=tile_size)
 
                 x, y = int(x // tile_size), int(y // tile_size)
 
                 add_patch_to_h5py(
-                    os.path.join(save_dir, f"{depth}.h5"),
-                    np.array(padded_patch),
-                    x,
-                    y
+                    os.path.join(save_dir, f"{depth}.h5"), np.array(padded_patch), x, y
                 )
+
 
 def dzsave(
     wsi_path,
@@ -422,5 +423,5 @@ def initialize_dzsave_dir():
 
 if __name__ == "__main__":
     initialize_dzsave_dir()
-    
-    dzsave_wsi_name('H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi', tile_size=256)
+
+    dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=256)
