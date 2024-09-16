@@ -48,7 +48,7 @@ import time
 def benchmark_loading_h5(h5_path, nums_to_load):
     start = time.time()
     with h5py.File(h5_path, "r") as h5_file:
-        for i in range(nums_to_load):
+        for i in tqdm(range(nums_to_load), desc="Loading from h5"):
             # randomly sample a row and column
             row = np.random.randint(0, h5_file["data"].shape[0])
             column = np.random.randint(0, h5_file["data"].shape[1])
@@ -60,7 +60,7 @@ def benchmark_loading_h5(h5_path, nums_to_load):
 
 def benchmark_loading_folder(folder_path, nums_to_load):
     start = time.time()
-    for i in range(nums_to_load):
+    for i in tqdm(range(nums_to_load), desc="Loading from folder"):
         # randomly sample a row and column
         row = np.random.randint(0, 400)
         column = np.random.randint(0, 400)
