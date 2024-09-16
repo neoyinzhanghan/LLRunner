@@ -9,7 +9,7 @@ from LLRunner.slide_processing.run_one_slide import (
     run_one_slide_with_specimen_clf,
     find_slide,
 )
-from LLRunner.slide_processing.dzsave import dzsave_wsi_name
+# from LLRunner.slide_processing.dzsave import dzsave_wsi_name
 from LLRunner.slide_transfer.slides_management import (
     copy_slide_to_tmp,
     delete_slide_from_tmp,
