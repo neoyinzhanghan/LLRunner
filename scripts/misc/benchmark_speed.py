@@ -6,9 +6,9 @@ from tqdm import tqdm
 from PIL import Image
 
 hdd_h5_path = "/media/hdd3/neo/random_data.h5"
-hdd_folder_path = "/media/hdd3/neo/random_images"
+hdd_folder_path = "/media/hdd3/neo/random_images_2"
 isilon_h5_path = "/dmpisilon_tools/neo/dzsave_test/random_data.h5"
-isilon_folder_path = "/dmpisilon_tools/neo/dzsave_test/random_images"
+isilon_folder_path = "/dmpisilon_tools/neo/dzsave_test/random_images_2"
 
 
 def create_random_h5_file(h5_path, rows, columns, patch_size):
