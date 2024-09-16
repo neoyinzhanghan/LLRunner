@@ -480,8 +480,6 @@ def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256, levels=
         f.create_dataset("Overlap", data=0)
         f.create_dataset("Format", data="jpeg")
 
-    print(f"Initialized HDF5 file at {h5_path} for all levels.")
-
 
 def add_patch_to_h5py(h5_path, level, patch, row, column):
     with h5py.File(h5_path, "a") as f:
