@@ -1,6 +1,7 @@
 import numpy as np
 import h5py
 import os
+import time
 from tqdm import tqdm
 from PIL import Image
 
@@ -50,9 +51,6 @@ starttime = time.time()
 # create_random_image_folder(hdd_folder_path, 400, 400, 32)
 folder_creation_time = time.time() - starttime
 
-# now benchmark how long it takes to load 1000 random images from the h5 file vs the image folder
-import time
-
 
 def benchmark_loading_h5(h5_path, nums_to_load):
     start = time.time()
@@ -96,7 +94,7 @@ folder_network_copy_time = time.time() - starttime
 starttime = time.time()
 h5_network_loading_time = benchmark_loading_h5(isilon_h5_path, 10000)
 # folder_network_loading_time = benchmark_loading_folder(isilon_folder_path, 10000)
-folder_network_loading_time = None # TODO: fix this
+folder_network_loading_time = None  # TODO: fix this
 
 print(f"Creating h5 file took {h5_creation_time:.2f} seconds")
 print(f"Creating image folder took {folder_creation_time:.2f} seconds")
