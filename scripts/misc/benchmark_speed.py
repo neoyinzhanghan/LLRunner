@@ -79,7 +79,7 @@ def benchmark_loading_folder(folder_path, nums_to_load):
 
 
 h5_local_loading_time = benchmark_loading_h5(hdd_h5_path, 10000)
-folder_local_loading_time = benchmark_loading_folder(hdd_folder_path, 10000)
+folder_local_loading_time = None # benchmark_loading_folder(hdd_folder_path, 10000)
 
 # sudo rsync -av the h5 file and the image folder to /dmpisilon_tools/neo/dzsave_test
 # and then benchmark how long it takes to load the h5 file vs the image folder from the network
