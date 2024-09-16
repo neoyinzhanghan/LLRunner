@@ -20,9 +20,37 @@ from LLRunner.slide_processing.dzsave import initialize_dzsave_dir
 from LLRunner.deletion.delete_slide_results import delete_results_from_note
 
 
+def create_list_of_batches_from_list(list, batch_size):
+    """
+    This function creates a list of batches from a list.
+
+    :param list: a list
+    :param batch_size: the size of each batch
+    :return: a list of batches
+
+    >>> create_list_of_batches_from_list([1, 2, 3, 4, 5], 2)
+    [[1, 2], [3, 4], [5]]
+    >>> create_list_of_batches_from_list([1, 2, 3, 4, 5, 6], 3)
+    [[1, 2, 3], [4, 5, 6]]
+    >>> create_list_of_batches_from_list([], 3)
+    []
+    >>> create_list_of_batches_from_list([1, 2], 3)
+    [[1, 2]]
+    """
+
+    list_of_batches = []
+
+    for i in range(0, len(list), batch_size):
+        batch = list[i : i + batch_size]
+        list_of_batches.append(batch)
+
+    return list_of_batches
+
+
 def main_concurrent_processing(
     wsi_name_filter_func,
     processing_filter_func,
+    slide_batch_size=50,
     num_rsync_workers=1,
     note="",
     delete_slide=True,
@@ -76,58 +104,68 @@ def main_concurrent_processing(
         f"Found {len(wsi_names_to_run_just_dzsave)} slides to run just the dzsave pipeline on."
     )
 
-    # Create a ThreadPoolExecutor for handling slide copying in parallel
-    with ThreadPoolExecutor(
-        max_workers=num_rsync_workers
-    ) as executor:  # You can adjust max_workers as needed
-        slide_copy_futures = {}  # To track slide copying tasks
+    slides_batches = create_list_of_batches_from_list(
+        wsi_names_to_run_union, slide_batch_size
+    )
 
-        # Start copying slides in parallel
-        for wsi_name in wsi_names_to_run_union:
-            slide_copy_futures[wsi_name] = executor.submit(
-                find_slide, wsi_name, copy_slide=True
-            )
+    for i, slide_batch in tqdm(
+        enumerate(slides_batches),
+        desc="Batch Progress",
+        total=len(slides_batches),
+    ):
 
-        # Process slides once copying is done
-        for wsi_name in tqdm(
-            wsi_names_to_run_union,
-            desc="Running BMA or PBS diff and dzsave pipeline on slides",
-            total=len(wsi_names_to_run_union),
-        ):
+        # Create a ThreadPoolExecutor for handling slide copying in parallel
+        with ThreadPoolExecutor(
+            max_workers=num_rsync_workers
+        ) as executor:  # You can adjust max_workers as needed
+            slide_copy_futures = {}  # To track slide copying tasks
 
-            # Wait for the slide copying to complete if it hasn't yet
-            slide_copy_future = slide_copy_futures[wsi_name]
-            print(slide_copy_future.done())
-            if not slide_copy_future.done():
-                print(f"Waiting for slide {wsi_name} to be copied...")
-                slide_copy_future.result()  # Wait for completion
-
-            # # Continue with processing
-            # slide_path = find_slide(
-            #     wsi_name, copy_slide=False
-            # )  # Now it should be instantaneous
-
-            if wsi_name in wsi_names_to_run_diff:
-                print(f"Running BMA or PBS diff pipeline on {wsi_name}")
-                run_one_slide_with_specimen_clf(
-                    wsi_name,
-                    copy_slide=False,
-                    delete_slide=False,
-                    note=note,
-                    hoarding=True,
-                    continue_on_error=True,
-                    do_extract_features=False,
-                    check_specimen_clf=False,
+            # Start copying slides in parallel
+            for wsi_name in slide_batch:
+                slide_copy_futures[wsi_name] = executor.submit(
+                    find_slide, wsi_name, copy_slide=True
                 )
-                print(f"Finished running BMA or PBS diff pipeline on {wsi_name}")
 
-            # if wsi_name in wsi_names_to_run_dzsave: #TODO we are not going to run dzsave until we fix the dzsave isilon archiving problem
-            #     print(f"Running dzsave pipeline on {wsi_name}")
-            #     dzsave_wsi_name(wsi_name)
-            #     print(f"Finished dzsaving {wsi_name}")
+            # Process slides once copying is done
+            for wsi_name in tqdm(
+                wsi_names_to_run_union,
+                desc=f"Running BMA or PBS diff and dzsave pipeline on slides for batch {i+1}/{len(slides_batches)}",
+                total=len(wsi_names_to_run_union),
+            ):
 
-            if delete_slide:
-                delete_slide_from_tmp(wsi_name)
+                # Wait for the slide copying to complete if it hasn't yet
+                slide_copy_future = slide_copy_futures[wsi_name]
+                print(slide_copy_future.done())
+                if not slide_copy_future.done():
+                    print(f"Waiting for slide {wsi_name} to be copied...")
+                    slide_copy_future.result()  # Wait for completion
+
+                # # Continue with processing
+                # slide_path = find_slide(
+                #     wsi_name, copy_slide=False
+                # )  # Now it should be instantaneous
+
+                if wsi_name in wsi_names_to_run_diff:
+                    print(f"Running BMA or PBS diff pipeline on {wsi_name}")
+                    run_one_slide_with_specimen_clf(
+                        wsi_name,
+                        copy_slide=False,
+                        delete_slide=False,
+                        note=note,
+                        hoarding=True,
+                        continue_on_error=True,
+                        do_extract_features=False,
+                        check_specimen_clf=False,
+                    )
+                    print(f"Finished running BMA or PBS diff pipeline on {wsi_name}")
+
+                # if wsi_name in wsi_names_to_run_dzsave: #TODO we are not going to run dzsave until we fix the dzsave isilon archiving problem
+                #     print(f"Running dzsave pipeline on {wsi_name}")
+                #     dzsave_wsi_name(wsi_name)
+                #     print(f"Finished dzsaving {wsi_name}")
+
+                if delete_slide:
+                    delete_slide_from_tmp(wsi_name)
 
 
 # def main_serial_bma_processing(
