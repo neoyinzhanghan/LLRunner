@@ -447,81 +447,71 @@ from LLRunner.config import dzsave_dir, dzsave_metadata_path, tmp_slide_dir
 
 
 def create_list_of_batches_from_list(lst, batch_size):
-    """
-    This function creates a list of batches from a list.
-    """
     list_of_batches = []
     for i in range(0, len(lst), batch_size):
-        batch = lst[i : i + batch_size]
+        batch = lst[i: i + batch_size]
         list_of_batches.append(batch)
     return list_of_batches
 
 
-def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256):
+def initialize_h5py_file(h5_path, img_height, img_width, patch_size=256, levels=8):
     """
-    Create an HDF5 file with a dataset that stores tiles, indexed by row and column.
+    Create an HDF5 file with datasets for each level.
     """
     assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
     num_tile_rows = int(np.ceil(img_height / patch_size))
     num_tile_columns = int(np.ceil(img_width / patch_size))
+
     with h5py.File(h5_path, "w") as f:
-        f.create_dataset(
-            "tiles",
-            shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3),
-            dtype="uint8",
-        )
+        for level in range(levels):
+            level_height = max(1, img_height // (2 ** level))
+            level_width = max(1, img_width // (2 ** level))
+            num_tile_rows = int(np.ceil(level_height / patch_size))
+            num_tile_columns = int(np.ceil(level_width / patch_size))
+
+            f.create_dataset(
+                f"{level}",
+                shape=(num_tile_rows, num_tile_columns, patch_size, patch_size, 3),
+                dtype="uint8",
+            )
         f.create_dataset("Heights", data=img_height)
         f.create_dataset("Widths", data=img_width)
         f.create_dataset("TileSize", data=patch_size)
         f.create_dataset("Overlap", data=0)
         f.create_dataset("Format", data="jpeg")
 
-    print(
-        f"Initialized HDF5 file at {h5_path} with shape {num_tile_rows} x {num_tile_columns} for tiles."
-    )
+    print(f"Initialized HDF5 file at {h5_path} for all levels.")
 
 
 def add_patch_to_h5py(h5_path, level, patch, row, column):
-    """
-    Add a patch to an HDF5 file at the specified row and column at the dataset named str(level).
-    """
     with h5py.File(h5_path, "a") as f:
         f[f"{level}"][row, column] = patch
 
 
 @ray.remote
 class WSICropManager:
-    """
-    A class representing a manager that crops WSIs.
-    """
-
     def __init__(self, wsi_path) -> None:
         self.wsi_path = wsi_path
         self.wsi = None
 
     def open_slide(self):
-        """Open the WSI."""
         self.wsi = openslide.OpenSlide(self.wsi_path)
 
     def close_slide(self):
-        """Close the WSI."""
         self.wsi.close()
         self.wsi = None
 
     def get_level_0_dimensions(self):
-        """Get dimensions of the slide at level 0."""
         if self.wsi is None:
             self.open_slide()
         return self.wsi.dimensions
 
     def get_level_N_dimensions(self, level):
-        """Get dimensions of the slide at level N."""
         if self.wsi is None:
             self.open_slide()
         return self.wsi.level_dimensions[level]
 
     def get_tile_coordinate_level_pairs(self, tile_size=256, level=0):
-        """Generate a list of coordinates for 256x256 disjoint patches."""
         if self.wsi is None:
             self.open_slide()
 
@@ -540,15 +530,14 @@ class WSICropManager:
         return coordinates
 
     def crop(self, coords, level=0):
-        """Crop the WSI at the specified level of magnification."""
         if self.wsi is None:
             self.open_slide()
 
         coords_level_0 = (
-            coords[0] * (2**level),
-            coords[1] * (2**level),
-            coords[2] * (2**level),
-            coords[3] * (2**level),
+            coords[0] * (2 ** level),
+            coords[1] * (2 ** level),
+            coords[2] * (2 ** level),
+            coords[3] * (2 ** level),
         )
 
         image = self.wsi.read_region(
@@ -561,9 +550,8 @@ class WSICropManager:
         return image
 
     def async_get_bma_focus_region_level_pair_batch(
-        self, focus_region_coords_level_pairs, h5_path, crop_size=256
+            self, focus_region_coords_level_pairs, h5_path, crop_size=256
     ):
-        """Save a list of focus regions to a temporary HDF5 file."""
         for focus_region_coord_level_pair in focus_region_coords_level_pairs:
             focus_region_coord, level = focus_region_coord_level_pair
 
@@ -580,14 +568,13 @@ class WSICropManager:
 
 
 def padding_image(image, patch_size=256):
-    """Pad the image to make it patch_size x patch_size by adding black pixels to the right and bottom."""
     image_width = image.width
     image_height = image.height
     assert (
-        image_width <= patch_size
+            image_width <= patch_size
     ), f"Error: Image width {image.width} is greater than patch_size {patch_size}."
     assert (
-        image_height <= patch_size
+            image_height <= patch_size
     ), f"Error: Image height {image.height} is greater than patch_size {patch_size}."
 
     if image_height == patch_size and image_width == patch_size:
@@ -599,24 +586,22 @@ def padding_image(image, patch_size=256):
 
 
 def crop_wsi_images_all_levels(
-    wsi_path,
-    h5_path,
-    region_cropping_batch_size,
-    crop_size=256,
-    verbose=True,
-    num_cpus=96,
+        wsi_path,
+        h5_path,
+        region_cropping_batch_size,
+        crop_size=256,
+        verbose=True,
+        num_cpus=96,
 ):
-    num_croppers = num_cpus  # Number of croppers is the same as num_cpus
+    num_croppers = num_cpus
 
     if verbose:
         print("Initializing WSICropManager")
 
     manager = WSICropManager.remote(wsi_path)
 
-    # Create a temporary directory for individual HDF5 files
     tmp_dir = tempfile.mkdtemp()
 
-    # Get all the coordinates for 256x256 patches
     focus_regions_coordinates = []
 
     for level in range(0, 8):
@@ -637,18 +622,17 @@ def crop_wsi_images_all_levels(
 
     for i, batch in enumerate(list_of_batches):
         manager = task_managers[i % num_croppers]
-        
-        # Assign a unique temporary HDF5 file for each batch
+
         tmp_h5_path = os.path.join(tmp_dir, f"tmp_{i}.h5")
         initialize_h5py_file(tmp_h5_path, *ray.get(manager.get_level_0_dimensions.remote()), crop_size)
-        
+
         task = manager.async_get_bma_focus_region_level_pair_batch.remote(
             batch, tmp_h5_path, crop_size=crop_size
         )
         tasks[task] = tmp_h5_path
 
     with tqdm(
-        total=len(focus_regions_coordinates), desc="Cropping focus regions"
+            total=len(focus_regions_coordinates), desc="Cropping focus regions"
     ) as pbar:
         while tasks:
             done_ids, _ = ray.wait(list(tasks.keys()))
@@ -664,27 +648,22 @@ def crop_wsi_images_all_levels(
 
                 del tasks[done_id]
 
-    # Merge temporary HDF5 files into the main HDF5 file
     merge_h5_files(tmp_dir, h5_path)
 
-    # Remove the temporary directory
     shutil.rmtree(tmp_dir)
 
 
 def merge_h5_files(tmp_dir, h5_path):
-    """Merge temporary HDF5 files into a single HDF5 file."""
     with h5py.File(h5_path, "a") as main_h5:
         for tmp_file in os.listdir(tmp_dir):
             tmp_h5_path = os.path.join(tmp_dir, tmp_file)
             with h5py.File(tmp_h5_path, "r") as tmp_h5:
                 for level in tmp_h5.keys():
                     if level in main_h5:
-                        # Copy data from temporary HDF5 file to the main file
                         main_h5[level][:] = np.maximum(main_h5[level][:], tmp_h5[level][:])
 
 
 def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
-    """Downsample the image by a factor of 2 for each depth level."""
     wsi = openslide.OpenSlide(wsi_path)
     level_7_dimensions = wsi.level_dimensions[7]
     image = wsi.read_region((0, 0), 7, level_7_dimensions)
@@ -692,12 +671,10 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
 
     current_image = image
     for depth in range(10, -1, -1):
-        # downsample the image by a factor of 2
         current_image = current_image.resize(
             (max(current_image.width // 2, 1), max(current_image.height // 2, 1))
         )
 
-        # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
         for y in range(0, current_image.height, tile_size):
             for x in range(0, current_image.width, tile_size):
                 right = min(x + tile_size, current_image.width)
@@ -717,16 +694,13 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
 
 
 def dzsave(
-    wsi_path,
-    save_dir,
-    h5_name,
-    tile_size=256,
-    num_cpus=96,
-    region_cropping_batch_size=256,
+        wsi_path,
+        save_dir,
+        h5_name,
+        tile_size=256,
+        num_cpus=96,
+        region_cropping_batch_size=256,
 ):
-    """
-    Create a DeepZoom image pyramid from a WSI.
-    """
     wsi = openslide.OpenSlide(wsi_path)
     height, width = wsi.dimensions
 
@@ -734,7 +708,7 @@ def dzsave(
 
     starttime = time.time()
 
-    h5_path = os.path.join(save_dir, f"{h5_name}")
+    h5_path = os.path.join(save_dir, f"{h5_name}.h5")
 
     initialize_h5py_file(
         h5_path=h5_path,
@@ -759,7 +733,6 @@ def dzsave(
 
 
 def dzsave_wsi_name(wsi_name, tile_size=256):
-    """Check if the wsi_name is in the dzsave_metadata_path. If not, create a subfolder and save."""
     wsi_name_path = Path(wsi_name)
     wsi_path = os.path.join(tmp_slide_dir, wsi_name)
 
@@ -807,12 +780,10 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
 
         new_row_df = pd.DataFrame([new_row])
 
-        # Add a row to the dataframe
         dzsave_metadata_df = pd.concat(
             [dzsave_metadata_df, new_row_df], ignore_index=True
         )
 
-        # Save the dataframe back to the dzsave_metadata_path
         dzsave_metadata_df.to_csv(dzsave_metadata_path, index=False)
 
 
