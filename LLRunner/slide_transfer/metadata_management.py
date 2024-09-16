@@ -374,7 +374,7 @@ def decide_what_to_run(wsi_name_filter_func, processing_filter_func, pipeline):
 
 
 def decide_what_to_run_with_specimen_clf_cross_machine(
-    wsi_name_filter_func, processing_filter_func, pipelines
+    wsi_name_filter_func, processing_filter_func, pipelines, rerun=False
 ):
     """Decide what to run based on the processing_filter_func and the pipeline.
     The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
@@ -416,6 +416,8 @@ def decide_what_to_run_with_specimen_clf_cross_machine(
 
     for wsi_name in wsi_names:
         if wsi_name not in df["wsi_name"].values:
+            wsi_names_to_run.append(wsi_name)
+        elif rerun:
             wsi_names_to_run.append(wsi_name)
 
     return wsi_names_to_run

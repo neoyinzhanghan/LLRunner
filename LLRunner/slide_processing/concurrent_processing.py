@@ -9,6 +9,7 @@ from LLRunner.slide_processing.run_one_slide import (
     run_one_slide_with_specimen_clf,
     find_slide,
 )
+
 # from LLRunner.slide_processing.dzsave import dzsave_wsi_name
 from LLRunner.slide_transfer.slides_management import (
     copy_slide_to_tmp,
@@ -19,7 +20,7 @@ from LLRunner.slide_processing.dzsave import initialize_dzsave_dir
 from LLRunner.deletion.delete_slide_results import delete_results_from_note
 
 
-def main_concurrent_bma_processing(
+def main_concurrent_processing(
     wsi_name_filter_func,
     processing_filter_func,
     num_rsync_workers=1,
@@ -38,6 +39,7 @@ def main_concurrent_bma_processing(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
         pipelines=["BMA-diff", "PBS-diff"],
+        rerun=True,
     )
 
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
@@ -46,9 +48,7 @@ def main_concurrent_bma_processing(
     )
 
     # get the union of the two lists
-    wsi_names_to_run_union = list(
-        set(wsi_names_to_run_diff + wsi_names_to_run_dzsave)
-    )
+    wsi_names_to_run_union = list(set(wsi_names_to_run_diff + wsi_names_to_run_dzsave))
 
     # get the intersection of the two lists
     wsi_names_to_run_intersection = list(
@@ -460,7 +460,7 @@ if __name__ == "__main__":
 
     print("Starting concurrent processing")
     start_time = time.time()
-    main_concurrent_bma_processing(
+    main_concurrent_processing(
         wsi_name_filter_func=test_wsi_name_filter_func,
         processing_filter_func=identity_filter,
         num_rsync_workers=4,
@@ -494,6 +494,4 @@ if __name__ == "__main__":
 
     # serial_processing_time = time.time() - start_time
 
-    print(
-        f"Concurrent processing took {concurrent_processing_time} seconds"
-    )
+    print(f"Concurrent processing took {concurrent_processing_time} seconds")
