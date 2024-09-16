@@ -302,7 +302,11 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 x, y = int(x // tile_size), int(y // tile_size)
 
                 add_patch_to_h5py(
-                    os.path.join(save_dir, f"{depth}.h5"), np.array(padded_patch), x, y
+                    h5_path=save_dir,
+                    level=depth,
+                    patch=np.array(padded_patch),
+                    row=x,
+                    column=y,
                 )
 
 
