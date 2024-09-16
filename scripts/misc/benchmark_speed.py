@@ -31,6 +31,7 @@ def create_random_image_folder(folder_path, rows, columns, patch_size):
             image_path = os.path.join(folder_path, f"image_{i}_{j}.png")
             imageio.imwrite(image_path, image)
 
+create_random_image_folder("random_images", 400, 400, 32)
 
 # now benchmark how long it takes to load 1000 random images from the h5 file vs the image folder
 import time
