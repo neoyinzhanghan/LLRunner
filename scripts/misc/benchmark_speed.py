@@ -24,7 +24,7 @@ def create_random_h5_file(h5_path, rows, columns, patch_size):
 
 starttime = time.time()
 # create a random h5 file with 1000 rows, 1000 columns, and 32x32 patches
-create_random_h5_file(hdd_h5_path, 400, 400, 32)
+# create_random_h5_file(hdd_h5_path, 400, 400, 32)
 h5_creation_time = time.time() - starttime
 
 
@@ -47,7 +47,7 @@ def create_random_image_folder(folder_path, rows, columns, patch_size):
 
 
 starttime = time.time()
-create_random_image_folder(hdd_folder_path, 400, 400, 32)
+# create_random_image_folder(hdd_folder_path, 400, 400, 32)
 folder_creation_time = time.time() - starttime
 
 # now benchmark how long it takes to load 1000 random images from the h5 file vs the image folder
@@ -86,16 +86,17 @@ folder_local_loading_time = benchmark_loading_folder(hdd_folder_path, 10000)
 # sudo rsync -av the h5 file and the image folder to /dmpisilon_tools/neo/dzsave_test
 # and then benchmark how long it takes to load the h5 file vs the image folder from the network
 starttime = time.time()
-os.system(f"sudo rsync -av {hdd_h5_path} {isilon_h5_path}")
+# os.system(f"sudo rsync -av {hdd_h5_path} {isilon_h5_path}")
 h5_network_copy_time = time.time() - starttime
 
 starttime = time.time()
-os.system(f"sudo rsync -av {hdd_folder_path} {isilon_folder_path}")
+# os.system(f"sudo rsync -av {hdd_folder_path} {isilon_folder_path}")
 folder_network_copy_time = time.time() - starttime
 
 starttime = time.time()
 h5_network_loading_time = benchmark_loading_h5(isilon_h5_path, 10000)
-folder_network_loading_time = benchmark_loading_folder(isilon_folder_path, 10000)
+# folder_network_loading_time = benchmark_loading_folder(isilon_folder_path, 10000)
+folder_network_loading_time = None # TODO: fix this
 
 print(f"Creating h5 file took {h5_creation_time:.2f} seconds")
 print(f"Creating image folder took {folder_creation_time:.2f} seconds")
