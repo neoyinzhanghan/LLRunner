@@ -71,7 +71,7 @@ def benchmark_loading_folder(folder_path, nums_to_load):
     return time.time() - start
 
 
-h5_time = benchmark_loading_h5("random_data.h5", 1000)
-folder_time = benchmark_loading_folder("random_images", 1000)
+h5_time = benchmark_loading_h5("random_data.h5", 10000)
+folder_time = benchmark_loading_folder("random_images", 10000)
 print(f"Loading from h5 took {h5_time:.2f} seconds")
 print(f"Loading from folder took {folder_time:.2f} seconds")
