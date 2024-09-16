@@ -128,9 +128,9 @@ def main_concurrent_processing(
 
             # Process slides once copying is done
             for wsi_name in tqdm(
-                wsi_names_to_run_union,
+                slide_batch,
                 desc=f"Running BMA or PBS diff and dzsave pipeline on slides for batch {i+1}/{len(slides_batches)}",
-                total=len(wsi_names_to_run_union),
+                total=len(slide_batch),
             ):
 
                 # Wait for the slide copying to complete if it hasn't yet
