@@ -183,6 +183,28 @@ class WSICropManager:
                 tuple(np.subtract(coords_level_0[2:], coords_level_0[:2])),
             )
 
+        else:
+            wsi_level_difference = wsi_level - self.wsi.level_count
+            downsample_factor = 2**wsi_level_difference
+
+            # take the whole image at the highest level using read region
+            topview = self.wsi.read_region(
+                (0, 0),
+                self.wsi.level_count - 1,
+                self.wsi.level_dimensions[self.wsi.level_count - 1],
+            )
+
+            # downsample the image to the desired level
+            image = topview.resize(
+                (
+                    topview.width // downsample_factor,
+                    topview.height // downsample_factor,
+                )
+            )
+
+            # now crop the image from the downsampled image
+            image = image.crop((coords[0], coords[1], coords[2], coords[3]))
+
         image = image.convert("RGB")
         return image
 
@@ -215,7 +237,7 @@ def dzsave_h5(
     for key in focus_region_coords_level_pairs.keys():
         total += len(focus_region_coords_level_pairs[key])
 
-    print(f"Total number of patches: {total}")  
+    print(f"Total number of patches: {total}")
 
     keys = list(focus_region_coords_level_pairs.keys())
 
