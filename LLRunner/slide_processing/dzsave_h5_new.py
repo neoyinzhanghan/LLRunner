@@ -276,6 +276,6 @@ def dzsave_h5(
 
 if __name__ == "__main__":
     slide_path = "/media/hdd3/neo/BMA_AML/H19-3767;S10;MSKG - 2023-09-05 16.27.28.ndpi"
-    save_dir = "/media/hdd3/neo/BMA_AML/test_dzsave_h5"
+    save_dir = "/media/hdd3/neo/test_dzsave_h5"
 
     dzsave_h5(slide_path, save_dir)
