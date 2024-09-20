@@ -473,3 +473,26 @@ def update_slide_time(wsi_name):
     slide_md.loc[slide_md["wsi_name"] == wsi_name, "slide_last_updated"] = (
         datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
+
+
+def which_are_already_ran(wsi_names, note=""):
+    """Check which slides have already been ran for the specified pipelines and note."""
+    # open the pipeline_run_history_path file for all machines
+    pipeline_run_history_dfs = []
+    for machine in available_machines:
+        df = get_pipeline_run_history_df(machine)
+
+        pipeline_run_history_dfs.append(df)
+
+    # concatenate all the dfs
+    df = pd.concat(pipeline_run_history_dfs, ignore_index=True)
+
+    already_ran = []
+
+    for wsi_name in tqdm(wsi_names, desc="Checking what has already been ran"):
+        if wsi_name in df["wsi_name"].values:
+            # check if the note is the same as the note in the df
+            if df[df["wsi_name"] == wsi_name]["note"].values[0] == note:
+                already_ran.append(wsi_name)
+
+    return already_ran

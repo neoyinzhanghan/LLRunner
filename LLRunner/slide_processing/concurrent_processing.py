@@ -4,6 +4,7 @@ from LLRunner.slide_transfer.metadata_management import (
     decide_what_to_run_with_specimen_clf_cross_machine,
     decide_what_to_run_dzsave_across_machines,
     initialize_reported_bma_metadata,
+    which_are_already_ran,
 )
 from LLRunner.slide_processing.run_one_slide import (
     run_one_slide_with_specimen_clf,
@@ -69,6 +70,22 @@ def main_concurrent_processing(
         pipelines=["BMA-diff", "PBS-diff"],
         rerun=True,
     )
+
+    total_before_check = len(wsi_names_to_run_diff)
+
+    already_ran_wsi_names = which_are_already_ran(wsi_names_to_run_diff, note=note)
+
+    wsi_names_to_run_diff = list(
+        set(wsi_names_to_run_diff) - set(already_ran_wsi_names)
+    )
+
+    print(
+        f"Found {total_before_check} slides to run the BMA-diff and PBS-diff pipelines on."
+    )
+    print(
+        f"Found {len(already_ran_wsi_names)} slides that have already been processed."
+    )
+    print(f"Only {len(wsi_names_to_run_diff)} slides will be processed in this run.")
 
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
         wsi_name_filter_func=wsi_name_filter_func,
