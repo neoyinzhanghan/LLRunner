@@ -86,6 +86,7 @@ class WSIH5CropManager:
         self.image_height = image_height
 
         self.manager_id = manager_id
+        self.root_tmp_dir = root_tmp_dir
 
     def open_slide(self):
         """Open the WSI."""
