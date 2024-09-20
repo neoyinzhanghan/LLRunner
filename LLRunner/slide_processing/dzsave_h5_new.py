@@ -62,7 +62,7 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
 
 
 @ray.remote
-class WSICropManager:
+class WSIH5CropManager:
     """
     A class representing a manager that crops WSIs.
     Each Manager object is assigned with a single CPU core and is responsible for cropping a subset of the coordinates from a given WSI.
@@ -225,7 +225,7 @@ def dzsave_h5(
     os.makedirs(root_tmp_dir, exist_ok=True)
 
     managers = [
-        WSICropManager.remote(wsi_path, i, root_tmp_dir) for i in range(num_cpus)
+        WSIH5CropManager.remote(wsi_path, i, root_tmp_dir) for i in range(num_cpus)
     ]
 
     print("Batching all levels...")
@@ -265,6 +265,7 @@ def dzsave_h5(
             for done_id in done_ids:
                 try:
                     key = tasks[done_id]
+                    output = ray.get(done_id)
                     pbar.update()
                 except ray.exceptions.RayTaskError as e:
                     print(f"Task for batch {key} failed with error: {e}")
