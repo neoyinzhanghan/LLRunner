@@ -283,5 +283,13 @@ if __name__ == "__main__":
     slide_path = "/media/hdd3/neo/BMA_AML/H19-3767;S10;MSKG - 2023-09-05 16.27.28.ndpi"
     save_dir = "/media/hdd3/neo/test_dzsave_h5"
 
-    dzsave_h5(slide_path, save_dir)
+    # dzsave_h5(slide_path, save_dir)
     # initialize_h5py_file("/media/hdd3/neo/test_dzsave_h5/test/0_0.h5", 1, 0)
+
+    example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
+
+    # open the h5 file and print all the keys
+    with h5py.File(example_h5_tmp, "r") as f:
+        print(f.keys())
+        print(f["17"].shape)
+        print(f["17"][0, 0].shape)
