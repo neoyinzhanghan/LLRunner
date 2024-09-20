@@ -200,6 +200,8 @@ def dzsave_h5(
 
     root_tmp_dir = os.path.join(save_dir, h5_name)
 
+    os.makedirs(root_tmp_dir, exist_ok=True)
+
     managers = [
         WSICropManager.remote(wsi_path, i, root_tmp_dir) for i in range(num_cpus)
     ]
@@ -207,6 +209,13 @@ def dzsave_h5(
     print("Batching all levels...")
     focus_region_coords_level_pairs = managers[0].batch_all_levels.remote(tile_size)
     focus_region_coords_level_pairs = ray.get(focus_region_coords_level_pairs)
+
+    # number of patches
+    total = 0
+    for key in focus_region_coords_level_pairs.keys():
+        total += len(focus_region_coords_level_pairs[key])
+
+    print(f"Total number of patches: {total}")  
 
     keys = list(focus_region_coords_level_pairs.keys())
 
