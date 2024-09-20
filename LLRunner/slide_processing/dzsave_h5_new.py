@@ -139,6 +139,8 @@ class WSICropManager:
         """
 
         tmp_h5_path = os.path.join(self.root_tmp_dir, f"{str(level)}_{str(row_id)}.h5")
+
+        print(f"Initalizing h5 file at {tmp_h5_path}...")
         initialize_h5py_file(tmp_h5_path, batch_width=len(batch), level=level)
 
         for i, focus_region_coord_level_pair in enumerate(batch):
