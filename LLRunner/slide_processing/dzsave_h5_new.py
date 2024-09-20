@@ -43,8 +43,6 @@ def initialize_h5py_file(h5_path, batch_width, level, patch_size=256):
     """
     assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
 
-    # Calculate the number of rows and columns for the tiles
-
     # Create the HDF5 file and dataset
     with h5py.File(h5_path, "w") as f:
         # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
@@ -279,3 +277,4 @@ if __name__ == "__main__":
     save_dir = "/media/hdd3/neo/test_dzsave_h5"
 
     dzsave_h5(slide_path, save_dir)
+    initialize_h5py_file("/media/hdd3/neo/test_dzsave_h5/test/0_0.h5", 1, 0)
