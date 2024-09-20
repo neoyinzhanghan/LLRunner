@@ -204,7 +204,8 @@ def dzsave_h5(
         WSICropManager.remote(wsi_path, i, root_tmp_dir) for i in range(num_cpus)
     ]
 
-    focus_region_coords_level_pairs = managers[0].batch_all_levels(patch_size=tile_size)
+    focus_region_coords_level_pairs = managers[0].batch_all_levels.remote(tile_size)
+    focus_region_coords_level_pairs = ray.get(focus_region_coords_level_pairs)
 
     keys = list(focus_region_coords_level_pairs.keys())
 
