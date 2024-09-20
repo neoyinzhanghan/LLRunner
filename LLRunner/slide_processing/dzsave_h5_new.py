@@ -280,4 +280,4 @@ if __name__ == "__main__":
     save_dir = "/media/hdd3/neo/test_dzsave_h5"
 
     dzsave_h5(slide_path, save_dir)
-    initialize_h5py_file("/media/hdd3/neo/test_dzsave_h5/test/0_0.h5", 1, 0)
+    # initialize_h5py_file("/media/hdd3/neo/test_dzsave_h5/test/0_0.h5", 1, 0)
