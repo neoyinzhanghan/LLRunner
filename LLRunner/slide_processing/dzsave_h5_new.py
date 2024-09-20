@@ -297,5 +297,5 @@ if __name__ == "__main__":
         # turn it into a PIL image
         img = Image.fromarray(f["17"][0, 0])
 
-        # show the image
-        img.show()
+        # save the image in the same directory
+        img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
