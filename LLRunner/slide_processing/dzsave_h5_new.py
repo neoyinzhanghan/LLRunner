@@ -184,7 +184,7 @@ class WSIH5CropManager:
             image = self.wsi.read_region(
                 coords_level_0[:2],
                 wsi_level,
-                tuple(np.subtract(coords_level_0[2:], coords_level_0[:2])),
+                (crop_width, crop_height),
             )
 
         else:
@@ -218,7 +218,7 @@ def dzsave_h5(
     save_dir,
     h5_name="test",
     tile_size=256,
-    num_cpus=2,
+    num_cpus=96,
 ):
 
     ray.shutdown()
