@@ -204,12 +204,15 @@ def dzsave_h5(
         WSICropManager.remote(wsi_path, i, root_tmp_dir) for i in range(num_cpus)
     ]
 
+    print("Batching all levels...")
     focus_region_coords_level_pairs = managers[0].batch_all_levels.remote(tile_size)
     focus_region_coords_level_pairs = ray.get(focus_region_coords_level_pairs)
 
     keys = list(focus_region_coords_level_pairs.keys())
 
     tasks = {}
+
+    print("Assigning Ray Tasks to Workers...")
 
     for i, key in enumerate(keys):
         manager = managers[i % num_cpus]
@@ -218,6 +221,8 @@ def dzsave_h5(
         )
 
         tasks[task] = key
+
+    print("Cropping regions and saving to HDF5...")
 
     with tqdm(
         total=len(focus_region_coords_level_pairs),
