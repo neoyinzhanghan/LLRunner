@@ -294,6 +294,8 @@ if __name__ == "__main__":
         print(f["17"].shape)
         print(f["17"][0, 0].shape)
 
+        print(f["17"][0, 0])    
+
         # turn it into a PIL image
         img = Image.fromarray(f["17"][0, 0])
 
