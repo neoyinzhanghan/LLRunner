@@ -329,3 +329,12 @@ if __name__ == "__main__":
             is_all_black = np.all(np.array(f[key]) == 0)
 
             print(f"{h5_file}: {is_all_black}")
+
+    test_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
+
+    initialize_h5py_file(test_path, 1, 0)
+
+    with h5py.File(test_path, "r") as f:
+        print(f.keys())
+        print(f["0"].shape)
+        print("The entire dataset is black: ", np.all(np.array(f["0"]) == 0))
