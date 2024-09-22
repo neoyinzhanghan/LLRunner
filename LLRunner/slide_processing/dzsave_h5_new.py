@@ -306,3 +306,6 @@ if __name__ == "__main__":
 
         # save the image in the same directory
         img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
+
+        # print True if all entries in the entire h5 file is black
+        print(np.all(np.array(f["17"]) == 0))
