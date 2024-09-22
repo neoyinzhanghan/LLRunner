@@ -87,6 +87,10 @@ def main_concurrent_processing(
     )
     print(f"Only {len(wsi_names_to_run_diff)} slides will be processed in this run.")
 
+    import sys
+
+    sys.exit()
+
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
