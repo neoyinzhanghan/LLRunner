@@ -294,10 +294,13 @@ if __name__ == "__main__":
         print(f["17"].shape)
         print(f["17"][0, 0].shape)
 
-        print(f["17"][0, 0])    
+        print(f["17"][0, 0])
 
         # turn it into a PIL image
         img = Image.fromarray(f["17"][0, 0])
+
+        # print True if the entire image is black
+        print(np.all(np.array(img) == 0))
 
         # save the image in the same directory
         img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
