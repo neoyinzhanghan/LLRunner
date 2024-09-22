@@ -309,3 +309,23 @@ if __name__ == "__main__":
 
         # print True if all entries in the entire h5 file is black
         print(np.all(np.array(f["17"]) == 0))
+
+    h5_dir = "/media/hdd3/neo/test_dzsave_h5/test"
+
+    # get a list of all the h5 files in the directory
+    h5_files = [
+        os.path.join(h5_dir, f) for f in os.listdir(h5_dir) if f.endswith(".h5")
+    ]
+
+    # open all the h5 files and print the shape of the dataset
+    for h5_file in h5_files:
+        with h5py.File(h5_file, "r") as f:
+            # print whether or not the entire dataset is black
+            # first get the keys
+            keys = list(f.keys())
+            key = keys[0]
+
+            # PRINT whether or not the entire dataset is black
+            is_all_black = np.all(np.array(f[key]) == 0)
+
+            print(f"{h5_file}: {is_all_black}")
