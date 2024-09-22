@@ -317,18 +317,18 @@ if __name__ == "__main__":
         os.path.join(h5_dir, f) for f in os.listdir(h5_dir) if f.endswith(".h5")
     ]
 
-    # open all the h5 files and print the shape of the dataset
-    for h5_file in h5_files:
-        with h5py.File(h5_file, "r") as f:
-            # print whether or not the entire dataset is black
-            # first get the keys
-            keys = list(f.keys())
-            key = keys[0]
+    # # open all the h5 files and print the shape of the dataset
+    # for h5_file in h5_files:
+    #     with h5py.File(h5_file, "r") as f:
+    #         # print whether or not the entire dataset is black
+    #         # first get the keys
+    #         keys = list(f.keys())
+    #         key = keys[0]
 
-            # PRINT whether or not the entire dataset is black
-            is_all_black = np.all(np.array(f[key]) == 0)
+    #         # PRINT whether or not the entire dataset is black
+    #         is_all_black = np.all(np.array(f[key]) == 0)
 
-            print(f"{h5_file}: {is_all_black}")
+    #         print(f"{h5_file}: {is_all_black}")
 
     test_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
 
