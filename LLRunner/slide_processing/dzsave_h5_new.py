@@ -183,6 +183,23 @@ class WSIH5CropManager:
             crop_width = coords[2] - coords[0]
             crop_height = coords[3] - coords[1]
 
+            # assert taht the crop is not out of bounds
+            assert (
+                coords_level_0[0] >= 0
+            ), f"Error: coords_level_0[0] is less than 0: {coords_level_0[0]}."
+
+            assert (
+                coords_level_0[1] >= 0
+            ), f"Error: coords_level_0[1] is less than 0: {coords_level_0[1]}."
+
+            assert (
+                coords_level_0[2] <= self.image_width
+            ), f"Error: coords_level_0[2] is greater than image_width: {coords_level_0[2]}."
+
+            assert (
+                coords_level_0[3] <= self.image_height
+            ), f"Error: coords_level_0[3] is greater than image_height: {coords_level_0[3]}."
+
             image = self.wsi.read_region(
                 coords_level_0[:2],
                 wsi_level,
