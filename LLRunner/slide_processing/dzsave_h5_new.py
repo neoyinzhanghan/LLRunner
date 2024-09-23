@@ -127,10 +127,10 @@ class WSIH5CropManager:
                 focus_region_coords_level_pairs[(level, row_id)] = [
                     (
                         (
-                            row_id * patch_size,
                             column_id * patch_size,
-                            min((row_id + 1) * patch_size, level_image_height),
+                            row_id * patch_size,
                             min((column_id + 1) * patch_size, level_image_width),
+                            min((row_id + 1) * patch_size, level_image_height),
                         ),
                         level,
                     )
