@@ -397,22 +397,22 @@ def dzsave_h5(
     with openslide.OpenSlide(wsi_path) as slide:
         image_width, image_height = slide.dimensions
 
-    # print("Combining temporary h5 files... initializing final h5 file...")
-    # initialize_final_h5py_file(
-    #     h5_save_path,
-    #     image_width=image_width,
-    #     image_height=image_height,
-    #     num_levels=18,
-    #     patch_size=256,
-    # )
+    print("Combining temporary h5 files... initializing final h5 file...")
+    initialize_final_h5py_file(
+        h5_save_path,
+        image_width=image_width,
+        image_height=image_height,
+        num_levels=18,
+        patch_size=256,
+    )
 
-    # print("Combining temporary h5 files... adding patches to final h5 file...")
-    # combine_tmp_h5_files(root_tmp_dir, h5_save_path)
+    print("Combining temporary h5 files... adding patches to final h5 file...")
+    combine_tmp_h5_files(root_tmp_dir, h5_save_path)
 
-    # print("Combining temporary h5 files... deleting temporary h5 files...")
-    # os.system(f"rm -r {root_tmp_dir}")
+    print("Combining temporary h5 files... deleting temporary h5 files...")
+    os.system(f"rm -r {root_tmp_dir}")
 
-    # print("Done!")
+    print("Done!")
 
 
 if __name__ == "__main__":
