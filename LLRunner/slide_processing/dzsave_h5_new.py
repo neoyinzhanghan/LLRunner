@@ -430,3 +430,8 @@ if __name__ == "__main__":
     with h5py.File(dzsave_h5_path, "r") as f:
         for key in f.keys():
             print(key)
+
+    # print the shape of the 18
+    print("Shape of level 18:")
+    with h5py.File(dzsave_h5_path, "r") as f:
+        print(f["18"].shape)
