@@ -115,6 +115,11 @@ def initialize_final_h5py_file(
             dtype="int",
         )
 
+        f["level_0_width"][0] = image_width
+        f["level_0_height"][0] = image_height
+        f["patch_size"][0] = patch_size
+        f["num_levels"][0] = num_levels
+
 
 def combine_tmp_h5_files(tmp_h5_dir, h5_save_path):
     # first get a list of all the h5 files in the directory
