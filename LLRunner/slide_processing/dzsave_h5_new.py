@@ -53,6 +53,99 @@ def initialize_h5py_file(h5_path, batch_width, level, patch_size=256):
         )
 
 
+def initialize_final_h5py_file(
+    h5_path, image_width, image_height, num_levels=18, patch_size=256
+):
+    """
+    Create an HDF5 file with a dataset that stores tiles, indexed by row and column.
+
+    Parameters:
+        h5_path (str): Path where the HDF5 file will be created.
+        image_shape (tuple): Shape of the full image (height, width, channels).
+        patch_size (int): The size of each image patch (default: 256).
+
+    Raises:
+        AssertionError: If the file already exists at h5_path.
+    """
+    assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
+
+    # Create the HDF5 file and dataset
+    with h5py.File(h5_path, "w") as f:
+        # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
+        for level in range(num_levels):
+            level_image_height = image_height // (2 ** (num_levels - level))
+            level_image_width = image_width // (2 ** (num_levels - level))
+
+            f.create_dataset(
+                str(level),
+                shape=(
+                    level_image_height // patch_size,
+                    level_image_width // patch_size,
+                    patch_size,
+                    patch_size,
+                    3,
+                ),
+                dtype="uint8",
+            )
+
+            # also track the image width and height
+            f.create_dataset(
+                "level_0_width",
+                shape=(1,),
+                dtype="int",
+            )
+
+            f.create_dataset(
+                "level_0_height",
+                shape=(1,),
+                dtype="int",
+            )
+
+            # also track the patch size
+            f.create_dataset(
+                "patch_size",
+                shape=(1,),
+                dtype="int",
+            )
+
+            # also track the number of levels
+            f.create_dataset(
+                "num_levels",
+                shape=(1,),
+                dtype="int",
+            )
+
+
+def combine_tmp_h5_files(tmp_h5_dir, h5_save_path):
+    # first get a list of all the h5 files in the directory
+    h5_files = [
+        os.path.join(tmp_h5_dir, f) for f in os.listdir(tmp_h5_dir) if f.endswith(".h5")
+    ]
+
+    # open the h5_save_path
+    with h5py.File(h5_save_path, "r") as f:
+        level_0_width = f["level_0_width"][0]
+        level_0_height = f["level_0_height"][0]
+        patch_size = f["patch_size"][0]
+        num_levels = f["num_levels"][0]
+
+    # open the h5_save_path in write mode
+    with h5py.File(h5_save_path, "a") as f:
+        for h5_file in tqdm(h5_files, desc="Combining temporary h5 files..."):
+
+            # the h5_file filename is of the form level_row.h5, parse it to get the level and row
+            level = int(h5_file.split("/")[-1].split("_")[0])
+            row = int(h5_file.split("/")[-1].split("_")[1].split(".")[0])
+            with h5py.File(h5_file, "r") as tmp_f:
+                for level in range(num_levels):
+                    level_image_height = level_0_height // (2 ** (num_levels - level))
+                    level_image_width = level_0_width // (2 ** (num_levels - level))
+
+                    for row in range(level_image_height // patch_size):
+                        for column in range(level_image_width // patch_size):
+                            f[f"{level}"][row, column] = tmp_f[f"{level}"][0, column]
+
+
 def add_patch_to_h5py(h5_path, level, patch, row, column):
     """
     Add a patch to an HDF5 file at the specified row and column at the dataste named str(level).
@@ -296,6 +389,26 @@ def dzsave_h5(
                 del tasks[done_id]
 
     ray.shutdown()
+
+    # now combine all the temporary h5 files into a single h5 file
+    h5_save_path = os.path.join(save_dir, f"{h5_name}.h5")
+
+    print("Combining temporary h5 files... initializing final h5 file...")
+    initialize_final_h5py_file(
+        h5_save_path,
+        image_width=managers[0].image_width,
+        image_height=managers[0].image_height,
+        num_levels=18,
+        patch_size=256,
+    )
+
+    print("Combining temporary h5 files... adding patches to final h5 file...")
+    combine_tmp_h5_files(root_tmp_dir, h5_save_path)
+
+    print("Combining temporary h5 files... deleting temporary h5 files...")
+    os.system(f"rm -r {root_tmp_dir}")
+
+    print("Done!")
 
 
 if __name__ == "__main__":
