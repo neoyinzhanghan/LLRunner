@@ -151,7 +151,7 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
     Add a patch to an HDF5 file at the specified row and column at the dataste named str(level).
     """
     # print whether patch is all black
-    print(np.all(patch == 0))
+    # print(np.all(patch == 0))
     with h5py.File(h5_path, "a") as f:
         f[f"{level}"][row, column] = patch
 
