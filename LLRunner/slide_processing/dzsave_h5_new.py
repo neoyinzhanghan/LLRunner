@@ -453,7 +453,7 @@ if __name__ == "__main__":
         random_file = random.choice(all_tmp_files)
 
         # open the h5 file on the network location
-        with h5py.File(os.path.join(network_location, random_file), "r") as f:
+        with h5py.File(os.path.join(network_location, "test", random_file), "r") as f:
             # load a random column from the h5 file
             column = random.randint(0, f["17"].shape[1] - 1)
 
