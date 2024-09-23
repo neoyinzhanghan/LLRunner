@@ -497,8 +497,26 @@ if __name__ == "__main__":
     # #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
 
     # time how long it takes to sudo rsync the slide to the network location
-    import time
+    # import time
 
-    start_time = time.time()
-    os.system(f'sudo rsync -av "{slide_path}" "{network_location}"')
-    print("Time to rsync slide to network location:", time.time() - start_time)
+    # start_time = time.time()
+    # os.system(f'sudo rsync -av "{slide_path}" "{network_location}"')
+    # print("Time to rsync slide to network location:", time.time() - start_time)
+
+    # get the total storage consumption of /media/hdd3/neo/test_dzsave_h5
+    import os
+    import subprocess
+
+    # get the total storage consumption of /media/hdd3/neo/test_dzsave_h5
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(save_dir):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+
+    print(f"Total size of {save_dir}: {total_size / 1e9} GB")
+
+    # get the total storage consumption of the slide_path itself
+    total_size = os.path.getsize(slide_path)
+
+    print(f"Total size of {slide_path}: {total_size / 1e9} GB")
