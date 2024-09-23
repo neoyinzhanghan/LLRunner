@@ -143,7 +143,8 @@ def combine_tmp_h5_files(tmp_h5_dir, h5_save_path):
 
                     for row in range(level_image_height // patch_size):
                         for column in range(level_image_width // patch_size):
-                            f[f"{level}"][row, column] = tmp_f[f"{level}"][0, column]
+                            f[f"{level}"][row, column] = tmp_f[f"{level}"][0, column] # TODO check the integrity of the images before and after added to the final h5 file
+                            # TODO also check the statistical distribution of pixels in the final h5 file at each level
 
 
 def add_patch_to_h5py(h5_path, level, patch, row, column):
@@ -409,8 +410,8 @@ def dzsave_h5(
     print("Combining temporary h5 files... adding patches to final h5 file...")
     combine_tmp_h5_files(root_tmp_dir, h5_save_path)
 
-    print("Combining temporary h5 files... deleting temporary h5 files...")
-    os.system(f"rm -r {root_tmp_dir}")
+    # print("Combining temporary h5 files... deleting temporary h5 files...")
+    # os.system(f"rm -r {root_tmp_dir}")
 
     print("Done!")
 
