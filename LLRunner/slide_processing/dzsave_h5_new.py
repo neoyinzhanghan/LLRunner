@@ -292,7 +292,7 @@ if __name__ == "__main__":
 
     # open the slide
     slide = openslide.OpenSlide(slide_path)
-    height, width = slide.dimensions
+    width, height = slide.dimensions
     print(height, width)
 
     # example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
