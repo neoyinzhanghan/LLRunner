@@ -295,6 +295,12 @@ if __name__ == "__main__":
     width, height = slide.dimensions
     print(height, width)
 
+    # crop the slide centered at height + 1000, width + 1000 of a crop size of 256 x 256
+    crop = slide.read_region((height + 1000, width + 1000), 0, (256, 256))
+
+    # save the crop as a jpg
+    crop.save("/media/hdd3/neo/test_dzsave_h5/test_crop.jpg")
+
     # example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
 
     # # open the h5 file and print all the keys
