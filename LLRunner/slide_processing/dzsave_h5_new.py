@@ -322,27 +322,27 @@ if __name__ == "__main__":
     # save the crop as a jpg
     crop.save("/media/hdd3/neo/test_dzsave_h5/test_crop.jpg")
 
-    # example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
+    example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
 
-    # # open the h5 file and print all the keys
-    # with h5py.File(example_h5_tmp, "r") as f:
-    #     print(f.keys())
-    #     print(f["17"].shape)
-    #     print(f["17"][0, 0].shape)
+    # open the h5 file and print all the keys
+    with h5py.File(example_h5_tmp, "r") as f:
+        print(f.keys())
+        print(f["17"].shape)
+        print(f["17"][0, 0].shape)
 
-    #     print(f["17"][0, 0])
+        print(f["17"][0, 0])
 
-    #     # turn it into a PIL image
-    #     img = Image.fromarray(f["17"][0, 0])
+        # turn it into a PIL image
+        img = Image.fromarray(f["17"][0, 0])
 
-    #     # print True if the entire image is black
-    #     print(np.all(np.array(img) == 0))
+        # print True if the entire image is black
+        print(np.all(np.array(img) == 0))
 
-    #     # save the image in the same directory
-    #     img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
+        # save the image in the same directory
+        img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
 
-    #     # print True if all entries in the entire h5 file is black
-    #     print(np.all(np.array(f["17"]) == 0))
+        # print True if all entries in the entire h5 file is black
+        print(np.all(np.array(f["17"]) == 0))
 
     # h5_dir = "/media/hdd3/neo/test_dzsave_h5/test"
 
