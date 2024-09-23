@@ -422,24 +422,24 @@ if __name__ == "__main__":
 
     os.makedirs(save_dir, exist_ok=True)
 
-    # dzsave_h5(slide_path, save_dir)
+    dzsave_h5(slide_path, save_dir)
 
     dzsave_h5_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
 
-    # print all the keys in the h5 file
-    print("Keys in the h5 file:")
-    with h5py.File(dzsave_h5_path, "r") as f:
-        for key in f.keys():
-            print(key)
+    # # print all the keys in the h5 file
+    # print("Keys in the h5 file:")
+    # with h5py.File(dzsave_h5_path, "r") as f:
+    #     for key in f.keys():
+    #         print(key)
 
-    # print the shape of each level 0 ... 18
-    for i in range(18):
-        with h5py.File(dzsave_h5_path, "r") as f:
-            print(f"Shape of level {i}: {f[str(i)].shape}")
+    # # print the shape of each level 0 ... 18
+    # for i in range(18):
+    #     with h5py.File(dzsave_h5_path, "r") as f:
+    #         print(f"Shape of level {i}: {f[str(i)].shape}")
 
-    # get the image at (101,206) at level 18
-    with h5py.File(dzsave_h5_path, "r") as f:
-        image = f["17"][101, 206]
-        # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
-        Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
-        print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
+    # # get the image at (101,206) at level 18
+    # with h5py.File(dzsave_h5_path, "r") as f:
+    #     image = f["17"][101, 206]
+    #     # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
+    #     Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
+    #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
