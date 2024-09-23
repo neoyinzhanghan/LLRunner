@@ -443,7 +443,7 @@ if __name__ == "__main__":
     with h5py.File(dzsave_h5_path, "r") as f:
         image = f["17"][101, 206]
         # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
-        Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
+        Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test/test.jpg")
         print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
 
     # retrieve the same image from the tmp h5 file
