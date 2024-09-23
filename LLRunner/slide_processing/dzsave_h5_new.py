@@ -393,11 +393,15 @@ def dzsave_h5(
     # now combine all the temporary h5 files into a single h5 file
     h5_save_path = os.path.join(save_dir, f"{h5_name}.h5")
 
+    # get the image_width and image_height from wsi_path
+    with openslide.OpenSlide(wsi_path) as slide:
+        image_width, image_height = slide.dimensions
+
     print("Combining temporary h5 files... initializing final h5 file...")
     initialize_final_h5py_file(
         h5_save_path,
-        image_width=managers[0].image_width,
-        image_height=managers[0].image_height,
+        image_width=image_width,
+        image_height=image_height,
         num_levels=18,
         patch_size=256,
     )
