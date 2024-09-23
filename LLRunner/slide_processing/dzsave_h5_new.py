@@ -435,7 +435,3 @@ if __name__ == "__main__":
     for i in range(18):
         with h5py.File(dzsave_h5_path, "r") as f:
             print(f"Shape of level {i}: {f[str(i)].shape}")
-            print(f"Max value of level {i}: {f[str(i)].max()}")
-            print(f"Min value of level {i}: {f[str(i)].min()}")
-            print(f"Mean value of level {i}: {f[str(i)].mean()}")
-            print(f"Std value of level {i}: {f[str(i)].std()}")
