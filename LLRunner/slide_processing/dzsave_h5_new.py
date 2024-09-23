@@ -437,13 +437,13 @@ if __name__ == "__main__":
     os.makedirs(save_dir, exist_ok=True)
 
     start_time = time.time()
-    # dzsave_h5(slide_path, save_dir)
+    dzsave_h5(slide_path, save_dir)
     dzsave_h5_tmp_dir = os.path.join(save_dir, "test")
     dzsave_time = time.time() - start_time
 
     start_time = time.time()
     # rysnc the tmp h5 files to the save_dir
-    # os.system(f'sudo rsync -av "{dzsave_h5_tmp_dir}" "{network_location}"')
+    os.system(f'sudo rsync -av "{dzsave_h5_tmp_dir}" "{network_location}"')
     rsync_time = time.time() - start_time
 
     all_tmp_files = os.listdir(dzsave_h5_tmp_dir)
