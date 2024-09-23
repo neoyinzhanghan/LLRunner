@@ -304,7 +304,7 @@ if __name__ == "__main__":
 
     os.makedirs(save_dir, exist_ok=True)
 
-    # dzsave_h5(slide_path, save_dir)
+    dzsave_h5(slide_path, save_dir)
     # initialize_h5py_file("/media/hdd3/neo/test_dzsave_h5/test/0_0.h5", 1, 0)
 
     # open the slide
