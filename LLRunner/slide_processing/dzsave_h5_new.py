@@ -174,10 +174,10 @@ class WSIH5CropManager:
         ), f"Error: Level {level} is greater than max_level {max_level}."
         if wsi_level <= self.wsi.level_count:
             coords_level_0 = (
-                coords[0] * (2**level),
-                coords[1] * (2**level),
-                coords[2] * (2**level),
-                coords[3] * (2**level),
+                coords[0] * (2**wsi_level),
+                coords[1] * (2**wsi_level),
+                coords[2] * (2**wsi_level),
+                coords[3] * (2**wsi_level),
             )
 
             crop_width = coords[2] - coords[0]
