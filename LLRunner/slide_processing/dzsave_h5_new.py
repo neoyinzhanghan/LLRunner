@@ -57,6 +57,8 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
     """
     Add a patch to an HDF5 file at the specified row and column at the dataste named str(level).
     """
+    # print whether patch is all black
+    print(np.all(patch == 0))
     with h5py.File(h5_path, "a") as f:
         f[f"{level}"][row, column] = patch
 
@@ -285,56 +287,56 @@ if __name__ == "__main__":
 
     os.makedirs(save_dir, exist_ok=True)
 
-    # dzsave_h5(slide_path, save_dir)
+    dzsave_h5(slide_path, save_dir)
     # initialize_h5py_file("/media/hdd3/neo/test_dzsave_h5/test/0_0.h5", 1, 0)
 
-    example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
+    # example_h5_tmp = "/media/hdd3/neo/test_dzsave_h5/test/17_132.h5"
 
-    # open the h5 file and print all the keys
-    with h5py.File(example_h5_tmp, "r") as f:
-        print(f.keys())
-        print(f["17"].shape)
-        print(f["17"][0, 0].shape)
+    # # open the h5 file and print all the keys
+    # with h5py.File(example_h5_tmp, "r") as f:
+    #     print(f.keys())
+    #     print(f["17"].shape)
+    #     print(f["17"][0, 0].shape)
 
-        print(f["17"][0, 0])
+    #     print(f["17"][0, 0])
 
-        # turn it into a PIL image
-        img = Image.fromarray(f["17"][0, 0])
+    #     # turn it into a PIL image
+    #     img = Image.fromarray(f["17"][0, 0])
 
-        # print True if the entire image is black
-        print(np.all(np.array(img) == 0))
+    #     # print True if the entire image is black
+    #     print(np.all(np.array(img) == 0))
 
-        # save the image in the same directory
-        img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
+    #     # save the image in the same directory
+    #     img.save("/media/hdd3/neo/test_dzsave_h5/test/17_132_example.jpg")
 
-        # print True if all entries in the entire h5 file is black
-        print(np.all(np.array(f["17"]) == 0))
+    #     # print True if all entries in the entire h5 file is black
+    #     print(np.all(np.array(f["17"]) == 0))
 
-    h5_dir = "/media/hdd3/neo/test_dzsave_h5/test"
+    # h5_dir = "/media/hdd3/neo/test_dzsave_h5/test"
 
-    # get a list of all the h5 files in the directory
-    h5_files = [
-        os.path.join(h5_dir, f) for f in os.listdir(h5_dir) if f.endswith(".h5")
-    ]
+    # # get a list of all the h5 files in the directory
+    # h5_files = [
+    #     os.path.join(h5_dir, f) for f in os.listdir(h5_dir) if f.endswith(".h5")
+    # ]
 
-    # # open all the h5 files and print the shape of the dataset
-    # for h5_file in h5_files:
-    #     with h5py.File(h5_file, "r") as f:
-    #         # print whether or not the entire dataset is black
-    #         # first get the keys
-    #         keys = list(f.keys())
-    #         key = keys[0]
+    # # # open all the h5 files and print the shape of the dataset
+    # # for h5_file in h5_files:
+    # #     with h5py.File(h5_file, "r") as f:
+    # #         # print whether or not the entire dataset is black
+    # #         # first get the keys
+    # #         keys = list(f.keys())
+    # #         key = keys[0]
 
-    #         # PRINT whether or not the entire dataset is black
-    #         is_all_black = np.all(np.array(f[key]) == 0)
+    # #         # PRINT whether or not the entire dataset is black
+    # #         is_all_black = np.all(np.array(f[key]) == 0)
 
-    #         print(f"{h5_file}: {is_all_black}")
+    # #         print(f"{h5_file}: {is_all_black}")
 
-    test_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
+    # test_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
 
-    initialize_h5py_file(test_path, 1, 0)
+    # initialize_h5py_file(test_path, 1, 0)
 
-    with h5py.File(test_path, "r") as f:
-        print(f.keys())
-        print(f["0"].shape)
-        print("The entire dataset is black: ", np.all(np.array(f["0"]) == 0))
+    # with h5py.File(test_path, "r") as f:
+    #     print(f.keys())
+    #     print(f["0"].shape)
+    #     print("The entire dataset is black: ", np.all(np.array(f["0"]) == 0))
