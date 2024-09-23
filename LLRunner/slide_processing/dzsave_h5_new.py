@@ -133,20 +133,23 @@ def combine_tmp_h5_files(tmp_h5_dir, h5_save_path):
     with h5py.File(h5_save_path, "a") as f:
         for h5_file in tqdm(h5_files, desc="Combining temporary h5 files..."):
 
+            print(f"Adding {h5_file} to {h5_save_path}...")
+
             # the h5_file filename is of the form level_row.h5, parse it to get the level and row
             level = int(h5_file.split("/")[-1].split("_")[0])
             row = int(h5_file.split("/")[-1].split("_")[1].split(".")[0])
-            with h5py.File(h5_file, "r") as tmp_f:
-                for level in range(num_levels):
-                    level_image_height = level_0_height // (2 ** (num_levels - level))
-                    level_image_width = level_0_width // (2 ** (num_levels - level))
 
-                    for row in range(level_image_height // patch_size):
-                        for column in range(level_image_width // patch_size):
-                            f[f"{level}"][row, column] = tmp_f[f"{level}"][
-                                0, column
-                            ]  # TODO check the integrity of the images before and after added to the final h5 file
-                            # TODO also check the statistical distribution of pixels in the final h5 file at each level
+            print(f"Adding level {level} row {row}...")
+            with h5py.File(h5_file, "r") as tmp_f:
+                level_image_height = level_0_height // (2 ** (num_levels - level))
+                level_image_width = level_0_width // (2 ** (num_levels - level))
+
+                for row in range(level_image_height // patch_size):
+                    for column in range(level_image_width // patch_size):
+                        f[f"{level}"][row, column] = tmp_f[f"{level}"][
+                            0, column
+                        ]  # TODO check the integrity of the images before and after added to the final h5 file
+                        # TODO also check the statistical distribution of pixels in the final h5 file at each level
 
 
 def add_patch_to_h5py(h5_path, level, patch, row, column):
