@@ -298,6 +298,10 @@ if __name__ == "__main__":
     # crop the slide centered at height + 1000, width + 1000 of a crop size of 256 x 256
     crop = slide.read_region((height + 1000, width + 1000), 0, (256, 256))
 
+    # if RGBA, convert to RGB
+    if crop.mode == "RGBA":
+        crop = crop.convert("RGB")
+
     # save the crop as a jpg
     crop.save("/media/hdd3/neo/test_dzsave_h5/test_crop.jpg")
 
