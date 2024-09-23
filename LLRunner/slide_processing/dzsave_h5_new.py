@@ -88,32 +88,32 @@ def initialize_final_h5py_file(
                 dtype="uint8",
             )
 
-            # also track the image width and height
-            f.create_dataset(
-                "level_0_width",
-                shape=(1,),
-                dtype="int",
-            )
+        # also track the image width and height
+        f.create_dataset(
+            "level_0_width",
+            shape=(1,),
+            dtype="int",
+        )
 
-            f.create_dataset(
-                "level_0_height",
-                shape=(1,),
-                dtype="int",
-            )
+        f.create_dataset(
+            "level_0_height",
+            shape=(1,),
+            dtype="int",
+        )
 
-            # also track the patch size
-            f.create_dataset(
-                "patch_size",
-                shape=(1,),
-                dtype="int",
-            )
+        # also track the patch size
+        f.create_dataset(
+            "patch_size",
+            shape=(1,),
+            dtype="int",
+        )
 
-            # also track the number of levels
-            f.create_dataset(
-                "num_levels",
-                shape=(1,),
-                dtype="int",
-            )
+        # also track the number of levels
+        f.create_dataset(
+            "num_levels",
+            shape=(1,),
+            dtype="int",
+        )
 
 
 def combine_tmp_h5_files(tmp_h5_dir, h5_save_path):
