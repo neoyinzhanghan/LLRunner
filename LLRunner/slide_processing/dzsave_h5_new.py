@@ -431,67 +431,74 @@ if __name__ == "__main__":
     save_dir = "/media/hdd3/neo/test_dzsave_h5"
     network_location = "/dmpisilon_tools/neo/dzsave_h5_rows"
 
+    # import time
+    # import random
+
+    # os.makedirs(save_dir, exist_ok=True)
+
+    # start_time = time.time()
+    # dzsave_h5(slide_path, save_dir)
+    # dzsave_h5_tmp_dir = os.path.join(save_dir, "test")
+    # dzsave_time = time.time() - start_time
+
+    # start_time = time.time()
+    # # rysnc the tmp h5 files to the save_dir
+    # os.system(f'sudo rsync -av "{dzsave_h5_tmp_dir}" "{network_location}"')
+    # rsync_time = time.time() - start_time
+
+    # all_tmp_files = os.listdir(dzsave_h5_tmp_dir)
+    # start_time = time.time()
+    # num_to_load = 1000
+    # for i in tqdm(range(num_to_load), desc="Loading random patches..."):
+    #     random_file = random.choice(all_tmp_files)
+
+    #     # open the h5 file on the network location
+    #     with h5py.File(os.path.join(network_location, "test", random_file), "r") as f:
+    #         level = random_file.split("_")[0]
+    #         # load a random column from the h5 file
+    #         column = random.randint(0, f[level].shape[1] - 1)
+
+    #         # load the image
+    #         image = f[level][0, column]
+
+    #         # convert the image to a PIL image
+    #         pil_image = Image.fromarray(image)
+
+    # loading_time = time.time() - start_time
+
+    # print(f"dzsave_h5 time: {dzsave_time}")
+    # print(f"rsync time: {rsync_time}")
+    # print(f"loading time for {num_to_load} patches: {loading_time}")
+    # # dzsave_h5_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
+
+    # # # print all the keys in the h5 file
+    # # print("Keys in the h5 file:")
+    # # with h5py.File(dzsave_h5_path, "r") as f:
+    # #     for key in f.keys():
+    # #         print(key)
+
+    # # # print the shape of each level 0 ... 18
+    # # for i in range(18):
+    # #     with h5py.File(dzsave_h5_path, "r") as f:
+    # #         print(f"Shape of level {i}: {f[str(i)].shape}")
+
+    # # # get the image at (101,206) at level 18
+    # # with h5py.File(dzsave_h5_path, "r") as f:
+    # #     image = f["17"][101, 206]
+    # #     # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
+    # #     Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
+    # #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
+
+    # # # retrieve the same image from the tmp h5 file
+    # # with h5py.File("/media/hdd3/neo/test_dzsave_h5/test/17_101.h5", "r") as f:
+    # #     image = f["17"][0, 206]
+    # #     # save the image to "/media/hdd3/neo/test_dzsave_h5/test_tmp.jpg"
+    # #     Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
+    # #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
+
+    # time how long it takes to sudo rsync the slide to the network location
     import time
-    import random
-
-    os.makedirs(save_dir, exist_ok=True)
 
     start_time = time.time()
-    dzsave_h5(slide_path, save_dir)
-    dzsave_h5_tmp_dir = os.path.join(save_dir, "test")
-    dzsave_time = time.time() - start_time
-
-    start_time = time.time()
-    # rysnc the tmp h5 files to the save_dir
-    os.system(f'sudo rsync -av "{dzsave_h5_tmp_dir}" "{network_location}"')
-    rsync_time = time.time() - start_time
-
-    all_tmp_files = os.listdir(dzsave_h5_tmp_dir)
-    start_time = time.time()
-    num_to_load = 1000
-    for i in tqdm(range(num_to_load), desc="Loading random patches..."):
-        random_file = random.choice(all_tmp_files)
-
-        # open the h5 file on the network location
-        with h5py.File(os.path.join(network_location, "test", random_file), "r") as f:
-            level = random_file.split("_")[0]
-            # load a random column from the h5 file
-            column = random.randint(0, f[level].shape[1] - 1)
-
-            # load the image
-            image = f[level][0, column]
-
-            # convert the image to a PIL image
-            pil_image = Image.fromarray(image)
-
-    loading_time = time.time() - start_time
-
-    print(f"dzsave_h5 time: {dzsave_time}")
-    print(f"rsync time: {rsync_time}")
-    print(f"loading time for {num_to_load} patches: {loading_time}")
-    # dzsave_h5_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
-
-    # # print all the keys in the h5 file
-    # print("Keys in the h5 file:")
-    # with h5py.File(dzsave_h5_path, "r") as f:
-    #     for key in f.keys():
-    #         print(key)
-
-    # # print the shape of each level 0 ... 18
-    # for i in range(18):
-    #     with h5py.File(dzsave_h5_path, "r") as f:
-    #         print(f"Shape of level {i}: {f[str(i)].shape}")
-
-    # # get the image at (101,206) at level 18
-    # with h5py.File(dzsave_h5_path, "r") as f:
-    #     image = f["17"][101, 206]
-    #     # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
-    #     Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
-    #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
-
-    # # retrieve the same image from the tmp h5 file
-    # with h5py.File("/media/hdd3/neo/test_dzsave_h5/test/17_101.h5", "r") as f:
-    #     image = f["17"][0, 206]
-    #     # save the image to "/media/hdd3/neo/test_dzsave_h5/test_tmp.jpg"
-    #     Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
-    #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
+    os.system(f'sudo rsync -av "{slide_path}" "{network_location}"')
+    print("Time to rsync slide to network location:", time.time() - start_time)
