@@ -250,7 +250,7 @@ class WSIH5CropManager:
 
         tmp_h5_path = os.path.join(self.root_tmp_dir, f"{str(level)}_{str(row_id)}.h5")
 
-        print(f"Initalizing h5 file at {tmp_h5_path}...")
+        # print(f"Initalizing h5 file at {tmp_h5_path}...")
         initialize_h5py_file(tmp_h5_path, batch_width=len(batch), level=level)
 
         for i, focus_region_coord_level_pair in enumerate(batch):
@@ -437,28 +437,29 @@ if __name__ == "__main__":
     os.makedirs(save_dir, exist_ok=True)
 
     start_time = time.time()
-    dzsave_h5(slide_path, save_dir)
+    # dzsave_h5(slide_path, save_dir)
     dzsave_h5_tmp_dir = os.path.join(save_dir, "test")
     dzsave_time = time.time() - start_time
 
     start_time = time.time()
     # rysnc the tmp h5 files to the save_dir
-    os.system(f'sudo rsync -av "{dzsave_h5_tmp_dir}" "{network_location}"')
+    # os.system(f'sudo rsync -av "{dzsave_h5_tmp_dir}" "{network_location}"')
     rsync_time = time.time() - start_time
 
     all_tmp_files = os.listdir(dzsave_h5_tmp_dir)
     start_time = time.time()
     num_to_load = 1000
-    for i in range(num_to_load):
+    for i in tqdm(range(num_to_load), desc="Loading random patches..."):
         random_file = random.choice(all_tmp_files)
 
         # open the h5 file on the network location
         with h5py.File(os.path.join(network_location, "test", random_file), "r") as f:
+            level = random_file.split("_")[0]
             # load a random column from the h5 file
-            column = random.randint(0, f["17"].shape[1] - 1)
+            column = random.randint(0, f[level].shape[1] - 1)
 
             # load the image
-            image = f["17"][0, column]
+            image = f[level][0, column]
 
             # convert the image to a PIL image
             pil_image = Image.fromarray(image)
