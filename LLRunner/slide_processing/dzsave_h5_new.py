@@ -143,7 +143,9 @@ def combine_tmp_h5_files(tmp_h5_dir, h5_save_path):
 
                     for row in range(level_image_height // patch_size):
                         for column in range(level_image_width // patch_size):
-                            f[f"{level}"][row, column] = tmp_f[f"{level}"][0, column] # TODO check the integrity of the images before and after added to the final h5 file
+                            f[f"{level}"][row, column] = tmp_f[f"{level}"][
+                                0, column
+                            ]  # TODO check the integrity of the images before and after added to the final h5 file
                             # TODO also check the statistical distribution of pixels in the final h5 file at each level
 
 
@@ -426,20 +428,27 @@ if __name__ == "__main__":
 
     dzsave_h5_path = "/media/hdd3/neo/test_dzsave_h5/test.h5"
 
-    # # print all the keys in the h5 file
-    # print("Keys in the h5 file:")
-    # with h5py.File(dzsave_h5_path, "r") as f:
-    #     for key in f.keys():
-    #         print(key)
+    # print all the keys in the h5 file
+    print("Keys in the h5 file:")
+    with h5py.File(dzsave_h5_path, "r") as f:
+        for key in f.keys():
+            print(key)
 
-    # # print the shape of each level 0 ... 18
-    # for i in range(18):
-    #     with h5py.File(dzsave_h5_path, "r") as f:
-    #         print(f"Shape of level {i}: {f[str(i)].shape}")
+    # print the shape of each level 0 ... 18
+    for i in range(18):
+        with h5py.File(dzsave_h5_path, "r") as f:
+            print(f"Shape of level {i}: {f[str(i)].shape}")
 
-    # # get the image at (101,206) at level 18
-    # with h5py.File(dzsave_h5_path, "r") as f:
-    #     image = f["17"][101, 206]
-    #     # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
-    #     Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
-    #     print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
+    # get the image at (101,206) at level 18
+    with h5py.File(dzsave_h5_path, "r") as f:
+        image = f["17"][101, 206]
+        # save the image to "/media/hdd3/neo/test_dzsave_h5/test.jpg"
+        Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test.jpg")
+        print("Image saved to /media/hdd3/neo/test_dzsave_h5/test.jpg")
+
+    # retrieve the same image from the tmp h5 file
+    with h5py.File("/media/hdd3/neo/test_dzsave_h5/17_101.h5", "r") as f:
+        image = f["17"][0, 206]
+        # save the image to "/media/hdd3/neo/test_dzsave_h5/test_tmp.jpg"
+        Image.fromarray(image).save("/media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
+        print("Image saved to /media/hdd3/neo/test_dzsave_h5/test_tmp.jpg")
