@@ -799,5 +799,12 @@ def initialize_dzsave_dir():
 
 
 if __name__ == "__main__":
+    import time
+
     initialize_dzsave_dir()
+
+    start_time = time.time()
     dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=2048)
+    dzsave_time = time.time() - start_time
+
+    print(f"dzsave_time: {dzsave_time}")
