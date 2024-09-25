@@ -160,7 +160,7 @@ def crop_wsi_images_all_levels(
     region_cropping_batch_size,
     crop_size=256,
     verbose=True,
-    num_cpus=96,
+    num_cpus=32,
 ):
     num_croppers = num_cpus  # Number of croppers is the same as num_cpus
 
@@ -253,7 +253,7 @@ def dzsave(
     save_dir,
     folder_name,
     tile_size=256,
-    num_cpus=96,
+    num_cpus=32,
     region_cropping_batch_size=256,
 ):
     """
@@ -389,7 +389,7 @@ if __name__ == "__main__":
     initialize_dzsave_dir()
 
     start_time = time.time()
-    dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=256)
+    dzsave_wsi_name("H24-3562;S15;MSK1 - 2024-05-20 20.38.51.ndpi", tile_size=2048)
     dzsave_time = time.time() - start_time
 
     print(f"dzsave_time: {dzsave_time}")
