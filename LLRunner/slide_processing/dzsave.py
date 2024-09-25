@@ -142,12 +142,17 @@ class WSICropManager:
 
 
 def initialize_h5py_file(h5_path, patch_size=256):
-    """ Create an h5py file with databases with names 0-18, at h5_path, raise an error if the file already exists."""
+    """Create an h5py file with databases with names 0-18, at h5_path, raise an error if the file already exists."""
     assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
 
     with h5py.File(h5_path, "w") as f:
         for i in range(19):
-            f.create_dataset(str(i), (0, patch_size, patch_size, 3), maxshape=(None, patch_size, patch_size, 3))
+            f.create_dataset(
+                str(i),
+                (0, patch_size, patch_size, 3),
+                maxshape=(None, patch_size, patch_size, 3),
+            )
+
 
 def crop_wsi_images_all_levels(
     wsi_path,
@@ -383,7 +388,7 @@ if __name__ == "__main__":
         wsi_path="/media/hdd3/neo/monocytic_aml/AML_1.ndpi",
         save_dir="/media/hdd3/neo/monocytic_aml/AML_1",
         folder_name="AML_1",
-        tile_size=256,
+        tile_size=2048,
         num_cpus=96,
         region_cropping_batch_size=256,
     )
