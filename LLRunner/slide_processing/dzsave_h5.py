@@ -800,5 +800,4 @@ def initialize_dzsave_dir():
 
 if __name__ == "__main__":
     initialize_dzsave_dir()
-
-    dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=256)
+    dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=2048)
