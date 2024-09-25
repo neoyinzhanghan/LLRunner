@@ -379,5 +379,11 @@ def initialize_dzsave_dir():
 
 
 if __name__ == "__main__":
-    initialize_dzsave_dir()
-    initialize_h5py_file(os.path.join(dzsave_dir, "test.h5"), patch_size=256)
+    dzsave(
+        wsi_path="/media/hdd3/neo/monocytic_aml/AML_1.ndpi",
+        save_dir="/media/hdd3/neo/monocytic_aml/AML_1",
+        folder_name="AML_1",
+        tile_size=256,
+        num_cpus=96,
+        region_cropping_batch_size=256,
+    )

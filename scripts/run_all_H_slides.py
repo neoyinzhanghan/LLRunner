@@ -12,8 +12,6 @@ def identity_filter(pipeline_history_df):
 
 note = "First all-slide BMA-diff and PBS-diff processing with specimen classification. Begin on 2024-09-16."
 
-delete_results_from_note(note=note, ask_for_confirmation=False)
-
 main_concurrent_processing(
     wsi_name_filter_func=start_with_H_filter,
     processing_filter_func=identity_filter,

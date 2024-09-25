@@ -223,6 +223,55 @@ def add_bma_diff_metadata_row(wsi_name):
     update_bma_diff_metadata(metadata_row_dct, overwrite=True)
 
 
+def initialize_all_metadata(wsi_name_filter_func, overwrite=False):
+    """Look for all the slides in the slide_source_dir and update the slide metadata file.
+    wsi_name_filter_func is a function that takes in a wsi_name and returns True if the slide should be updated in the metadata file.
+    """
+
+    with SSHOS() as sshos:
+        print("Looking for files in the slide source directory.")
+
+        # first get the list of all the slides in the slide_source_dir
+        files = sshos.listdir(slide_source_dir)
+        print("Looking for WSIs amongst the files.")
+
+        # only keep the slides such that the extension is in "allowed_extensions" and is a file
+        wsi_names = [f for f in files if Path(f).suffix in allowed_extensions]
+
+        print("Looking for slides that satisfy the specified conditions.")
+
+        # only keep the slides such that wsi_name_filter_func(wsi_name) is True
+        wsi_names = [f for f in wsi_names if wsi_name_filter_func(f)]
+
+        print(
+            f"{len(wsi_names)} slides are found satisfying the specified conditions. Beginning metadata pooling and update."
+        )
+
+        missing_Dx, missing_sub_Dx, missing_part_description = 0, 0, 0
+
+        for wsi_name in tqdm(wsi_names, desc="Pooling and updating metadata"):
+            metadata_row_dct = get_slide_metadata_row(wsi_name)
+            update_slide_metadata(metadata_row_dct, overwrite=overwrite)
+
+            if metadata_row_dct["reported_BMA"]:
+                bma_metadata_row_dct = get_bma_diff_metadata_row(wsi_name)
+                update_bma_diff_metadata(
+                    metadata_row_dct=bma_metadata_row_dct, overwrite=overwrite
+                )
+
+            if metadata_row_dct["Dx"] == "NA":
+                missing_Dx += 1
+            if metadata_row_dct["sub_Dx"] == "NA":
+                missing_sub_Dx += 1
+            if metadata_row_dct["part_description"] == "NA":
+                missing_part_description += 1
+
+        print(f"Finished updating metadata for {len(wsi_names)} slides.")
+        print(f"Number of Slides Missing Dx: {missing_Dx}")
+        print(f"Number of Slides Missing Sub Dx: {missing_sub_Dx}")
+        print(f"Number of Slides Missing Part Description: {missing_part_description}")
+
+
 def initialize_reported_bma_metadata(wsi_name_filter_func, overwrite=False):
     """Look for all the slides in the slide_source_dir and update the slide metadata file.
     wsi_name_filter_func is a function that takes in a wsi_name and returns True if the slide should be updated in the metadata file.
