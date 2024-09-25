@@ -397,7 +397,7 @@ if __name__ == "__main__":
     start_time = time.time()
     dzsave_folder = "/media/hdd3/neo/dzsave_dir/H22-9925;S15;MSK8 - 2023-06-12 18.11.56"
     # run a sudo rsync of this folder to /dmpisilon_tools/neo
-    os.system(f"rsync -avz '{dzsave_folder}' /dmpisilon_tools/neo")
+    os.system(f"sudo rsync -avz '{dzsave_folder}' /dmpisilon_tools/neo")
     rsync_time = time.time() - start_time
 
     print(f"rsync_time: {rsync_time}")
