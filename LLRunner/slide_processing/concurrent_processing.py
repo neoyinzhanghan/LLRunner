@@ -123,7 +123,7 @@ def main_concurrent_processing(
     )
 
     slides_batches = create_list_of_batches_from_list(
-        wsi_names_to_run_union, slide_batch_size
+        wsi_names_to_run_diff, slide_batch_size
     )
 
     for i, slide_batch in tqdm(
