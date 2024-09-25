@@ -384,11 +384,12 @@ def initialize_dzsave_dir():
 
 
 if __name__ == "__main__":
-    dzsave(
-        wsi_path="/media/hdd3/neo/monocytic_aml/AML_1.ndpi",
-        save_dir="/media/hdd3/neo/monocytic_aml/AML_1",
-        folder_name="AML_1",
-        tile_size=2048,
-        num_cpus=96,
-        region_cropping_batch_size=256,
-    )
+    import time
+
+    initialize_dzsave_dir()
+
+    start_time = time.time()
+    dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=2048)
+    dzsave_time = time.time() - start_time
+
+    print(f"dzsave_time: {dzsave_time}")
