@@ -389,7 +389,7 @@ if __name__ == "__main__":
     initialize_dzsave_dir()
 
     start_time = time.time()
-    dzsave_wsi_name("H24-3562;S15;MSK1 - 2024-05-20 20.38.51.ndpi", tile_size=2048)
+    dzsave_wsi_name("H24-3562;S15;MSK1 - 2024-05-20 20.38.51.ndpi", tile_size=256)
     dzsave_time = time.time() - start_time
 
     print(f"dzsave_time: {dzsave_time}")
