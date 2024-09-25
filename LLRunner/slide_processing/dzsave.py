@@ -386,10 +386,18 @@ def initialize_dzsave_dir():
 if __name__ == "__main__":
     import time
 
-    initialize_dzsave_dir()
+    # initialize_dzsave_dir()
+
+    # start_time = time.time()
+    # dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=2048)
+    # dzsave_time = time.time() - start_time
+
+    # print(f"dzsave_time: {dzsave_time}")
 
     start_time = time.time()
-    dzsave_wsi_name("H22-9925;S15;MSK8 - 2023-06-12 18.11.56.ndpi", tile_size=2048)
-    dzsave_time = time.time() - start_time
+    dzsave_folder = "/media/hdd3/neo/dzsave_dir/H22-9925;S15;MSK8 - 2023-06-12 18.11.56"
+    # run a sudo rsync of this folder to /dmpisilon_tools/neo
+    os.system(f"rsync -avz '{dzsave_folder}' /dmpisilon_tools/neo")
+    rsync_time = time.time() - start_time
 
-    print(f"dzsave_time: {dzsave_time}")
+    print(f"rsync_time: {rsync_time}")
