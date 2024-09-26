@@ -356,7 +356,7 @@ def dzsave_h5(
     save_dir,
     h5_name="test",
     tile_size=256,
-    num_cpus=96,
+    num_cpus=8,
 ):
 
     ray.shutdown()
