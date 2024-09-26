@@ -443,7 +443,7 @@ if __name__ == "__main__":
     import time
     import random
 
-    # os.makedirs(save_dir, exist_ok=True)
+    os.makedirs(save_dir, exist_ok=True)
 
     start_time = time.time()
     dzsave_h5(slide_path, save_dir)
