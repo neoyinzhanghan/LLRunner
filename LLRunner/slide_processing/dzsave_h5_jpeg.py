@@ -50,9 +50,9 @@ def initialize_h5py_file(h5_path, batch_width, level, patch_size=256):
     with h5py.File(h5_path, "w") as f:
         # Create dataset with shape (num_tile_rows, num_tile_columns)
 
-        dt = h5py.string_dtype(
-            encoding="utf-8"
-        )  # you want a flexible string length dataset
+        dt = h5py.special_dtype(
+            vlen=np.dtype("uint8")
+        )
 
         f.create_dataset(
             str(level),
