@@ -23,6 +23,7 @@ def image_to_jpeg_string(image):
 
 def jpeg_string_to_image(jpeg_string):
     # Create a BytesIO object from the JPEG string (byte data)
+    jpeg_string = bytes(jpeg_string)
     buffer = io.BytesIO(jpeg_string)
 
     # Open the image from the buffer
@@ -83,9 +84,9 @@ def initialize_final_h5py_file(
             level_image_height = image_height // (2 ** (num_levels - level))
             level_image_width = image_width // (2 ** (num_levels - level))
 
-            dt = h5py.string_dtype(
-                encoding="utf-8"
-            )  # you want a flexible string length dataset
+            dt = h5py.special_dtype(
+                vlen=np.dtype("uint8")
+            )  # Variable-length binary data
 
             f.create_dataset(
                 str(level),
@@ -176,8 +177,10 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
     # apply jpeg compression to the image
     patch_string = image_to_jpeg_string(patch)
 
+    patch_raw_bytes = np.void(patch_string)
+
     with h5py.File(h5_path, "a") as f:
-        f[f"{level}"][row, column] = patch_string
+        f[f"{level}"][row, column] = patch_raw_bytes
 
 
 @ray.remote
