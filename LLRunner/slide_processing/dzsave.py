@@ -373,21 +373,21 @@ def initialize_dzsave_dir():
 if __name__ == "__main__":
     import time
 
-    start_time = time.time()
-    print("Rsyncing slide")
-    original_slide_path = (
-        "/pesgisipth/NDPI/H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
-    )
+    # start_time = time.time()
+    # print("Rsyncing slide")
+    # original_slide_path = (
+    #     "/pesgisipth/NDPI/H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    # )
 
-    # run sudo rsync -av the slide from original_slide_path to slide_path
-    save_path = "/media/hdd3/neo/"
+    # # run sudo rsync -av the slide from original_slide_path to slide_path
+    # save_path = "/media/hdd3/neo/"
 
     slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
-    slide_path = os.path.join(save_path, slide_name)
+    # slide_path = os.path.join(save_path, slide_name)
 
-    # copy the slide from original_slide_path to slide_path
-    os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
-    rsync_slide_time = time.time() - start_time
+    # # copy the slide from original_slide_path to slide_path
+    # os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
+    # rsync_slide_time = time.time() - start_time
 
     start_time = time.time()
     print("DZSaving slide")
@@ -399,5 +399,4 @@ if __name__ == "__main__":
 
     dzsave_time = time.time() - start_time
 
-    print(f"Rsync slide time: {rsync_slide_time}")
     print(f"DZSave time: {dzsave_time}")
