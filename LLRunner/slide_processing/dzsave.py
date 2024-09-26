@@ -141,19 +141,6 @@ class WSICropManager:
         return len(focus_region_coords_level_pairs)
 
 
-def initialize_h5py_file(h5_path, patch_size=256):
-    """Create an h5py file with databases with names 0-18, at h5_path, raise an error if the file already exists."""
-    assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
-
-    with h5py.File(h5_path, "w") as f:
-        for i in range(19):
-            f.create_dataset(
-                str(i),
-                (0, patch_size, patch_size, 3),
-                maxshape=(None, patch_size, patch_size, 3),
-            )
-
-
 def crop_wsi_images_all_levels(
     wsi_path,
     save_dir,
@@ -386,18 +373,31 @@ def initialize_dzsave_dir():
 if __name__ == "__main__":
     import time
 
-    initialize_dzsave_dir()
+    start_time = time.time()
+    print("Rsyncing slide")
+    original_slide_path = (
+        "/pesgisipth/NDPI/H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    )
+
+    # run sudo rsync -av the slide from original_slide_path to slide_path
+    save_path = "/media/hdd3/neo/"
+
+    slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    slide_path = os.path.join(save_path, slide_name)
+
+    # copy the slide from original_slide_path to slide_path
+    os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
+    rsync_slide_time = time.time() - start_time
 
     start_time = time.time()
-    dzsave_wsi_name("H24-3562;S15;MSK1 - 2024-05-20 20.38.51.ndpi", tile_size=256)
+    print("DZSaving slide")
+    initialize_dzsave_dir()
+    dzsave_wsi_name(
+        slide_name,
+        tile_size=2048,
+    )
+
     dzsave_time = time.time() - start_time
 
-    print(f"dzsave_time: {dzsave_time}")
-
-    # start_time = time.time()
-    # dzsave_folder = "/media/hdd3/neo/dzsave_dir/H22-9925;S15;MSK8 - 2023-06-12 18.11.56"
-    # # run a sudo rsync of this folder to /dmpisilon_tools/neo
-    # os.system(f"sudo rsync -avz '{dzsave_folder}' /dmpisilon_tools/neo")
-    # rsync_time = time.time() - start_time
-
-    # print(f"rsync_time: {rsync_time}")
+    print(f"Rsync slide time: {rsync_slide_time}")
+    print(f"DZSave time: {dzsave_time}")
