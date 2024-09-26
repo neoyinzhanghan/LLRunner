@@ -170,6 +170,9 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
     Add a patch to an HDF5 file at the specified row and column at the dataste named str(level).
     Patch is a PIL image.
     """
+
+    # assert that the patch is a PIL image
+    assert isinstance(patch, Image.Image), "Error: patch is not a PIL image."
     # apply jpeg compression to the image
     patch_string = image_to_jpeg_string(patch)
 
@@ -269,7 +272,7 @@ class WSIH5CropManager:
             add_patch_to_h5py(
                 h5_path=tmp_h5_path,
                 level=level,
-                patch=np.array(image),
+                patch=image,
                 row=0,
                 column=i,
             )
