@@ -183,7 +183,7 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
         f[f"{level}"][row, column] = patch_raw_bytes
 
 
-@ray.remote
+@ray.remote(num_cpus=1)
 class WSIH5CropManager:
     """
     A class representing a manager that crops WSIs.
