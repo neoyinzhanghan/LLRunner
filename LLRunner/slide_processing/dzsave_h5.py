@@ -521,7 +521,7 @@ if __name__ == "__main__":
         print(f["18"].shape)
         # print(f["18"][0, 0])
         print(f["18"][10, 10])
-        jpeg_string = f["18"][10, 10]
+        jpeg_string = f["18"][1, 0]
 
         print(type(jpeg_string))
 
