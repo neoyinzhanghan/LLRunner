@@ -1,6 +1,7 @@
 import io
 import os
 import ray
+import time
 import h5py
 import base64
 import openslide
