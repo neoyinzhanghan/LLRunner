@@ -232,15 +232,16 @@ class WSICropManager:
 
             image = self.crop(focus_region_coord, level=level)
 
-            indices = (
+            indices_level = (
                 int(focus_region_coord[0] // crop_size),
                 int(focus_region_coord[1] // crop_size),
+                level,
             )
 
             jpeg_string = image_to_jpeg_string(image)
             jpeg_string = encode_image_to_base64(jpeg_string)
 
-            indices_to_jpeg_dict[indices] = jpeg_string
+            indices_to_jpeg_dict[indices_level] = jpeg_string
 
         return indices_to_jpeg_dict
 
@@ -296,9 +297,11 @@ def crop_wsi_images_all_levels(
                 try:
                     batch = ray.get(done_id)
 
-                    for indices, jpeg_string in batch.items():
+                    keys = list(batch.keys())
+                    for indices in keys:
                         # Save the jpeg_string to the h5 file
-                        level = 18 - batch[indices][1]
+                        jpeg_string = batch[indices]
+                        level = 18 - indices[2]
                         with h5py.File(h5_path, "a") as f:
                             f[str(level)][indices[0], indices[1]] = jpeg_string
 
