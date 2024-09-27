@@ -40,7 +40,7 @@ def initialize_final_h5py_file(h5_path, image_width, image_height, patch_size=25
         level_image_width = image_width
         level_image_height = image_height
 
-        dt = h5py.special_dtype(vlen=np.dtype("uint8"))  # Variable-length binary data
+        dt = h5py.special_dtype(vlen=bytes)
 
         f.create_dataset(
             str(level),
@@ -77,7 +77,7 @@ def tile_wsi(wsi_path, h5_path, tile_size=256):
 
             start_time = time.time()
             with h5py.File(h5_path, "a") as f:
-                jpeg_string = np.void(jpeg_string)
+                jpeg_string = bytes(jpeg_string)
                 f["0"][i // tile_size, j // tile_size] = jpeg_string
             writing_time += time.time() - start_time
 
