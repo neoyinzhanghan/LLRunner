@@ -77,6 +77,7 @@ def tile_wsi(wsi_path, h5_path, tile_size=256):
 
             start_time = time.time()
             with h5py.File(h5_path, "a") as f:
+                jpeg_string = np.void(jpeg_string)
                 f["0"][i // tile_size, j // tile_size] = jpeg_string
             writing_time += time.time() - start_time
 
