@@ -532,14 +532,16 @@ if __name__ == "__main__":
     if tile.mode != "RGB":
         tile = tile.convert("RGB")
 
-    jpeg_string = image_to_jpeg_string(tile)
-    print(f"jpeg_string: {jpeg_string}")
+    jpeg_string_old = image_to_jpeg_string(tile)
+    print(f"jpeg_string: {jpeg_string_old}")
 
-    jpeg_string = encode_image_to_base64(jpeg_string)
+    jpeg_string = encode_image_to_base64(jpeg_string_old)
     print(f"jpeg_string base 64: {jpeg_string}")
 
     jpeg_string = decode_image_from_base64(jpeg_string)
     print(f"jpeg_string base 64 decoded: {jpeg_string}")
+
+    assert jpeg_string == jpeg_string_old
 
     image = jpeg_string_to_image(jpeg_string)
     image.save("/media/hdd3/neo/my_test.jpeg")
