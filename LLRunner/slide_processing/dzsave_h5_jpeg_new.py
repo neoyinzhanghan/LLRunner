@@ -328,17 +328,19 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
     current_image = image
     for depth in range(10, -1, -1):
         # downsample the image by a factor of 2
-        current_image = current_image.resize(
-            (max(current_image.width // 2, 1), max(current_image.height // 2, 1))
+        current_image = image.resize(
+            (
+                max(image.width // 2 ** (10 - depth), 1),
+                max(image.height // 2 ** (10 - depth), 1),
+            )
         )
-
         # print("Range debugging")
         # print(len(range(0, current_image.height, tile_size)))
         # print(len(range(0, current_image.width, tile_size)))
 
         # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
-        for y in range(0, current_image.height, tile_size):
-            for x in range(0, current_image.width, tile_size):
+        for y in range(current_image.height // tile_size):
+            for x in range(current_image.width // tile_size):
                 # Calculate the right and bottom coordinates ensuring they are within the image boundaries
                 right = min(x + tile_size, current_image.width)
                 bottom = min(y + tile_size, current_image.height)
