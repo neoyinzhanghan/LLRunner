@@ -4,6 +4,8 @@ import time
 import h5py
 import openslide
 import pandas as pd
+import numpy as np
+from PIL import Image
 from pathlib import Path
 from tqdm import tqdm
 from LLRunner.config import dzsave_dir, dzsave_metadata_path, tmp_slide_dir
@@ -368,6 +370,19 @@ def initialize_dzsave_dir():
     if not os.path.exists(dzsave_metadata_path):
         with open(dzsave_metadata_path, "w") as f:
             f.write("wsi_name,tile_size,processing_time,datetime_processed,error\n")
+
+
+def retrieve_tile(dzsave_dir, level, x, y):
+    """
+    Retrieve a tile from the DZSave directory.
+    """
+
+    file_path = os.path.join(dzsave_dir, str(level), f"{x}_{y}.jpeg")
+
+    # open as a PIL image
+    tile = Image.open(file_path)
+
+    return tile
 
 
 if __name__ == "__main__":
