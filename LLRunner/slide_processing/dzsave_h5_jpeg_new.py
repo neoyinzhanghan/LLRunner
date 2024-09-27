@@ -428,6 +428,8 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
             f"UserWarningL: Error: {error} occurred while processing {wsi_name}. While continue on error is on, the error should not be ignored if it happens to too many slides."
         )
 
+        raise e
+
     processing_time = time.time() - starttime
     datetime_processed = time.strftime("%Y-%m-%d %H:%M:%S")
 
