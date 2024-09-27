@@ -518,8 +518,8 @@ if __name__ == "__main__":
 
     with h5py.File(h5_path, "r") as f:
         print(f.keys())
-        print(f["0"].shape)
-        
+        print(f["18"].shape)
+
     # slide_path = os.path.join(tmp_slide_dir, slide_name)
 
     # wsi = openslide.OpenSlide(slide_path)
