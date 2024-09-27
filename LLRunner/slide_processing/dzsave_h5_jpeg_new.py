@@ -233,8 +233,8 @@ class WSICropManager:
             image = self.crop(focus_region_coord, level=level)
 
             indices_level = (
-                int(focus_region_coord[0] // crop_size),
-                int(focus_region_coord[1] // crop_size),
+                focus_region_coord[0] // crop_size,
+                focus_region_coord[1] // crop_size,
                 level,
             )
 
