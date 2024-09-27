@@ -516,32 +516,33 @@ if __name__ == "__main__":
 
     h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 
-    # take tile 10,10 from level 18
-    # image = retrieve_tile_h5(h5_path, 18, 10, 10)
+    with open(h5_path, "r") as f:
+        print(f.keys())
+        print(f["18"].shape)
 
-    slide_path = os.path.join(tmp_slide_dir, slide_name)
+    # slide_path = os.path.join(tmp_slide_dir, slide_name)
 
-    wsi = openslide.OpenSlide(slide_path)
+    # wsi = openslide.OpenSlide(slide_path)
 
-    width, height = wsi.dimensions
+    # width, height = wsi.dimensions
 
-    # get a random tile from the slide
-    tile = wsi.read_region((0, 0), 18, (256, 256))
+    # # get a random tile from the slide
+    # tile = wsi.read_region((0, 0), 18, (256, 256))
 
-    # if RGBA then convert to RGB
-    if tile.mode != "RGB":
-        tile = tile.convert("RGB")
+    # # if RGBA then convert to RGB
+    # if tile.mode != "RGB":
+    #     tile = tile.convert("RGB")
 
-    jpeg_string_old = image_to_jpeg_string(tile)
-    print(f"jpeg_string: {jpeg_string_old}")
+    # jpeg_string_old = image_to_jpeg_string(tile)
+    # print(f"jpeg_string: {jpeg_string_old}")
 
-    jpeg_string = encode_image_to_base64(jpeg_string_old)
-    print(f"jpeg_string base 64: {jpeg_string}")
+    # jpeg_string = encode_image_to_base64(jpeg_string_old)
+    # print(f"jpeg_string base 64: {jpeg_string}")
 
-    jpeg_string = decode_image_from_base64(jpeg_string)
-    print(f"jpeg_string base 64 decoded: {jpeg_string}")
+    # jpeg_string = decode_image_from_base64(jpeg_string)
+    # print(f"jpeg_string base 64 decoded: {jpeg_string}")
 
-    assert jpeg_string == jpeg_string_old
+    # assert jpeg_string == jpeg_string_old
 
-    image = jpeg_string_to_image(jpeg_string)
-    print(image)
+    # image = jpeg_string_to_image(jpeg_string)
+    # print(image)
