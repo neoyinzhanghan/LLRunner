@@ -13,6 +13,17 @@ h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5
 dzsave_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53"
 
 example_img_dir = "/media/hdd3/neo/example_img_dir"
+dzsave_metadata_path = os.path.join("/media/hdd3/neo/dzsave_dir", "dzsave_metadata.csv")
+
+
+def clear_metadata():
+    ## remove all rows but keep the header for the columns
+    with open(dzsave_metadata_path, "r") as f:
+        lines = f.readlines()
+
+    with open(dzsave_metadata_path, "w") as f:
+        f.write(lines[0])
+
 
 os.makedirs(dzsave_dir, exist_ok=True)
 os.makedirs(os.path.join(dzsave_dir, "h5"), exist_ok=True)
@@ -24,6 +35,7 @@ tile_size = 2048
 
 start_time = time.time()
 print("DZSaving slide as H5...")
+clear_metadata()
 dzsave_wsi_name_h5(
     slide_name,
     tile_size=2048,
@@ -38,6 +50,7 @@ print(f"DZSave H5 time: {dzsave_h5_time}")
 
 start_time = time.time()
 print("DZSaving slide as DZI...")
+clear_metadata()
 dzsave_wsi_name(
     slide_name,
     tile_size=2048,
