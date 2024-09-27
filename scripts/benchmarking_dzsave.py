@@ -1,8 +1,10 @@
+import os
 import time
 import openslide
+import numpy as np
 from LLRunner.config import tmp_slide_dir
-from LLRunner.slide_processing.dzsave import *
-from LLRunner.slide_processing.dzsave_h5 import *
+from LLRunner.slide_processing.dzsave import dzsave_wsi_name, retrieve_tile
+from LLRunner.slide_processing.dzsave_h5 import dzsave_wsi_name_h5, retrieve_tile_h5
 
 slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
 isilon_dir = "/dmpisilon_tools/neo/dzsave_bm"
@@ -30,7 +32,7 @@ dzsave_wsi_name_h5(
 
 dzsave_h5_time = time.time() - start_time
 
-print(f"DZSave H5 time: {dzsave_time}")
+print(f"DZSave H5 time: {dzsave_h5_time}")
 
 
 start_time = time.time()
