@@ -20,11 +20,14 @@ def image_to_jpeg_string(image):
 
     return jpeg_string
 
+
 def encode_image_to_base64(jpeg_string):
     return base64.b64encode(jpeg_string)
 
+
 def decode_image_from_base64(encoded_string):
     return base64.b64decode(encoded_string)
+
 
 def initialize_final_h5py_file(h5_path, image_width, image_height, patch_size=256):
     """
@@ -84,7 +87,6 @@ def tile_wsi(wsi_path, h5_path, tile_size=256):
             start_time = time.time()
             with h5py.File(h5_path, "a") as f:
                 jpeg_string = encode_image_to_base64(jpeg_string)
-                print(jpeg_string)
                 f["0"][i // tile_size, j // tile_size] = jpeg_string
             writing_time += time.time() - start_time
 
