@@ -394,7 +394,7 @@ def dzsave(
     return time_taken
 
 
-def dzsave_wsi_name(wsi_name, tile_size=256):
+def dzsave_wsi_name(wsi_name, tile_size=256, num_cpus=32):
     """Check if the wsi_name is in the dzsave_metadata_path. If not then create a subfolder in dzsave_dir with the wsi_name with out the extention
     The in that folder save the wsi_name_files folder and the wsi_name.dzi file.
     Add the processing time and datetime processed to the dzsave_metadata_path.
@@ -424,7 +424,7 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
             wsi_path=wsi_path,
             h5_path=h5_path,
             tile_size=tile_size,
-            num_cpus=128,
+            num_cpus=num_cpus,
             region_cropping_batch_size=256,
         )
         error = None
@@ -492,6 +492,7 @@ if __name__ == "__main__":
     dzsave_wsi_name(
         slide_name,
         tile_size=256,
+        num_cpus=32,
     )
 
     dzsave_time = time.time() - start_time
