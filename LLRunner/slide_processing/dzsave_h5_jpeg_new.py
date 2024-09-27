@@ -357,7 +357,6 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
 def dzsave(
     wsi_path,
     h5_path,
-    folder_name,
     tile_size=256,
     num_cpus=32,
     region_cropping_batch_size=256,
