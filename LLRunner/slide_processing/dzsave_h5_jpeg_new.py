@@ -89,7 +89,9 @@ def initialize_final_h5py_file(
     Raises:
         AssertionError: If the file already exists at h5_path.
     """
-    assert not os.path.exists(h5_path), f"Error: {h5_path} already exists."
+    if os.path.exists(h5_path):
+        # delete the file
+        os.remove(h5_path)
 
     # Create the HDF5 file and dataset
     with h5py.File(h5_path, "w") as f:
