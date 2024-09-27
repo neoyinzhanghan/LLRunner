@@ -475,40 +475,47 @@ def initialize_dzsave_dir():
 def retrieve_tile_h5(h5_path, level, row, col):
     with h5py.File(h5_path, "r") as f:
         jpeg_string = f[str(level)][row, col]
+        print(jpeg_string)
         jpeg_string = decode_image_from_base64(jpeg_string)
+        print(jpeg_string)
         image = jpeg_string_to_image(jpeg_string)
         return image
 
 
 if __name__ == "__main__":
-    import time
+    # import time
+
+    # # start_time = time.time()
+    # # print("Rsyncing slide")
+    # # original_slide_path = (
+    # #     "/pesgisipth/NDPI/H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    # # )
+
+    # # # run sudo rsync -av the slide from original_slide_path to slide_path
+    # # save_path = "/media/hdd3/neo/"
+
+    # slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    # # slide_path = os.path.join(save_path, slide_name)
+
+    # # # copy the slide from original_slide_path to slide_path
+    # # os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
+    # # rsync_slide_time = time.time() - start_time
 
     # start_time = time.time()
-    # print("Rsyncing slide")
-    # original_slide_path = (
-    #     "/pesgisipth/NDPI/H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    # print("DZSaving slide")
+    # initialize_dzsave_dir()
+    # dzsave_wsi_name_h5(
+    #     slide_name,
+    #     tile_size=256,
+    #     num_cpus=128,
+    #     region_cropping_batch_size=2048,
     # )
 
-    # # run sudo rsync -av the slide from original_slide_path to slide_path
-    # save_path = "/media/hdd3/neo/"
+    # dzsave_time = time.time() - start_time
 
-    slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
-    # slide_path = os.path.join(save_path, slide_name)
+    # print(f"DZSave time: {dzsave_time}")
 
-    # # copy the slide from original_slide_path to slide_path
-    # os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
-    # rsync_slide_time = time.time() - start_time
+    h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 
-    start_time = time.time()
-    print("DZSaving slide")
-    initialize_dzsave_dir()
-    dzsave_wsi_name_h5(
-        slide_name,
-        tile_size=256,
-        num_cpus=128,
-        region_cropping_batch_size=2048,
-    )
-
-    dzsave_time = time.time() - start_time
-
-    print(f"DZSave time: {dzsave_time}")
+    # take tile 10,10 from level 18
+    image = retrieve_tile_h5(h5_path, 18, 10, 10)
