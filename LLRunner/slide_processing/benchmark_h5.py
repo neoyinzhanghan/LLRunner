@@ -89,6 +89,10 @@ def tile_wsi(wsi_path, h5_path, tile_size=256):
 if __name__ == "__main__":
     wsi_path = "/media/hdd3/neo/BMA_AML/H19-3767;S10;MSKG - 2023-09-05 16.27.28.ndpi"
     h5_path = "/media/hdd3/neo/test.h5"
+
+    # if h5_path already exists, delete it
+    if os.path.exists(h5_path):
+        os.remove(h5_path)
     wsi = openslide.OpenSlide(wsi_path)
     image_width, image_height = wsi.dimensions
     initialize_final_h5py_file(h5_path, image_width, image_height)
