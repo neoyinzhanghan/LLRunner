@@ -544,4 +544,4 @@ if __name__ == "__main__":
     assert jpeg_string == jpeg_string_old
 
     image = jpeg_string_to_image(jpeg_string)
-    image.save("/media/hdd3/neo/my_test.jpeg")
+    print(image)
