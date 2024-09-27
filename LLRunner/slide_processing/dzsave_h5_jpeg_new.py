@@ -363,8 +363,6 @@ def dzsave(
 ):
     """
     Create a DeepZoom image pyramid from a WSI.
-    Save the dz folder structure at save_dir/folder_name_files
-    Save the .dzi file at save_dir/folder_name.dzi
     """
 
     wsi = openslide.OpenSlide(wsi_path)
@@ -412,15 +410,12 @@ def dzsave_wsi_name(wsi_name, tile_size=256):
         patch_size=tile_size,
     )
 
-    folder_name = wsi_name_no_ext
-
     starttime = time.time()
 
     try:
         dzsave(
             wsi_path=wsi_path,
             h5_path=h5_path,
-            folder_name=folder_name,
             tile_size=tile_size,
             num_cpus=128,
             region_cropping_batch_size=256,
