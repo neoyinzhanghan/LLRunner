@@ -228,24 +228,25 @@ class WSICropManager:
     ):
         """Save a list of focus regions."""
 
-        indices_to_jpeg_dict = {}
+        indices_to_jpeg = []
         for focus_region_coord_level_pair in focus_region_coords_level_pairs:
             focus_region_coord, level = focus_region_coord_level_pair
 
             image = self.crop(focus_region_coord, level=level)
 
-            indices_level = (
-                focus_region_coord[0] // crop_size,
-                focus_region_coord[1] // crop_size,
-                level,
-            )
-
             jpeg_string = image_to_jpeg_string(image)
             jpeg_string = encode_image_to_base64(jpeg_string)
 
-            indices_to_jpeg_dict[indices_level] = jpeg_string
+            indices_level_jpeg = (
+                focus_region_coord[0] // crop_size,
+                focus_region_coord[1] // crop_size,
+                level,
+                jpeg_string,
+            )
 
-        return indices_to_jpeg_dict
+            indices_to_jpeg.append(indices_level_jpeg)
+
+        return indices_to_jpeg
 
 
 def crop_wsi_images_all_levels(
@@ -298,16 +299,16 @@ def crop_wsi_images_all_levels(
             for done_id in done_ids:
                 try:
                     batch = ray.get(done_id)
-
-                    keys = list(batch.keys())
-                    for indices in keys:
+                    for indices_jpeg in batch:
                         # Save the jpeg_string to the h5 file
+                        indices = indices_jpeg[:3]
+                        jpeg_string = indices_jpeg[3]
                         jpeg_string = batch[indices]
                         level = 18 - indices[2]
                         with h5py.File(h5_path, "a") as f:
                             f[str(level)][indices[0], indices[1]] = jpeg_string
 
-                    pbar.update(len(keys))
+                    pbar.update(len(batch))
 
                 except ray.exceptions.RayTaskError as e:
                     print(f"Task for batch {tasks[done_id]} failed with error: {e}")
