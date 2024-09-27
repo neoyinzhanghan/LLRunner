@@ -31,12 +31,14 @@ def image_to_jpeg_string(image):
 
 
 def jpeg_string_to_image(jpeg_string):
-    # Create a BytesIO object from the JPEG string (byte data)
-    jpeg_string = bytes(jpeg_string)
+    # Create an in-memory bytes buffer from the byte string
     buffer = io.BytesIO(jpeg_string)
 
-    # Open the image from the buffer
-    image = Image.open(buffer)
+    try:
+        # Open the image from the buffer
+        image = Image.open(buffer)
+    finally:
+        buffer.close()  # Explicitly close the buffer to free memory
 
     return image
 
