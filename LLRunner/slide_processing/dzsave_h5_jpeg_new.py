@@ -154,7 +154,7 @@ class WSICropManager:
 
     """
 
-    def __init__(self, wsi_path, h5_path) -> None:
+    def __init__(self, wsi_path) -> None:
         self.wsi_path = wsi_path
         self.wsi = None
 
