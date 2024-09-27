@@ -95,8 +95,8 @@ def initialize_final_h5py_file(
     with h5py.File(h5_path, "w") as f:
         # Create dataset with shape (num_tile_rows, num_tile_columns, patch_size, patch_size, 3)
         for level in range(num_levels + 1):
-            level_image_height = image_height // (2 ** (num_levels - level))
-            level_image_width = image_width // (2 ** (num_levels - level))
+            level_image_height = image_height / (2 ** (num_levels - level))
+            level_image_width = image_width / (2 ** (num_levels - level))
 
             dt = h5py.special_dtype(vlen=bytes)
 
