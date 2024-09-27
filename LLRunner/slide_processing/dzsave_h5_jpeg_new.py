@@ -379,14 +379,14 @@ def dzsave(
 
     starttime = time.time()
 
-    # print("Cropping from NDPI")
-    # crop_wsi_images_all_levels(
-    #     wsi_path,
-    #     h5_path,
-    #     region_cropping_batch_size=region_cropping_batch_size,
-    #     crop_size=tile_size,
-    #     num_cpus=num_cpus,
-    # )
+    print("Cropping from NDPI")
+    crop_wsi_images_all_levels(
+        wsi_path,
+        h5_path,
+        region_cropping_batch_size=region_cropping_batch_size,
+        crop_size=tile_size,
+        num_cpus=num_cpus,
+    )
     print("Cropping Lower Resolution Levels")
     get_depth_from_0_to_11(wsi_path, h5_path, tile_size=tile_size)
     time_taken = time.time() - starttime
