@@ -310,8 +310,6 @@ def crop_wsi_images_all_levels(
                         with h5py.File(h5_path, "a") as f:
                             f[str(level)][indices[0], indices[1]] = jpeg_string
 
-                            print(jpeg_string)
-
                     pbar.update(len(batch))
 
                 except ray.exceptions.RayTaskError as e:
