@@ -1,4 +1,5 @@
 import openslide
+from LLRunner.config import tmp_slide_dir
 from LLRunner.slide_processing.dzsave import *
 from LLRunner.slide_processing.dzsave_h5 import *
 
@@ -14,7 +15,7 @@ os.makedirs(dzsave_dir, exist_ok=True)
 os.makedirs(os.path.join(dzsave_dir, "h5"), exist_ok=True)
 os.makedirs(os.path.join(dzsave_dir, "dzi"), exist_ok=True)
 
-wsi = openslide.OpenSlide(f"{isilon_dir}/{slide_name}")
+wsi = openslide.OpenSlide(os.path.join(tmp_slide_dir, slide_name))
 width, height = wsi.dimensions
 
 start_time = time.time()
