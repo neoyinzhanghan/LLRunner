@@ -11,15 +11,14 @@ import io
 def image_to_jpeg_string(image):
     # Create an in-memory bytes buffer
     buffer = io.BytesIO()
-
-    # Save the image in JPEG format to the buffer
-    image.save(buffer, format="JPEG")
-
-    # Get the byte data from the buffer
-    jpeg_string = buffer.getvalue()
-
+    try:
+        # Save the image in JPEG format to the buffer
+        image.save(buffer, format="JPEG")
+        jpeg_string = buffer.getvalue()  # Get the byte data
+    finally:
+        buffer.close()  # Explicitly close the buffer to free memory
+    
     return jpeg_string
-
 
 def jpeg_string_to_image(jpeg_string):
     # Create a BytesIO object from the JPEG string (byte data)
