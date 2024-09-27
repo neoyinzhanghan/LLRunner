@@ -1,6 +1,7 @@
 import os
 import ray
 import h5py
+import base64
 import openslide
 import numpy as np
 from tqdm import tqdm
@@ -17,8 +18,9 @@ def image_to_jpeg_string(image):
         jpeg_string = buffer.getvalue()  # Get the byte data
     finally:
         buffer.close()  # Explicitly close the buffer to free memory
-    
+
     return jpeg_string
+
 
 def jpeg_string_to_image(jpeg_string):
     # Create a BytesIO object from the JPEG string (byte data)
@@ -29,6 +31,14 @@ def jpeg_string_to_image(jpeg_string):
     image = Image.open(buffer)
 
     return image
+
+
+def encode_image_to_base64(jpeg_string):
+    return base64.b64encode(jpeg_string)
+
+
+def decode_image_from_base64(encoded_string):
+    return base64.b64decode(encoded_string)
 
 
 def initialize_h5py_file(h5_path, batch_width, level, patch_size=256):
@@ -49,9 +59,7 @@ def initialize_h5py_file(h5_path, batch_width, level, patch_size=256):
     with h5py.File(h5_path, "w") as f:
         # Create dataset with shape (num_tile_rows, num_tile_columns)
 
-        dt = h5py.special_dtype(
-            vlen=np.dtype("uint8")
-        )
+        dt = h5py.special_dtype(vlen=bytes)
 
         f.create_dataset(
             str(level),
@@ -83,9 +91,7 @@ def initialize_final_h5py_file(
             level_image_height = image_height // (2 ** (num_levels - level))
             level_image_width = image_width // (2 ** (num_levels - level))
 
-            dt = h5py.special_dtype(
-                vlen=np.dtype("uint8")
-            )  # Variable-length binary data
+            dt = h5py.special_dtype(vlen=bytes)
 
             f.create_dataset(
                 str(level),
@@ -176,7 +182,7 @@ def add_patch_to_h5py(h5_path, level, patch, row, column):
     # apply jpeg compression to the image
     patch_string = image_to_jpeg_string(patch)
 
-    patch_raw_bytes = np.void(patch_string)
+    patch_raw_bytes = encode_image_to_base64(patch_string)
 
     with h5py.File(h5_path, "a") as f:
         f[f"{level}"][row, column] = patch_raw_bytes
