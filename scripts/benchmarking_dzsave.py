@@ -1,3 +1,4 @@
+import time
 import openslide
 from LLRunner.config import tmp_slide_dir
 from LLRunner.slide_processing.dzsave import *
