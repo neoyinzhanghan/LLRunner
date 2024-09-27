@@ -20,6 +20,7 @@ os.makedirs(os.path.join(dzsave_dir, "dzi"), exist_ok=True)
 
 wsi = openslide.OpenSlide(os.path.join(tmp_slide_dir, slide_name))
 width, height = wsi.dimensions
+tile_size = 2048
 
 start_time = time.time()
 print("DZSaving slide as H5...")
@@ -74,8 +75,8 @@ for i in range(num_to_retrieve):
     downsample_factor = 2 ** (18 - random_level)
 
     # find a random x and y coordinate
-    random_x = np.random.randint(0, max(width // downsample_factor, 1))
-    random_y = np.random.randint(0, max(height // downsample_factor, 1))
+    random_x = np.random.randint(0, max((width / downsample_factor) // tile_size, 1))
+    random_y = np.random.randint(0, max((height / downsample_factor) // tile_size, 1))
 
     start_time = time.time()
     h5_tile = retrieve_tile_h5(h5_path, random_level, random_x, random_y)
