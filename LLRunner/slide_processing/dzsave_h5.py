@@ -516,10 +516,10 @@ if __name__ == "__main__":
 
     h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 
-    with open(h5_path, "r") as f:
+    with h5py.File(h5_path, "r") as f:
         print(f.keys())
-        print(f["18"].shape)
-
+        print(f["0"].shape)
+        
     # slide_path = os.path.join(tmp_slide_dir, slide_name)
 
     # wsi = openslide.OpenSlide(slide_path)
