@@ -105,8 +105,8 @@ def initialize_final_h5py_file(
             f.create_dataset(
                 str(level),
                 shape=(
-                    level_image_width // patch_size,
-                    level_image_height // patch_size,
+                    max(level_image_width // patch_size, 1),
+                    max(level_image_height // patch_size, 1),
                 ),
                 dtype=dt,
             )
