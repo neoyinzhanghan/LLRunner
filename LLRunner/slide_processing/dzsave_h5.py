@@ -337,10 +337,6 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
                 max(image.height // 2 ** (10 - depth), 1),
             )
         )
-        # print("Range debugging")
-        # print(len(range(0, current_image.height, tile_size)))
-        # print(len(range(0, current_image.width, tile_size)))
-
         # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
         for y in range(current_image.height // tile_size):
             for x in range(current_image.width // tile_size):
@@ -475,9 +471,7 @@ def initialize_dzsave_dir():
 def retrieve_tile_h5(h5_path, level, row, col):
     with h5py.File(h5_path, "r") as f:
         jpeg_string = f[str(level)][row, col]
-        print(jpeg_string)
         jpeg_string = decode_image_from_base64(jpeg_string)
-        print(jpeg_string)
         image = jpeg_string_to_image(jpeg_string)
         return image
 
