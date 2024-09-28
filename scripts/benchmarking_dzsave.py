@@ -32,29 +32,29 @@ os.makedirs(os.path.join(example_img_dir, "dzi"), exist_ok=True)
 
 wsi = openslide.OpenSlide(os.path.join(tmp_slide_dir, slide_name))
 width, height = wsi.dimensions
-tile_size = 2048
+tile_size = 256
 
 start_time = time.time()
-# print("DZSaving slide as H5...")
-# clear_metadata()
-# dzsave_wsi_name_h5(
-#     slide_name,
-#     tile_size=2048,
-#     num_cpus=128,
-#     region_cropping_batch_size=256,
-# )
+print("DZSaving slide as H5...")
+clear_metadata()
+dzsave_wsi_name_h5(
+    slide_name,
+    tile_size=2048,
+    num_cpus=128,
+    region_cropping_batch_size=256,
+)
 
 dzsave_h5_time = time.time() - start_time
 
 start_time = time.time()
-# print("DZSaving slide as DZI...")
-# clear_metadata()
-# dzsave_wsi_name(
-#     slide_name,
-#     tile_size=2048,
-#     num_cpus=128,
-#     region_cropping_batch_size=256,
-# )
+print("DZSaving slide as DZI...")
+clear_metadata()
+dzsave_wsi_name(
+    slide_name,
+    tile_size=2048,
+    num_cpus=128,
+    region_cropping_batch_size=256,
+)
 
 dzsave_time = time.time() - start_time
 
@@ -66,13 +66,13 @@ dzsave_dir_size = sum(
 )
 
 start_time = time.time()
-# print("Rsyncing h5 file to isilon...")
-# os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
+print("Rsyncing h5 file to isilon...")
+os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
 rsync_h5_time = time.time() - start_time
 
 start_time = time.time()
-# print("Rsyncing dzsave dir to isilon...")
-# os.system(f"sudo rsync -av '{dzsave_dir}' {isilon_dir}")
+print("Rsyncing dzsave dir to isilon...")
+os.system(f"sudo rsync -av '{dzsave_dir}' {isilon_dir}")
 rsync_dzsave_time = time.time() - start_time
 
 h5_size_mb = h5_file_size / 1e6
@@ -86,7 +86,7 @@ print(f"Rsync DZSave time: {rsync_dzsave_time} for {dzsave_size_mb} MB")
 
 retrieval_time_h5 = 0
 retrieval_time_dzsave = 0
-num_to_retrieve = 100
+num_to_retrieve = 1000
 
 for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     # find a random level from 0, 1, ... 18
@@ -108,16 +108,13 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     tile_path = retrieve_tile(
         "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files",
         random_level,
-
         random_x,
         random_y,
     )
     retrieval_time_dzsave += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/dzsave
-    tile_path.save(
-        os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}.jpeg")
-    )
+    tile_path.save(os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}.jpeg"))
 
 
 print(
