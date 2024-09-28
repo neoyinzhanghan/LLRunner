@@ -114,7 +114,7 @@ for i in range(num_to_retrieve):
 
     # save the tile as a jpeg image in the example_img_dir/dzsave
     tile_path.save(
-        os.path.join(example_img_dir, "dzsave", f"{random_x}_{random_y}.jpeg")
+        os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}.jpeg")
     )
 
 
