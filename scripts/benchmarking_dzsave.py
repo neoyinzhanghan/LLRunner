@@ -2,6 +2,7 @@ import os
 import time
 import openslide
 import numpy as np
+from tqdm import tqdm
 from LLRunner.config import tmp_slide_dir
 from LLRunner.slide_processing.dzsave import dzsave_wsi_name, retrieve_tile
 from LLRunner.slide_processing.dzsave_h5 import dzsave_wsi_name_h5, retrieve_tile_h5
@@ -87,7 +88,7 @@ retrieval_time_h5 = 0
 retrieval_time_dzsave = 0
 num_to_retrieve = 100
 
-for i in range(num_to_retrieve):
+for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     # find a random level from 0, 1, ... 18
     random_level = np.random.randint(14, 19)
     downsample_factor = 2 ** (18 - random_level)
