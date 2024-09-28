@@ -105,8 +105,7 @@ for i in range(num_to_retrieve):
 
     start_time = time.time()
     tile_path = retrieve_tile(
-        dzsave_dir,
-        "H19-5749;S10;MSKI - 2023-05-24 21.38.53_files",
+        "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files",
         random_level,
         random_x,
         random_y,
