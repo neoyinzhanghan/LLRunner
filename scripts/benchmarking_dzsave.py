@@ -89,7 +89,7 @@ num_to_retrieve = 100
 
 for i in range(num_to_retrieve):
     # find a random level from 0, 1, ... 18
-    random_level = np.random.randint(12, 19)
+    random_level = np.random.randint(14, 19)
     downsample_factor = 2 ** (18 - random_level)
 
     # find a random x and y coordinate
@@ -107,7 +107,7 @@ for i in range(num_to_retrieve):
     tile_path = retrieve_tile(
         "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files",
         random_level,
-        
+
         random_x,
         random_y,
     )
