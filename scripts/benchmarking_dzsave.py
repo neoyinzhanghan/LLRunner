@@ -89,7 +89,7 @@ num_to_retrieve = 100
 
 for i in range(num_to_retrieve):
     # find a random level from 0, 1, ... 18
-    random_level = np.random.randint(0, 19)
+    random_level = np.random.randint(11, 19)
     downsample_factor = 2 ** (18 - random_level)
 
     # find a random x and y coordinate
