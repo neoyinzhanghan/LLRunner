@@ -309,6 +309,9 @@ def crop_wsi_images_all_levels(
                         jpeg_string = indices_jpeg[3]
                         level = int(18 - indices[2])
                         with h5py.File(h5_path, "a") as f:
+                            if level == 18:
+                                print(f"Level: {level}")
+                                print(indices)
                             f[str(level)][indices[0], indices[1]] = jpeg_string
 
                     pbar.update(len(batch))
