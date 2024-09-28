@@ -275,7 +275,7 @@ def crop_wsi_images_all_levels(
         focus_regions_coordinates.extend(
             ray.get(
                 manager.get_tile_coordinate_level_pairs.remote(
-                    tile_size=crop_size, level=level
+                    tile_size=crop_size, wsi_level=level
                 )
             )
         )
