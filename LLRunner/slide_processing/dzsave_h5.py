@@ -526,11 +526,11 @@ if __name__ == "__main__":
 
     #     print(type(jpeg_string))
 
-    # slide_path = os.path.join(tmp_slide_dir, slide_name)
+    slide_path = os.path.join(tmp_slide_dir, slide_name)
 
-    # wsi = openslide.OpenSlide(slide_path)
+    wsi = openslide.OpenSlide(slide_path)
 
-    # width, height = wsi.dimensions
+    width, height = wsi.dimensions
 
     # get a random tile from the slide
     tile = wsi.read_region((0, 0), 18, (256, 256))
