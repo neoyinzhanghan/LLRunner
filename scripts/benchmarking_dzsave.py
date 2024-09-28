@@ -93,7 +93,7 @@ for i in range(num_to_retrieve):
     retrieval_time_h5 += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/h5
-    h5_tile.save(os.path.join(example_img_dir, "h5", f"{random_x}_{random_y}.jpeg"))
+    h5_tile.save(os.path.join(example_img_dir, "h5", str(random_level), f"{random_x}_{random_y}.jpeg"))
 
     start_time = time.time()
     tile_path = retrieve_tile(dzsave_dir, random_level, random_x, random_y)
