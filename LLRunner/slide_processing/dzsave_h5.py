@@ -474,12 +474,17 @@ def retrieve_tile_h5(h5_path, level, row, col):
             jpeg_string = f[str(level)][row, col]
             jpeg_string = decode_image_from_base64(jpeg_string)
             image = jpeg_string_to_image(jpeg_string)
-        
+
         except Exception as e:
-            print(f"Error: {e} occurred while retrieving tile at level: {level}, row: {row}, col: {col} from {h5_path}")
+            print(
+                f"Error: {e} occurred while retrieving tile at level: {level}, row: {row}, col: {col} from {h5_path}"
+            )
+            jpeg_string = f[str(level)][row, col]
+            print(f"jpeg_string: {jpeg_string}")
+            jpeg_string = decode_image_from_base64(jpeg_string)
+            print(f"jpeg_string base 64 decoded: {jpeg_string}")
             raise e
         return image
-        
 
 
 if __name__ == "__main__":
