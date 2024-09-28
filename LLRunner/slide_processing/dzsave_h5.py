@@ -305,7 +305,6 @@ def crop_wsi_images_all_levels(
                 try:
                     batch = ray.get(done_id)
                     for indices_jpeg in batch:
-                        print(indices_jpeg)
                         x, y, wsi_level, jpeg_string = indices_jpeg
                         level = int(18 - wsi_level)
                         with h5py.File(h5_path, "a") as f:
