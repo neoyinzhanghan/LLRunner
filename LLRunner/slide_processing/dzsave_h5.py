@@ -533,7 +533,7 @@ if __name__ == "__main__":
     width, height = wsi.dimensions
 
     # get a random tile from the slide
-    tile = wsi.read_region((0, 0), 18, (256, 256))
+    tile = wsi.read_region((40000, 40000), 18, (256, 256))
 
     # if RGBA then convert to RGB
     if tile.mode != "RGB":
