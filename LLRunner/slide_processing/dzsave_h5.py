@@ -504,19 +504,19 @@ if __name__ == "__main__":
     # # os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
     # # rsync_slide_time = time.time() - start_time
 
-    # start_time = time.time()
-    # print("DZSaving slide")
-    # initialize_dzsave_dir()
-    # dzsave_wsi_name_h5(
-    #     slide_name,
-    #     tile_size=256,
-    #     num_cpus=128,
-    #     region_cropping_batch_size=2048,
-    # )
+    start_time = time.time()
+    print("DZSaving slide")
+    initialize_dzsave_dir()
+    dzsave_wsi_name_h5(
+        slide_name,
+        tile_size=256,
+        num_cpus=128,
+        region_cropping_batch_size=2048,
+    )
 
-    # dzsave_time = time.time() - start_time
+    dzsave_time = time.time() - start_time
 
-    # print(f"DZSave time: {dzsave_time}")
+    print(f"DZSave time: {dzsave_time}")
 
     h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 
