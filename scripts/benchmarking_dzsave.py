@@ -25,9 +25,9 @@ def clear_metadata():
         f.write(lines[0])
 
 
-os.makedirs(dzsave_dir, exist_ok=True)
-os.makedirs(os.path.join(dzsave_dir, "h5"), exist_ok=True)
-os.makedirs(os.path.join(dzsave_dir, "dzi"), exist_ok=True)
+os.makedirs(example_img_dir, exist_ok=True)
+os.makedirs(os.path.join(example_img_dir, "h5"), exist_ok=True)
+os.makedirs(os.path.join(example_img_dir, "dzi"), exist_ok=True)
 
 wsi = openslide.OpenSlide(os.path.join(tmp_slide_dir, slide_name))
 width, height = wsi.dimensions
@@ -93,10 +93,16 @@ for i in range(num_to_retrieve):
     retrieval_time_h5 += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/h5
-    h5_tile.save(os.path.join(example_img_dir, "h5", str(random_level), f"{random_x}_{random_y}.jpeg"))
+    h5_tile.save(os.path.join(example_img_dir, "h5", f"{random_x}_{random_y}.jpeg"))
 
     start_time = time.time()
-    tile_path = retrieve_tile(dzsave_dir, random_level, random_x, random_y)
+    tile_path = retrieve_tile(
+        dzsave_dir,
+        "H19-5749;S10;MSKI - 2023-05-24 21.38.53_files",
+        random_level,
+        random_x,
+        random_y,
+    )
     retrieval_time_dzsave += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/dzsave
