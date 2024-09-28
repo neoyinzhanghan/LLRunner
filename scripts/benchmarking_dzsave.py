@@ -74,6 +74,14 @@ print("Rsyncing dzsave dir to isilon...")
 os.system(f"sudo rsync -av '{dzsave_dir}' {isilon_dir}")
 rsync_dzsave_time = time.time() - start_time
 
+h5_size_mb = h5_file_size / 1e6
+dzsave_size_mb = dzsave_dir_size / 1e6
+
+print(f"DZSave H5 time: {dzsave_h5_time}")
+print(f"DZSave time: {dzsave_time}")
+print(f"Rsync H5 time: {rsync_h5_time} for {h5_size_mb} MB")
+print(f"Rsync DZSave time: {rsync_dzsave_time} for {dzsave_size_mb} MB")
+
 
 retrieval_time_h5 = 0
 retrieval_time_dzsave = 0
@@ -111,13 +119,6 @@ for i in range(num_to_retrieve):
     )
 
 
-h5_size_mb = h5_file_size / 1e6
-dzsave_size_mb = dzsave_dir_size / 1e6
-
-print(f"DZSave H5 time: {dzsave_h5_time}")
-print(f"DZSave time: {dzsave_time}")
-print(f"Rsync H5 time: {rsync_h5_time} for {h5_size_mb} MB")
-print(f"Rsync DZSave time: {rsync_dzsave_time} for {dzsave_size_mb} MB")
 print(
     f"Retrieval H5 time on isilon: {retrieval_time_h5} for {num_to_retrieve} random tiles"
 )
