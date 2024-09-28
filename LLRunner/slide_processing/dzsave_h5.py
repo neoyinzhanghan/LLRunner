@@ -471,7 +471,9 @@ def initialize_dzsave_dir():
 def retrieve_tile_h5(h5_path, level, row, col):
     with h5py.File(h5_path, "r") as f:
         jpeg_string = f[str(level)][row, col]
+        print(jpeg_string)
         jpeg_string = decode_image_from_base64(jpeg_string)
+        print(jpeg_string)
         image = jpeg_string_to_image(jpeg_string)
         return image
 
