@@ -196,7 +196,8 @@ class WSICropManager:
         for y in range(height // tile_size):
             for x in range(width // tile_size):
                 # Ensure that the patch is within the image boundaries
-
+                y = y * tile_size
+                x = x * tile_size
                 coordinates.append(
                     (
                         (x, y, min(x + tile_size, width), min(y + tile_size, height)),
