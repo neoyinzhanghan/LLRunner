@@ -193,11 +193,11 @@ class WSICropManager:
         width, height = self.get_level_N_dimensions(wsi_level)
         coordinates = []
 
-        for y in range(height // tile_size):
-            for x in range(width // tile_size):
+        for y_ind in range(height // tile_size):
+            for x_ind in range(width // tile_size):
                 # Ensure that the patch is within the image boundaries
-                y = y * tile_size
-                x = x * tile_size
+                y = y_ind * tile_size
+                x = x_ind * tile_size
                 coordinates.append(
                     (
                         (x, y, min(x + tile_size, width), min(y + tile_size, height)),
