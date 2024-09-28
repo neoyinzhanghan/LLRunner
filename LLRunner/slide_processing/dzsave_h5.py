@@ -179,18 +179,18 @@ class WSICropManager:
             self.open_slide()
         return self.wsi.dimensions
 
-    def get_level_N_dimensions(self, level):
+    def get_level_N_dimensions(self, wsi_level):
         """Get dimensions of the slide at level N."""
         if self.wsi is None:
             self.open_slide()
-        return self.wsi.level_dimensions[level]
+        return self.wsi.level_dimensions[wsi_level]
 
-    def get_tile_coordinate_level_pairs(self, tile_size=256, level=0):
+    def get_tile_coordinate_level_pairs(self, tile_size=256, wsi_level=0):
         """Generate a list of coordinates_leve for 256x256 disjoint patches."""
         if self.wsi is None:
             self.open_slide()
 
-        width, height = self.get_level_N_dimensions(level)
+        width, height = self.get_level_N_dimensions(wsi_level)
         coordinates = []
 
         for y in range(height // tile_size):
@@ -200,27 +200,27 @@ class WSICropManager:
                 coordinates.append(
                     (
                         (x, y, min(x + tile_size, width), min(y + tile_size, height)),
-                        level,
+                        wsi_level,
                     )
                 )
 
         return coordinates
 
-    def crop(self, coords, level=0):
+    def crop(self, coords, wsi_level=0):
         """Crop the WSI at the specified level of magnification."""
         if self.wsi is None:
             self.open_slide()
 
         coords_level_0 = (
-            coords[0] * (2**level),
-            coords[1] * (2**level),
-            coords[2] * (2**level),
-            coords[3] * (2**level),
+            coords[0] * (2**wsi_level),
+            coords[1] * (2**wsi_level),
+            coords[2] * (2**wsi_level),
+            coords[3] * (2**wsi_level),
         )
 
         image = self.wsi.read_region(
             (coords_level_0[0], coords_level_0[1]),
-            level,
+            wsi_level,
             (coords[2] - coords[0], coords[3] - coords[1]),
         )
 
@@ -234,9 +234,9 @@ class WSICropManager:
 
         indices_to_jpeg = []
         for focus_region_coord_level_pair in focus_region_coords_level_pairs:
-            focus_region_coord, level = focus_region_coord_level_pair
+            focus_region_coord, wsi_level = focus_region_coord_level_pair
 
-            image = self.crop(focus_region_coord, level=level)
+            image = self.crop(focus_region_coord, wsi_level=wsi_level)
 
             jpeg_string = image_to_jpeg_string(image)
             jpeg_string = encode_image_to_base64(jpeg_string)
@@ -244,7 +244,7 @@ class WSICropManager:
             indices_level_jpeg = (
                 focus_region_coord[0] // crop_size,
                 focus_region_coord[1] // crop_size,
-                level,
+                wsi_level,
                 jpeg_string,
             )
 
@@ -304,14 +304,12 @@ def crop_wsi_images_all_levels(
                 try:
                     batch = ray.get(done_id)
                     for indices_jpeg in batch:
+                        print(indices_jpeg)
                         # Save the jpeg_string to the h5 file
                         indices = indices_jpeg[:3]
                         jpeg_string = indices_jpeg[3]
                         level = int(18 - indices[2])
                         with h5py.File(h5_path, "a") as f:
-                            if level == 18:
-                                print(f"Level: {level}")
-                                print(indices)
                             f[str(level)][indices[0], indices[1]] = jpeg_string
 
                     pbar.update(len(batch))
