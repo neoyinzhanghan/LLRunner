@@ -39,7 +39,7 @@ print("DZSaving slide as H5...")
 clear_metadata()
 dzsave_wsi_name_h5(
     slide_name,
-    tile_size=2048,
+    tile_size=tile_size,
     num_cpus=128,
     region_cropping_batch_size=256,
 )
@@ -51,7 +51,7 @@ print("DZSaving slide as DZI...")
 clear_metadata()
 dzsave_wsi_name(
     slide_name,
-    tile_size=2048,
+    tile_size=tile_size,
     num_cpus=128,
     region_cropping_batch_size=256,
 )
@@ -72,7 +72,7 @@ rsync_h5_time = time.time() - start_time
 
 start_time = time.time()
 print("Rsyncing dzsave dir to isilon...")
-os.system(f"sudo rsync -av '{dzsave_dir}' {isilon_dir}")
+# os.system(f"sudo rsync -av '{dzsave_dir}' {isilon_dir}")
 rsync_dzsave_time = time.time() - start_time
 
 h5_size_mb = h5_file_size / 1e6
