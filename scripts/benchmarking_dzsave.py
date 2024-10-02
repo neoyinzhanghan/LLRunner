@@ -16,6 +16,13 @@ dzsave_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53
 example_img_dir = "/media/hdd3/neo/example_img_dir"
 dzsave_metadata_path = os.path.join("/media/hdd3/neo/dzsave_dir", "dzsave_metadata.csv")
 
+isilon_h5_path = (
+    "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
+)
+isilon_dzsave_dir = (
+    "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files"
+)
+
 
 def clear_metadata():
     ## remove all rows but keep the header for the columns
@@ -88,6 +95,8 @@ retrieval_time_h5 = 0
 retrieval_time_dzsave = 0
 num_to_retrieve = 1000
 
+current_idx = 0
+
 for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     # find a random level from 0, 1, ... 18
     random_level = np.random.randint(0, 19)
@@ -98,11 +107,13 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     random_y = np.random.randint(0, max((height / downsample_factor) // tile_size, 1))
 
     start_time = time.time()
-    h5_tile = retrieve_tile_h5(h5_path, random_level, random_x, random_y)
+    h5_tile = retrieve_tile_h5(isilon_h5_path, random_level, random_x, random_y)
     retrieval_time_h5 += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/h5
-    h5_tile.save(os.path.join(example_img_dir, "h5", f"{random_x}_{random_y}.jpeg"))
+    h5_tile.save(
+        os.path.join(example_img_dir, "h5", f"{random_x}_{random_y}_{current_idx}.jpeg")
+    )
 
     start_time = time.time()
     tile_path = retrieve_tile(
@@ -115,6 +126,8 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
 
     # save the tile as a jpeg image in the example_img_dir/dzsave
     tile_path.save(os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}.jpeg"))
+
+    current_idx += 1
 
 
 print(
