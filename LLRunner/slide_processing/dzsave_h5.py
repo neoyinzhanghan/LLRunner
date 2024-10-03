@@ -356,7 +356,11 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
                 with h5py.File(h5_path, "a") as f:
                     jpeg_string = image_to_jpeg_string(patch)
                     jpeg_string = encode_image_to_base64(jpeg_string)
-                    f[str(level)][x, y] = jpeg_string
+                    try:
+                        f[str(level)][x, y] = jpeg_string
+                    except Exception as e:
+                        print(f"Error: {e} occurred while saving patch at level: {level}, x: {x}, y: {y} to {h5_path}")
+                        raise e
 
 
 def dzsave_h5(
