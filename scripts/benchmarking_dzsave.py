@@ -44,12 +44,12 @@ tile_size = 256
 start_time = time.time()
 # print("DZSaving slide as H5...")
 clear_metadata()
-# dzsave_wsi_name_h5(
-#     slide_name,
-#     tile_size=tile_size,
-#     num_cpus=32,
-#     region_cropping_batch_size=256,
-# )
+dzsave_wsi_name_h5(
+    slide_name,
+    tile_size=tile_size,
+    num_cpus=32,
+    region_cropping_batch_size=256,
+)
 
 dzsave_h5_time = time.time() - start_time
 
