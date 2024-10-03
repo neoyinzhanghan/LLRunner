@@ -142,10 +142,18 @@ def initialize_final_h5py_file(
             dtype="int",
         )
 
+        # also track the number for overlap which is 0
+        f.create_dataset(
+            "overlap",
+            shape=(1,),
+            dtype="int",
+        )
+
         f["level_0_width"][0] = image_width
         f["level_0_height"][0] = image_height
         f["patch_size"][0] = patch_size
         f["num_levels"][0] = num_levels
+        f["overlap"][0] = 0
 
 
 @ray.remote
