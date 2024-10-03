@@ -364,9 +364,13 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
                     jpeg_string = image_to_jpeg_string(patch)
                     jpeg_string = encode_image_to_base64(jpeg_string)
                     try:
-                        f[str(level)][int(x//tile_size), int(y//tile_size)] = jpeg_string
+                        f[str(level)][
+                            int(x // tile_size), int(y // tile_size)
+                        ] = jpeg_string
                     except Exception as e:
-                        print(f"Error: {e} occurred while saving patch at level: {level}, x: {x}, y: {y} to {h5_path}")
+                        print(
+                            f"Error: {e} occurred while saving patch at level: {level}, x: {x}, y: {y} to {h5_path}"
+                        )
 
 
 def dzsave_h5(
@@ -381,7 +385,7 @@ def dzsave_h5(
     """
 
     wsi = openslide.OpenSlide(wsi_path)
-    height, width = wsi.dimensions
+    width, height = wsi.dimensions
 
     print(f"Width: {width}, Height: {height}")
 
