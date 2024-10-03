@@ -159,4 +159,13 @@ if __name__ == "__main__":
             tile = h5_reader.retrieve_tile_h5(random_level, random_x, random_y)
     retrieval_time_h5 = time.time() - start_time
 
-    print("Retrieval time for h5:", retrieval_time_h5)
+    print(
+        f"Retrieval time for h5 for {num_to_retrieve} random tiles:", retrieval_time_h5
+    )
+    print(f"File size of the h5 file: {os.path.getsize(h5_path) / 1e6} MB")
+    print(f"Tile size: {tile.size}")
+    print(f"Width: {width}, Height: {height}")
+    print(f"Number of levels: {h5_reader.get_num_levels()}")
+    print(f"Overlap: {h5_reader.get_overlap()}")
+
+    f.close()
