@@ -130,7 +130,7 @@ class h5_tile_reader:
 
 
 if __name__ == "__main__":
-    h5_path = "/dmpisilon_tools/neo/dzsave_bm/6825083.h5"
+    h5_path = "/dmpisilon_tools/HemeLabel/media/slides/6825083.h5"
 
     h5_reader = h5_tile_reader(h5_path)
 
