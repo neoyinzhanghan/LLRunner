@@ -214,10 +214,12 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
     current_image = image
     for depth in range(10, -1, -1):
         # downsample the image by a factor of 2
-        current_image = current_image.resize(
-            (max(current_image.width // 2, 1), max(current_image.height // 2, 1))
+        current_image = image.resize(
+            (
+                max(image.width // (2 ** (10 - depth)), 1),
+                max(image.height // (2 ** (10 - depth)), 1),
+            )
         )
-
         # print("Range debugging")
         # print(len(range(0, current_image.height, tile_size)))
         # print(len(range(0, current_image.width, tile_size)))

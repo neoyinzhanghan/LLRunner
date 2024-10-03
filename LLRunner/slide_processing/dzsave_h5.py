@@ -360,7 +360,6 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
                         f[str(level)][int(x//tile_size), int(y//tile_size)] = jpeg_string
                     except Exception as e:
                         print(f"Error: {e} occurred while saving patch at level: {level}, x: {x}, y: {y} to {h5_path}")
-                        
 
 
 def dzsave_h5(

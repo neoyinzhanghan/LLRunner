@@ -90,6 +90,7 @@ print(f"DZSave time: {dzsave_time}")
 print(f"Rsync H5 time: {rsync_h5_time} for {h5_size_mb} MB")
 print(f"Rsync DZSave time: {rsync_dzsave_time} for {dzsave_size_mb} MB")
 
+dzsave_files_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files"
 
 retrieval_time_h5 = 0
 retrieval_time_dzsave = 0
@@ -117,7 +118,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
 
     start_time = time.time()
     tile_path = retrieve_tile(
-        dzsave_dir,
+        dzsave_files_dir,
         random_level,
         random_x,
         random_y,
