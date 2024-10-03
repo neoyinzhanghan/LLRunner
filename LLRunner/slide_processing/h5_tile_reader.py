@@ -11,11 +11,6 @@ import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
 from PIL import Image
-from LLRunner.config import (
-    dzsave_dir,
-    dzsave_metadata_path,
-    tmp_slide_dir,
-)
 
 
 def image_to_jpeg_string(image):
