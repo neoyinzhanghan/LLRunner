@@ -109,8 +109,8 @@ def initialize_final_h5py_file(
             f.create_dataset(
                 str(level),
                 shape=(
-                    max(level_image_width // patch_size, 1),
-                    max(level_image_height // patch_size, 1),
+                    max(level_image_width // patch_size + 1, 1),
+                    max(level_image_height // patch_size + 1, 1),
                 ),
                 dtype=dt,
             )
@@ -185,23 +185,22 @@ class WSICropManager:
             self.open_slide()
         return self.wsi.level_dimensions[wsi_level]
 
-    def get_tile_coordinate_level_pairs(self, tile_size=256, wsi_level=0):
+    def get_tile_coordinate_level_pairs(self, tile_size=256, level=0):
         """Generate a list of coordinates_leve for 256x256 disjoint patches."""
         if self.wsi is None:
             self.open_slide()
 
-        width, height = self.get_level_N_dimensions(wsi_level)
+        width, height = self.get_level_N_dimensions(level)
         coordinates = []
 
-        for y_ind in range(height // tile_size):
-            for x_ind in range(width // tile_size):
+        for y in range(0, height, tile_size):
+            for x in range(0, width, tile_size):
                 # Ensure that the patch is within the image boundaries
-                y = y_ind * tile_size
-                x = x_ind * tile_size
+
                 coordinates.append(
                     (
                         (x, y, min(x + tile_size, width), min(y + tile_size, height)),
-                        wsi_level,
+                        level,
                     )
                 )
 
