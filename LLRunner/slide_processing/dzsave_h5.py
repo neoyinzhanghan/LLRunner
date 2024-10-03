@@ -338,14 +338,14 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
             )
         )
         # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
-        for y in range(max(current_image.height // tile_size, 1)):
-            for x in range(max(current_image.width // tile_size, 1)):
+        for y in range(0, current_image.height, tile_size):
+            for x in range(0, current_image.width, tile_size):
                 # Calculate the right and bottom coordinates ensuring they are within the image boundaries
-                right = min(x * tile_size  + tile_size, current_image.width)
-                bottom = min(y * tile_size + tile_size, current_image.height)
+                right = min(x + tile_size, current_image.width)
+                bottom = min(y + tile_size, current_image.height)
 
                 # Crop the patch from the image starting at (x, y) to (right, bottom)
-                patch = current_image.crop((x * tile_size, y * tile_size, right, bottom))
+                patch = current_image.crop((x, y, right, bottom))
 
                 # make sure patch is in RGB mode and a PIL image
                 patch = patch.convert("RGB")
@@ -357,7 +357,7 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
                     jpeg_string = image_to_jpeg_string(patch)
                     jpeg_string = encode_image_to_base64(jpeg_string)
                     try:
-                        f[str(level)][x, y] = jpeg_string
+                        f[str(level)][int(x//tile_size), int(y//tile_size)] = jpeg_string
                     except Exception as e:
                         print(f"Error: {e} occurred while saving patch at level: {level}, x: {x}, y: {y} to {h5_path}")
                         raise e

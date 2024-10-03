@@ -233,7 +233,7 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 patch = current_image.crop((x, y, right, bottom))
 
                 # Save the patch
-                path = os.path.join(save_dir, str(depth), f"{x}_{y}.jpeg")
+                path = os.path.join(save_dir, str(depth), f"{int(x//tile_size)}_{int(y//tile_size)}.jpeg")
                 patch.save(path)
 
 
