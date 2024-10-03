@@ -99,7 +99,7 @@ current_idx = 0
 
 for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     # find a random level from 0, 1, ... 18
-    random_level = np.random.randint(13, 19)
+    random_level = np.random.randint(0, 19)
     downsample_factor = 2 ** (18 - random_level)
 
     # find a random x and y coordinate
