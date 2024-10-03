@@ -126,7 +126,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     retrieval_time_dzsave += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/dzsave
-    tile_path.save(os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}.jpeg"))
+    tile_path.save(os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}_{current_idx}.jpeg"))
 
     current_idx += 1
 
