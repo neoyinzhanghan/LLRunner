@@ -74,7 +74,7 @@ dzsave_dir_size = sum(
 
 start_time = time.time()
 print("Rsyncing h5 file to isilon...")
-os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
+# os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
 rsync_h5_time = time.time() - start_time
 
 start_time = time.time()
@@ -107,7 +107,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     random_y = np.random.randint(0, max((height / downsample_factor) // tile_size, 1))
 
     start_time = time.time()
-    h5_tile = retrieve_tile_h5(isilon_h5_path, random_level, random_x, random_y)
+    h5_tile = retrieve_tile_h5(h5_path, random_level, random_x, random_y)
     retrieval_time_h5 += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/h5
@@ -117,7 +117,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
 
     start_time = time.time()
     tile_path = retrieve_tile(
-        "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files",
+        dzsave_dir,
         random_level,
         random_x,
         random_y,
