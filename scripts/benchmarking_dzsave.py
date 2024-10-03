@@ -20,7 +20,7 @@ isilon_h5_path = (
     "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 )
 isilon_dzsave_dir = (
-    "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files"
+    "/dmpisilon_tools/neo/dzsave_bm/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files"
 )
 
 
@@ -42,26 +42,26 @@ width, height = wsi.dimensions
 tile_size = 256
 
 start_time = time.time()
-print("DZSaving slide as H5...")
+# print("DZSaving slide as H5...")
 clear_metadata()
-dzsave_wsi_name_h5(
-    slide_name,
-    tile_size=tile_size,
-    num_cpus=32,
-    region_cropping_batch_size=256,
-)
+# dzsave_wsi_name_h5(
+#     slide_name,
+#     tile_size=tile_size,
+#     num_cpus=32,
+#     region_cropping_batch_size=256,
+# )
 
 dzsave_h5_time = time.time() - start_time
 
 start_time = time.time()
 print("DZSaving slide as DZI...")
-clear_metadata()
-dzsave_wsi_name(
-    slide_name,
-    tile_size=tile_size,
-    num_cpus=32,
-    region_cropping_batch_size=256,
-)
+# clear_metadata()
+# dzsave_wsi_name(
+#     slide_name,
+#     tile_size=tile_size,
+#     num_cpus=32,
+#     region_cropping_batch_size=256,
+# )
 
 dzsave_time = time.time() - start_time
 
@@ -74,7 +74,7 @@ dzsave_dir_size = sum(
 
 start_time = time.time()
 print("Rsyncing h5 file to isilon...")
-# os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
+os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
 rsync_h5_time = time.time() - start_time
 
 start_time = time.time()
@@ -100,7 +100,7 @@ current_idx = 0
 
 for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     # find a random level from 0, 1, ... 18
-    random_level = np.random.randint(0, 19)
+    random_level = np.random.randint(13, 19)
     downsample_factor = 2 ** (18 - random_level)
 
     # find a random x and y coordinate
@@ -108,7 +108,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
     random_y = np.random.randint(0, max((height / downsample_factor) // tile_size, 1))
 
     start_time = time.time()
-    h5_tile = retrieve_tile_h5(h5_path, random_level, random_x, random_y)
+    h5_tile = retrieve_tile_h5(isilon_h5_path, random_level, random_x, random_y)
     retrieval_time_h5 += time.time() - start_time
 
     # save the tile as a jpeg image in the example_img_dir/h5
@@ -118,7 +118,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
 
     start_time = time.time()
     tile_path = retrieve_tile(
-        dzsave_files_dir,
+        isilon_dzsave_dir,
         random_level,
         random_x,
         random_y,
