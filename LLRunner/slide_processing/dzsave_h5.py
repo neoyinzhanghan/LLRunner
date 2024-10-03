@@ -341,16 +341,15 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
         for y in range(max(current_image.height // tile_size, 1)):
             for x in range(max(current_image.width // tile_size, 1)):
                 # Calculate the right and bottom coordinates ensuring they are within the image boundaries
-                right = min(x + tile_size, current_image.width)
-                bottom = min(y + tile_size, current_image.height)
+                right = min(x * tile_size  + tile_size, current_image.width)
+                bottom = min(y * tile_size + tile_size, current_image.height)
 
                 # Crop the patch from the image starting at (x, y) to (right, bottom)
-                patch = current_image.crop((x, y, right, bottom))
+                patch = current_image.crop((x * tile_size, y * tile_size, right, bottom))
 
                 # make sure patch is in RGB mode and a PIL image
                 patch = patch.convert("RGB")
 
-                indices = (x // tile_size, y // tile_size)
                 level = str(depth)
 
                 # Save the patch to the h5 file
@@ -358,7 +357,7 @@ def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
                     jpeg_string = image_to_jpeg_string(patch)
                     jpeg_string = encode_image_to_base64(jpeg_string)
                     print(jpeg_string)
-                    f[str(level)][indices[0], indices[1]] = jpeg_string
+                    f[str(level)][x, y] = jpeg_string
 
 
 def dzsave_h5(
