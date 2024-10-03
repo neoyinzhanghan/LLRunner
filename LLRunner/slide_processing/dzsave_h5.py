@@ -185,12 +185,12 @@ class WSICropManager:
             self.open_slide()
         return self.wsi.level_dimensions[wsi_level]
 
-    def get_tile_coordinate_level_pairs(self, tile_size=256, level=0):
+    def get_tile_coordinate_level_pairs(self, tile_size=256, wsi_level=0):
         """Generate a list of coordinates_leve for 256x256 disjoint patches."""
         if self.wsi is None:
             self.open_slide()
 
-        width, height = self.get_level_N_dimensions(level)
+        width, height = self.get_level_N_dimensions(wsi_level)
         coordinates = []
 
         for y in range(0, height, tile_size):
@@ -200,7 +200,7 @@ class WSICropManager:
                 coordinates.append(
                     (
                         (x, y, min(x + tile_size, width), min(y + tile_size, height)),
-                        level,
+                        wsi_level,
                     )
                 )
 
