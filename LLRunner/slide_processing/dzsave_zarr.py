@@ -17,7 +17,8 @@ from LLRunner.config import (
     tmp_slide_dir,
 )
 from LLRunner.slide_processing.dzsave_h5 import initialize_dzsave_dir
-
+import zarr
+from numcodecs import VLenBytes  # Import the codec for variable-length bytes
 
 def image_to_jpeg_string(image):
     buffer = io.BytesIO()
@@ -51,32 +52,40 @@ def create_list_of_batches_from_list(list, batch_size):
     return list_of_batches
 
 
+
 def initialize_final_zarr_file(
     zarr_path, image_width, image_height, num_levels=18, patch_size=256
 ):
+    """
+    Initialize a Zarr file for storing image tiles.
+    """
     if os.path.exists(zarr_path):
         # Remove existing Zarr file
         os.remove(zarr_path)
 
     # Initialize the Zarr group
-    root = zarr.open(zarr_path, mode="w")
+    root = zarr.open(zarr_path, mode='w')
+
+    # Define the codec for storing variable-length bytes
+    object_codec = VLenBytes()
 
     for level in range(num_levels + 1):
         level_image_height = image_height // (2 ** (num_levels - level))
         level_image_width = image_width // (2 ** (num_levels - level))
 
-        dt = object  # Store as variable-length byte strings
-
+        # Create datasets for each level with the specified codec
         root.create_dataset(
             str(level),
             shape=(
                 max(level_image_width // patch_size + 1, 1),
                 max(level_image_height // patch_size + 1, 1),
             ),
-            dtype=dt,
+            dtype=object,  # Use object dtype for variable-length data
             chunks=(1, 1),  # Adjust chunk size as needed
+            object_codec=object_codec  # Specify the codec for variable-length bytes
         )
 
+    # Store metadata such as image dimensions, patch size, etc.
     root.create_dataset("level_0_width", shape=(1,), dtype="int")[0] = image_width
     root.create_dataset("level_0_height", shape=(1,), dtype="int")[0] = image_height
     root.create_dataset("patch_size", shape=(1,), dtype="int")[0] = patch_size
