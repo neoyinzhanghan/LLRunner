@@ -519,7 +519,7 @@ if __name__ == "__main__":
     # # rsync_slide_time = time.time() - start_time
 
     start_time = time.time()
-    print("DZSaving slide")
+    print("DZSavi ng slide")
     initialize_dzsave_dir()
     dzsave_wsi_name_h5(
         slide_name,

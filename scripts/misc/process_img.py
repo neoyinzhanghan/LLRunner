@@ -2,7 +2,7 @@ import cv2
 from PIL import Image, ImageDraw
 
 # Open the image
-img = Image.open("/Users/neo/Documents/painting_references/painting_rev.jpg")
+img = Image.open("/Users/neo/Documents/painting_references/Yor/yor.png")
 
 # Calculate the target size based on the 2:3 aspect ratio
 width, height = img.size
@@ -16,7 +16,7 @@ if height > new_height:
     img = img.crop((0, top, width, bottom))
 
 # Save the cropped image
-cropped_image_path = "/Users/neo/Documents/painting_references/painting_rev_cropped.jpg"
+cropped_image_path = "/Users/neo/Documents/painting_references/Yor/yor_pmsf.png"
 img.save(cropped_image_path)
 
 # Draw an 8x12 grid on the image
