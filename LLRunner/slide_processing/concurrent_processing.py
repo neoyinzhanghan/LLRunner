@@ -287,9 +287,7 @@ def main_concurrent_dzsave_h5(
                     print(f"Running BMA or PBS diff pipeline on {wsi_name}")
 
                     # h5_path is wsi_name replacing .ndpi with .h5
-                    wsi_name_split = wsi_name.split(".")
-                    wsi_name_split[-1] = "h5"
-                    wsi_name_h5 = ".".join(wsi_name_split)
+                    wsi_name_h5 = wsi_name[:-5] + ".h5"
 
                     # Assuming the dzsave output is located at a specific path:
                     output_path = f"/path/to/output/{wsi_name_h5}"
