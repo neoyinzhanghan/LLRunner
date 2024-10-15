@@ -301,27 +301,27 @@ def crop_wsi_images_all_levels(
             batch, crop_size=crop_size
         )
         tasks[task] = batch
-    with h5py.File(h5_path, "a") as f:
-        with tqdm(
-            total=len(focus_regions_coordinates), desc="Cropping focus regions"
-        ) as pbar:
-            while tasks:
-                done_ids, _ = ray.wait(list(tasks.keys()))
+    with tqdm(
+        total=len(focus_regions_coordinates), desc="Cropping focus regions"
+    ) as pbar:
+        while tasks:
+            done_ids, _ = ray.wait(list(tasks.keys()))
 
-                for done_id in done_ids:
-                    try:
-                        batch = ray.get(done_id)
-                        for indices_jpeg in batch:
-                            x, y, wsi_level, jpeg_string = indices_jpeg
-                            level = int(18 - wsi_level)
+            for done_id in done_ids:
+                try:
+                    batch = ray.get(done_id)
+                    for indices_jpeg in batch:
+                        x, y, wsi_level, jpeg_string = indices_jpeg
+                        level = int(18 - wsi_level)
+                        with h5py.File(h5_path, "a") as f:
                             f[str(level)][x, y] = jpeg_string
 
-                        pbar.update(len(batch))
+                    pbar.update(len(batch))
 
-                    except ray.exceptions.RayTaskError as e:
-                        print(f"Task for batch {tasks[done_id]} failed with error: {e}")
+                except ray.exceptions.RayTaskError as e:
+                    print(f"Task for batch {tasks[done_id]} failed with error: {e}")
 
-                    del tasks[done_id]
+                del tasks[done_id]
 
 
 def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
@@ -530,5 +530,3 @@ if __name__ == "__main__":
     dzsave_time = time.time() - start_time
 
     print(f"DZSave time: {dzsave_time}")
-
-    h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
