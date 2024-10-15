@@ -301,7 +301,7 @@ def main_concurrent_dzsave_h5(
                         # After dzsave is done, start rsync of the output asynchronously
                         destination_dir = "/dmpisilon_tools/neo/slide_tiles_h5"
 
-                        rsync_slide_output(wsi_name, output_path, destination_dir)
+                        rsync_slide_output(output_path, destination_dir)
 
                     if delete_slide:
                         delete_slide_from_tmp(wsi_name)
