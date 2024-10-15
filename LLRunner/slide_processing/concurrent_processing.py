@@ -3,9 +3,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from LLRunner.slide_transfer.metadata_management import (
     decide_what_to_run_with_specimen_clf_cross_machine,
     decide_what_to_run_dzsave_across_machines,
+    decide_what_to_run_dzsave_local,
     initialize_reported_bma_metadata,
     initialize_all_metadata,
     which_are_already_ran,
+    which_are_already_dzsaved_h5
 )
 from LLRunner.slide_processing.run_one_slide import (
     run_one_slide_with_specimen_clf,
@@ -18,7 +20,7 @@ from LLRunner.slide_transfer.slides_management import (
     delete_slide_from_tmp,
 )
 
-from LLRunner.slide_processing.dzsave import initialize_dzsave_dir
+from LLRunner.slide_processing.dzsave_h5 import dzsave_wsi_name_h5
 from LLRunner.deletion.delete_slide_results import delete_results_from_note
 
 
@@ -186,6 +188,26 @@ def main_concurrent_processing(
                     delete_slide_from_tmp(wsi_name)
 
 
+from subprocess import call
+from concurrent.futures import ThreadPoolExecutor
+
+
+def rsync_slide_output(wsi_name, output_path, destination_dir):
+    """Run rsync to sync the dzsave output to the destination."""
+    rsync_command = [
+        "sudo",
+        "rsync",
+        "-avz",  # Adjust options based on your needs
+        output_path,
+        destination_dir,
+    ]
+    result = call(rsync_command)
+    if result == 0:
+        print(f"Successfully synced {wsi_name} to {destination_dir}")
+    else:
+        print(f"Failed to sync {wsi_name}. Error code: {result}")
+
+
 def main_concurrent_dzsave_h5(
     wsi_name_filter_func,
     processing_filter_func,
@@ -202,15 +224,16 @@ def main_concurrent_dzsave_h5(
     )
 
     # then call decide_what_to_run_with_specimen_clf_cross_machine
-    wsi_names_to_run_dzsave_h5 = decide_what_to_run_dzsave_h5_local(
+    wsi_names_to_run_dzsave = decide_what_to_run_dzsave_local(
         wsi_name_filter_func=wsi_name_filter_func,
         processing_filter_func=processing_filter_func,
-        rerun=True,
     )
 
-    total_before_check = len(wsi_names_to_run_diff)
+    total_before_check = len(wsi_names_to_run_dzsave_h5)
 
-    already_ran_wsi_names = which_are_already_dzsaved_h5(wsi_names_to_run_dzsave_h5, note=note)
+    already_ran_wsi_names = which_are_already_dzsaved_h5(
+        wsi_names_to_run_dzsave_h5, note=note
+    )
 
     wsi_names_to_run_dzsave_h5 = list(
         set(wsi_names_to_run_dzsave_h5) - set(already_ran_wsi_names)
@@ -222,45 +245,20 @@ def main_concurrent_dzsave_h5(
     print(
         f"Found {len(already_ran_wsi_names)} slides that have already been processed."
     )
-    print(f"Only {len(wsi_names_to_run_diff)} slides will be processed in this run.")
-
-    wsi_names_to_run_dzsave = decide_what_to_run_dzsave_across_machines(
-        wsi_name_filter_func=wsi_name_filter_func,
-        processing_filter_func=processing_filter_func,
-    )
-
-    # get the union of the two lists
-    wsi_names_to_run_union = list(set(wsi_names_to_run_diff + wsi_names_to_run_dzsave))
-
-    # get the intersection of the two lists
-    wsi_names_to_run_intersection = list(
-        set(wsi_names_to_run_diff) & set(wsi_names_to_run_dzsave)
-    )
-
-    # get the list of slides to run the BMA speciment classification and BMA-diff pipeline on but not the dzsave pipeline
-    wsi_names_to_run_just_diff = list(
-        set(wsi_names_to_run_diff) - set(wsi_names_to_run_dzsave)
-    )
-
-    # get the list of slides to run the dzsave pipeline on but not the BMA-diff pipeline
-    wsi_names_to_run_just_dzsave = list(
-        set(wsi_names_to_run_dzsave) - set(wsi_names_to_run_diff)
-    )
-
-    print(f"Found {len(wsi_names_to_run_union)} slides in total to be processed.")
     print(
-        f"Found {len(wsi_names_to_run_intersection)} slides to run both the BMA-diff and dzsave pipelines on."
+        f"Only {len(wsi_names_to_run_dzsave_h5)} slides will be processed in this run."
     )
+
     print(
-        f"Found {len(wsi_names_to_run_just_diff)} slides to run just the BMA-diff pipeline on."
-    )
-    print(
-        f"Found {len(wsi_names_to_run_just_dzsave)} slides to run just the dzsave pipeline on."
+        f"Found {len(wsi_names_to_run_dzsave_h5)} slides to run the dzsave pipeline on."
     )
 
     slides_batches = create_list_of_batches_from_list(
-        wsi_names_to_run_diff, slide_batch_size
+        wsi_names_to_run_dzsave, slide_batch_size
     )
+
+    # Create a separate ThreadPoolExecutor for handling rsync operations
+    rsync_executor = ThreadPoolExecutor(max_workers=num_rsync_workers)
 
     for i, slide_batch in tqdm(
         enumerate(slides_batches),
@@ -289,37 +287,30 @@ def main_concurrent_dzsave_h5(
 
                 # Wait for the slide copying to complete if it hasn't yet
                 slide_copy_future = slide_copy_futures[wsi_name]
-                print(slide_copy_future.done())
                 if not slide_copy_future.done():
                     print(f"Waiting for slide {wsi_name} to be copied...")
                     slide_copy_future.result()  # Wait for completion
 
-                # # Continue with processing
-                # slide_path = find_slide(
-                #     wsi_name, copy_slide=False
-                # )  # Now it should be instantaneous
-
-                if wsi_name in wsi_names_to_run_diff:
+                # If slide needs to be processed
+                if wsi_name in wsi_names_to_run_dzsave:
                     print(f"Running BMA or PBS diff pipeline on {wsi_name}")
-                    run_one_slide_with_specimen_clf(
-                        wsi_name,
-                        copy_slide=False,
-                        delete_slide=False,
-                        note=note,
-                        hoarding=True,
-                        continue_on_error=True,
-                        do_extract_features=False,
-                        check_specimen_clf=False,
-                    )
-                    print(f"Finished running BMA or PBS diff pipeline on {wsi_name}")
 
-                # if wsi_name in wsi_names_to_run_dzsave: #TODO we are not going to run dzsave until we fix the dzsave isilon archiving problem
-                #     print(f"Running dzsave pipeline on {wsi_name}")
-                #     dzsave_wsi_name(wsi_name)
-                #     print(f"Finished dzsaving {wsi_name}")
+                    # Assuming the dzsave output is located at a specific path:
+                    output_path = f"/path/to/output/{wsi_name}.h5"
+
+                    # Run dzsave and metadata tracking here
+
+                    # After dzsave is done, start rsync of the output asynchronously
+                    destination_dir = "/pesgisipth/neo/slide_tiles_h5"
+                    rsync_executor.submit(
+                        rsync_slide_output, wsi_name, output_path, destination_dir
+                    )
 
                 if delete_slide:
                     delete_slide_from_tmp(wsi_name)
+
+    # Shutdown the rsync executor after all batches are processed
+    rsync_executor.shutdown(wait=False)
 
 
 # def main_serial_bma_processing(

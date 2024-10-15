@@ -514,6 +514,42 @@ def decide_what_to_run_dzsave_across_machines(
     return wsi_names_to_run
 
 
+def decide_what_to_run_dzsave_local(
+    wsi_name_filter_func,
+    processing_filter_func,
+):
+    """Decide what to run based on the processing_filter_func and the pipeline.
+    The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
+
+    Instead basing on reported specimen, we will use the specimen classification model to decide what to run.
+    Which means that at the metadata data stage we do not look at reported part description.
+    Also make sure to check the pipeline_run_history_path for all machines
+    """
+
+    # first open the slide_metadata_path file
+    slide_md = pd.read_csv(slide_metadata_path)
+
+    # use wsi_name_filter_func to filter the slide_md based on wsi_name column
+    slide_md = slide_md[slide_md["wsi_name"].apply(wsi_name_filter_func)]
+
+    dzsave_metadata_path = os.path.join(dzsave_dir, "dzsave_metadata.csv")
+
+    df = pd.read_csv(dzsave_metadata_path)
+
+    filtered_df = processing_filter_func(df)
+
+    # look for all the wsi_names in slide_md that are not in the filtered_df
+    wsi_names = slide_md["wsi_name"].values
+
+    wsi_names_to_run = []
+
+    for wsi_name in wsi_names:
+        if wsi_name not in filtered_df["wsi_name"].values:
+            wsi_names_to_run.append(wsi_name)
+
+    return wsi_names_to_run
+
+
 def update_slide_time(wsi_name):
     # open the slide_metadata_path file
     slide_md = pd.read_csv(slide_metadata_path)
@@ -545,3 +581,20 @@ def which_are_already_ran(wsi_names, note=""):
                 already_ran.append(wsi_name)
 
     return already_ran
+
+
+def which_are_already_dzsaved_h5_local(wsi_names):
+    """Check which slides have already been dzsaved for the specified notes."""
+
+    # open the dzsave_metadata_path file at the local path
+    dzsave_metadata_path = os.path.join(dzsave_dir, "dzsave_metadata.csv")
+
+    df = pd.read_csv(dzsave_metadata_path)
+
+    # turn the wsi_name column into a list
+    wsi_names_in_df = df["wsi_name"].values
+
+    # turn the wsi_names into a set for faster lookup
+    wsi_names = set(wsi_names)
+
+    return [wsi_name for wsi_name in wsi_names if wsi_name in wsi_names_in_df]
