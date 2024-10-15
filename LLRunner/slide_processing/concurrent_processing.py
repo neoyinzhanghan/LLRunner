@@ -222,7 +222,7 @@ def main_concurrent_dzsave_h5(
     )
 
     # then call decide_what_to_run_with_specimen_clf_cross_machine
-    wsi_names_to_run_dzsave = decide_what_to_run_dzsave_local(
+    wsi_names_to_run_dzsave_h5 = decide_what_to_run_dzsave_local(
         wsi_name_filter_func=wsi_name_filter_func,
     )
 
@@ -236,9 +236,7 @@ def main_concurrent_dzsave_h5(
         set(wsi_names_to_run_dzsave_h5) - set(already_ran_wsi_names)
     )
 
-    print(
-        f"Found {total_before_check} slides to run the BMA-diff and PBS-diff pipelines on."
-    )
+    print(f"Found {total_before_check} slides to run the dzsave h5 pipelines on.")
     print(
         f"Found {len(already_ran_wsi_names)} slides that have already been processed."
     )
@@ -246,12 +244,8 @@ def main_concurrent_dzsave_h5(
         f"Only {len(wsi_names_to_run_dzsave_h5)} slides will be processed in this run."
     )
 
-    print(
-        f"Found {len(wsi_names_to_run_dzsave_h5)} slides to run the dzsave pipeline on."
-    )
-
     slides_batches = create_list_of_batches_from_list(
-        wsi_names_to_run_dzsave, slide_batch_size
+        wsi_names_to_run_dzsave_h5, slide_batch_size
     )
 
     # Create a separate ThreadPoolExecutor for handling rsync operations
@@ -289,7 +283,7 @@ def main_concurrent_dzsave_h5(
                     slide_copy_future.result()  # Wait for completion
 
                 # If slide needs to be processed
-                if wsi_name in wsi_names_to_run_dzsave:
+                if wsi_name in wsi_names_to_run_dzsave_h5:
                     print(f"Running BMA or PBS diff pipeline on {wsi_name}")
 
                     # h5_path is wsi_name replacing .ndpi with .h5
