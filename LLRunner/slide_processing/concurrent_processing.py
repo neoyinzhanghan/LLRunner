@@ -270,38 +270,39 @@ def main_concurrent_dzsave_h5(
                 )
 
             # Process slides once copying is done
-            for wsi_name in tqdm(
-                slide_batch,
-                desc=f"Running BMA or PBS diff and dzsave pipeline on slides for batch {i+1}/{len(slides_batches)}",
+
+            with tqdm(
                 total=len(slide_batch),
-            ):
+                desc=f"Running dzsave_h5 pipeline on slides for batch {i+1}/{len(slides_batches)}",
+            ) as pbar:
 
-                # Wait for the slide copying to complete if it hasn't yet
-                slide_copy_future = slide_copy_futures[wsi_name]
-                if not slide_copy_future.done():
-                    print(f"Waiting for slide {wsi_name} to be copied...")
-                    slide_copy_future.result()  # Wait for completion
+                for wsi_name in slide_batch:
 
-                # If slide needs to be processed
-                if wsi_name in wsi_names_to_run_dzsave_h5:
-                    print(f"Running BMA or PBS diff pipeline on {wsi_name}")
+                    # Wait for the slide copying to complete if it hasn't yet
+                    slide_copy_future = slide_copy_futures[wsi_name]
+                    if not slide_copy_future.done():
+                        print(f"Waiting for slide {wsi_name} to be copied...")
+                        slide_copy_future.result()  # Wait for completion
 
-                    # h5_path is wsi_name replacing .ndpi with .h5
-                    wsi_name_h5 = wsi_name[:-5] + ".h5"
+                    # If slide needs to be processed
+                    if wsi_name in wsi_names_to_run_dzsave_h5:
+                        print(f"Running BMA or PBS diff pipeline on {wsi_name}")
 
-                    # Assuming the dzsave output is located at a specific path:
-                    output_path = f"/path/to/output/{wsi_name_h5}"
+                        # h5_path is wsi_name replacing .ndpi with .h5
+                        wsi_name_h5 = wsi_name[:-5] + ".h5"
 
-                    # Run dzsave and metadata tracking here
+                        # Assuming the dzsave output is located at a specific path:
+                        output_path = f"/path/to/output/{wsi_name_h5}"
 
-                    # After dzsave is done, start rsync of the output asynchronously
-                    destination_dir = "/dmpisilon_tools/neo/slide_tiles_h5"
-                    rsync_executor.submit(
-                        rsync_slide_output, wsi_name, output_path, destination_dir
-                    )
+                        # Run dzsave and metadata tracking here
 
-                if delete_slide:
-                    delete_slide_from_tmp(wsi_name)
+                        # After dzsave is done, start rsync of the output asynchronously
+                        destination_dir = "/dmpisilon_tools/neo/slide_tiles_h5"
+
+                        rsync_slide_output(wsi_name, output_path, destination_dir)
+
+                    if delete_slide:
+                        delete_slide_from_tmp(wsi_name)
 
     # Shutdown the rsync executor after all batches are processed
     rsync_executor.shutdown(wait=False)
