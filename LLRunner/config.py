@@ -1,6 +1,6 @@
 import os
 
-slide_source_hostname = "172.28.164.166"
+slide_source_hostname = "172.28.164.44" # "172.28.164.166" this is the GLV (the default source access)
 slide_source_username = "greg"
 slide_source_dir = "/pesgisipth/NDPI"
 
