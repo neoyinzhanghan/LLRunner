@@ -511,14 +511,14 @@ if __name__ == "__main__":
     # # # run sudo rsync -av the slide from original_slide_path to slide_path
     # # save_path = "/media/hdd3/neo/"
 
-    slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
+    slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"  # NOTE THIS IS MEANT TO BE RUN ON GLV2
 
     # # # copy the slide from original_slide_path to slide_path
     # # os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
     # # rsync_slide_time = time.time() - start_time
 
     start_time = time.time()
-    print("DZSavi ng slide")
+    print("DZSaving slide")
     initialize_dzsave_dir()
     dzsave_wsi_name_h5(
         slide_name,
@@ -532,40 +532,3 @@ if __name__ == "__main__":
     print(f"DZSave time: {dzsave_time}")
 
     h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
-
-    with h5py.File(h5_path, "r") as f:
-        print(f.keys())
-        print(f["18"].shape)
-        # print(f["18"][0, 0])
-        print(f["18"][10, 10])
-        jpeg_string = f["18"][0, 0]
-
-        print(type(jpeg_string))
-
-        # slide_path = os.path.join(tmp_slide_dir, slide_name)
-
-        # wsi = openslide.OpenSlide(slide_path)
-
-        # width, height = wsi.dimensions
-
-        # # get a random tile from the slide
-        # tile = wsi.read_region((40000, 40000), 18, (256, 256))
-
-        # # if RGBA then convert to RGB
-        # if tile.mode != "RGB":
-        #     tile = tile.convert("RGB")
-
-        # jpeg_string_old = image_to_jpeg_string(tile)
-        # print(f"jpeg_string: {jpeg_string_old}")
-
-        # jpeg_string = encode_image_to_base64(jpeg_string_old)
-        # print(f"jpeg_string base 64: {jpeg_string}")
-
-        jpeg_string = decode_image_from_base64(jpeg_string)
-        print(f"jpeg_string base 64 decoded: {jpeg_string}")
-
-        image = jpeg_string_to_image(jpeg_string)
-        print(image)
-
-        # save the image at /media/hdd3/neo/my_test.jpeg
-        image.save("/media/hdd3/neo/my_test.jpeg")
