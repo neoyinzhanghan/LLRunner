@@ -516,7 +516,7 @@ def decide_what_to_run_dzsave_across_machines(
 
 def decide_what_to_run_dzsave_local(
     wsi_name_filter_func,
-    processing_filter_func,
+    processing_filter_func=None,
 ):
     """Decide what to run based on the processing_filter_func and the pipeline.
     The processing_filter_func should take in the pipeline_run_history_path dataframe and then return a filtered dataframe.
@@ -536,7 +536,10 @@ def decide_what_to_run_dzsave_local(
 
     df = pd.read_csv(dzsave_metadata_path)
 
-    filtered_df = processing_filter_func(df)
+    if processing_filter_func is not None:
+        filtered_df = processing_filter_func(df)
+    else:
+        filtered_df = df
 
     # look for all the wsi_names in slide_md that are not in the filtered_df
     wsi_names = slide_md["wsi_name"].values
