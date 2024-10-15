@@ -7,7 +7,7 @@ from LLRunner.slide_transfer.metadata_management import (
     initialize_reported_bma_metadata,
     initialize_all_metadata,
     which_are_already_ran,
-    which_are_already_dzsaved_h5
+    which_are_already_dzsaved_h5_local,
 )
 from LLRunner.slide_processing.run_one_slide import (
     run_one_slide_with_specimen_clf,
@@ -210,10 +210,8 @@ def rsync_slide_output(wsi_name, output_path, destination_dir):
 
 def main_concurrent_dzsave_h5(
     wsi_name_filter_func,
-    processing_filter_func,
     slide_batch_size=50,
     num_rsync_workers=1,
-    note="",
     delete_slide=True,
 ):
     """Main function to run the overlapping BMA-diff and PBS-diff pipeline on slides."""
@@ -226,13 +224,12 @@ def main_concurrent_dzsave_h5(
     # then call decide_what_to_run_with_specimen_clf_cross_machine
     wsi_names_to_run_dzsave = decide_what_to_run_dzsave_local(
         wsi_name_filter_func=wsi_name_filter_func,
-        processing_filter_func=processing_filter_func,
     )
 
     total_before_check = len(wsi_names_to_run_dzsave_h5)
 
-    already_ran_wsi_names = which_are_already_dzsaved_h5(
-        wsi_names_to_run_dzsave_h5, note=note
+    already_ran_wsi_names = which_are_already_dzsaved_h5_local(
+        wsi_names_to_run_dzsave_h5
     )
 
     wsi_names_to_run_dzsave_h5 = list(
@@ -295,13 +292,18 @@ def main_concurrent_dzsave_h5(
                 if wsi_name in wsi_names_to_run_dzsave:
                     print(f"Running BMA or PBS diff pipeline on {wsi_name}")
 
+                    # h5_path is wsi_name replacing .ndpi with .h5
+                    wsi_name_split = wsi_name.split(".")
+                    wsi_name_split[-1] = "h5"
+                    wsi_name_h5 = ".".join(wsi_name_split)
+
                     # Assuming the dzsave output is located at a specific path:
-                    output_path = f"/path/to/output/{wsi_name}.h5"
+                    output_path = f"/path/to/output/{wsi_name_h5}"
 
                     # Run dzsave and metadata tracking here
 
                     # After dzsave is done, start rsync of the output asynchronously
-                    destination_dir = "/pesgisipth/neo/slide_tiles_h5"
+                    destination_dir = "/dmpisilon_tools/neo/slide_tiles_h5"
                     rsync_executor.submit(
                         rsync_slide_output, wsi_name, output_path, destination_dir
                     )
