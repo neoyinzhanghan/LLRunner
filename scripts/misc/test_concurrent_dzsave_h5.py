@@ -29,6 +29,7 @@ start_time = time.time()
 main_concurrent_dzsave_h5(
     wsi_name_filter_func=test_wsi_name_filter,
     num_rsync_workers=4,
+    delete_slide=True,
 )
 total_time = time.time() - start_time
 
