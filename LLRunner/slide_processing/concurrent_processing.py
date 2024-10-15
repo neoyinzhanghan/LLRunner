@@ -1,3 +1,4 @@
+import os
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from LLRunner.slide_transfer.metadata_management import (
@@ -22,6 +23,7 @@ from LLRunner.slide_transfer.slides_management import (
 
 from LLRunner.slide_processing.dzsave_h5 import dzsave_wsi_name_h5
 from LLRunner.deletion.delete_slide_results import delete_results_from_note
+from LLRunner.config import dzsave_dir
 
 
 def create_list_of_batches_from_list(list, batch_size):
@@ -192,7 +194,7 @@ from subprocess import call
 from concurrent.futures import ThreadPoolExecutor
 
 
-def rsync_slide_output(wsi_name, output_path, destination_dir):
+def rsync_slide_output(output_path, destination_dir):
     """Run rsync to sync the dzsave output to the destination."""
     rsync_command = [
         "sudo",
@@ -203,9 +205,9 @@ def rsync_slide_output(wsi_name, output_path, destination_dir):
     ]
     result = call(rsync_command)
     if result == 0:
-        print(f"Successfully synced {wsi_name} to {destination_dir}")
+        print(f"Successfully synced {output_path} to {destination_dir}")
     else:
-        print(f"Failed to sync {wsi_name}. Error code: {result}")
+        print(f"Failed to sync {output_path}. Error code: {result}")
 
 
 def main_concurrent_dzsave_h5(
@@ -292,7 +294,7 @@ def main_concurrent_dzsave_h5(
                         wsi_name_h5 = wsi_name[:-5] + ".h5"
 
                         # Assuming the dzsave output is located at a specific path:
-                        output_path = f"/path/to/output/{wsi_name_h5}"
+                        output_path = os.path.join(dzsave_dir, wsi_name_h5)
 
                         # Run dzsave and metadata tracking here
 
