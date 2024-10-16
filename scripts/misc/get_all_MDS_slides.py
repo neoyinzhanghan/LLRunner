@@ -18,7 +18,12 @@ for wsi_name in tqdm(wsi_names, desc="Finding MDS Slides"):
 
     try:
         dx, subdx = sst.get_dx(accession_number)
-        if dx is not None and subdx is not None and "MDS" in dx and ("EB1" in subdx or "EB2" in subdx):
+        if (
+            dx is not None
+            and subdx is not None
+            and "MDS" in dx
+            and ("EB1" in subdx or "EB2" in subdx)
+        ):
             MDS_wsi_names_df_dict["wsi_name"].append(wsi_name)
             MDS_wsi_names_df_dict["Dx"].append(dx)
             MDS_wsi_names_df_dict["sub_Dx"].append(subdx)
@@ -27,3 +32,9 @@ for wsi_name in tqdm(wsi_names, desc="Finding MDS Slides"):
         continue
 
 print("MDS Slides Found: ", len(MDS_wsi_names_df_dict["wsi_name"]))
+
+# create a dataframe from the dictionary
+MDS_wsi_names_df = pd.DataFrame(MDS_wsi_names_df_dict)
+
+# save the dataframe to a csv file in media/hdd3/neo
+MDS_wsi_names_df.to_csv("/media/hdd3/neo/MDS_wsi_names.csv", index=False)
