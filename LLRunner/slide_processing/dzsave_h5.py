@@ -524,7 +524,7 @@ if __name__ == "__main__":
         slide_name,
         tile_size=256,
         num_cpus=128,
-        region_cropping_batch_size=2048,
+        region_cropping_batch_size=256,
     )
 
     dzsave_time = time.time() - start_time

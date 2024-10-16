@@ -413,7 +413,7 @@ if __name__ == "__main__":
     initialize_dzsave_dir()
     dzsave_wsi_name(
         slide_name,
-        tile_size=2048,
+        tile_size=256,
     )
 
     dzsave_time = time.time() - start_time
