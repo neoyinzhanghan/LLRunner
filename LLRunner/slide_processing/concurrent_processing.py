@@ -288,7 +288,8 @@ def main_concurrent_dzsave_h5(
 
                     # If slide needs to be processed
                     if wsi_name in wsi_names_to_run_dzsave_h5:
-                        print(f"Running BMA or PBS diff pipeline on {wsi_name}")
+                        print(f"Running dzsave_h5 pipeline on {wsi_name}")
+                        dzsave_wsi_name_h5(wsi_name)
 
                         # h5_path is wsi_name replacing .ndpi with .h5
                         wsi_name_h5 = wsi_name[:-5] + ".h5"
