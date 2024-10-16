@@ -1,4 +1,5 @@
 import os
+import subprocess
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from LLRunner.slide_transfer.metadata_management import (
@@ -209,6 +210,18 @@ def rsync_slide_output(output_path, destination_dir):
     else:
         print(f"Failed to sync {output_path}. Error code: {result}")
 
+def async_rsync_slide_output(output_path, destination_dir):
+    """Run rsync to sync the dzsave output to the destination asynchronously."""
+    rsync_command = [
+        "sudo",
+        "rsync",
+        "-avz",  # Adjust options based on your needs
+        output_path,
+        destination_dir,
+    ]
+    process = subprocess.Popen(rsync_command)  # Non-blocking
+    return process  # You can keep track of the process if needed
+
 
 def main_concurrent_dzsave_h5(
     wsi_name_filter_func,
@@ -302,7 +315,7 @@ def main_concurrent_dzsave_h5(
                         # After dzsave is done, start rsync of the output asynchronously
                         destination_dir = "/dmpisilon_tools/neo/slide_tiles_h5"
 
-                        rsync_slide_output(output_path, destination_dir)
+                        async_rsync_slide_output(output_path, destination_dir)
 
                     if delete_slide:
                         delete_slide_from_tmp(wsi_name)
