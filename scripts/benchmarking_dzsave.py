@@ -13,8 +13,6 @@ isilon_dir = "/dmpisilon_tools/neo/dzsave_bm"
 h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 dzsave_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53"
 
-dzsave_tiles_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_tiles"
-
 example_img_dir = "/media/hdd3/neo/example_img_dir"
 dzsave_metadata_path = os.path.join("/media/hdd3/neo/dzsave_dir", "dzsave_metadata.csv")
 
@@ -120,7 +118,7 @@ for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
 
     start_time = time.time()
     tile_path = retrieve_tile(
-        dzsave_tiles_dir,
+        dzsave_files_dir,
         random_level,
         random_x,
         random_y,
