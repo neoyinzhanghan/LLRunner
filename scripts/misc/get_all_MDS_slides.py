@@ -79,7 +79,7 @@ for wsi_name in tqdm(MDS_wsi_names, desc="Running LLBMA on MDS Slides"):
 
     analyse_bma(
         slide_path=slide_path,
-        dump_dir=slide_save_dir,
+        dump_dir=MDS_results_dir,
         hoarding=True,
         continue_on_error=True,
         do_extract_features=False,
