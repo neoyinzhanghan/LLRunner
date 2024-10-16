@@ -18,10 +18,11 @@ for wsi_name in tqdm(wsi_names, desc="Finding MDS Slides"):
 
     try:
         dx, subdx = sst.get_dx(accession_number)
-        if "MDS" in dx and ("EB1" in subdx or "EB2" in subdx):
+        if dx is not None and subdx is not None and "MDS" in dx and ("EB1" in subdx or "EB2" in subdx):
             MDS_wsi_names_df_dict["wsi_name"].append(wsi_name)
             MDS_wsi_names_df_dict["Dx"].append(dx)
             MDS_wsi_names_df_dict["sub_Dx"].append(subdx)
+
     except AccessionNumberNotFoundError:
         continue
 
