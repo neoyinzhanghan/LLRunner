@@ -42,11 +42,11 @@ print("MDS Slides Found: ", len(MDS_wsi_names_df_dict["wsi_name"]))
 # create a dataframe from the dictionary
 MDS_wsi_names_df = pd.DataFrame(MDS_wsi_names_df_dict)
 
-# save the dataframe to a csv file in media/hdd3/neo
-MDS_wsi_names_df.to_csv("/media/hdd3/neo/MDS_wsi_names.csv", index=False)
-
-slide_save_dir = "/media/hdd3/neo/MDS_slides"
+slide_save_dir = "/media/hdd3/neo/BMA_MDS"
 os.makedirs(slide_save_dir, exist_ok=True)
+
+# save the dataframe to a csv file in media/hdd3/neo
+MDS_wsi_names_df.to_csv("/media/hdd3/neo/BMA_MDS/MDS_wsi_names.csv", index=False)
 
 
 def rsync_slide(slide_path, destination_dir):
