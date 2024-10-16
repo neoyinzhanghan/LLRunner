@@ -13,6 +13,8 @@ isilon_dir = "/dmpisilon_tools/neo/dzsave_bm"
 h5_path = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53.h5"
 dzsave_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53"
 
+dzsave_tiles_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_tiles"
+
 example_img_dir = "/media/hdd3/neo/example_img_dir"
 dzsave_metadata_path = os.path.join("/media/hdd3/neo/dzsave_dir", "dzsave_metadata.csv")
 
@@ -42,14 +44,14 @@ width, height = wsi.dimensions
 tile_size = 256
 
 start_time = time.time()
-# print("DZSaving slide as H5...")
-clear_metadata()
-dzsave_wsi_name_h5(
-    slide_name,
-    tile_size=tile_size,
-    num_cpus=32,
-    region_cropping_batch_size=256,
-)
+print("DZSaving slide as H5...")
+# clear_metadata()
+# dzsave_wsi_name_h5(
+#     slide_name,
+#     tile_size=tile_size,
+#     num_cpus=32,
+#     region_cropping_batch_size=256,
+# )
 
 dzsave_h5_time = time.time() - start_time
 
@@ -74,7 +76,7 @@ dzsave_dir_size = sum(
 
 start_time = time.time()
 print("Rsyncing h5 file to isilon...")
-os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
+# os.system(f"sudo rsync -av '{h5_path}' {isilon_dir}")
 rsync_h5_time = time.time() - start_time
 
 start_time = time.time()
@@ -92,48 +94,48 @@ print(f"Rsync DZSave time: {rsync_dzsave_time} for {dzsave_size_mb} MB")
 
 dzsave_files_dir = "/media/hdd3/neo/dzsave_dir/H19-5749;S10;MSKI - 2023-05-24 21.38.53/H19-5749;S10;MSKI - 2023-05-24 21.38.53_files"
 
-# retrieval_time_h5 = 0
-# retrieval_time_dzsave = 0
-# num_to_retrieve = 1000
+retrieval_time_h5 = 0
+retrieval_time_dzsave = 0
+num_to_retrieve = 1000
 
-# current_idx = 0
+current_idx = 0
 
-# for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
-#     # find a random level from 0, 1, ... 18
-#     random_level = np.random.randint(13, 19)
-#     downsample_factor = 2 ** (18 - random_level)
+for i in tqdm(range(num_to_retrieve), desc="Retrieving random tiles"):
+    # find a random level from 0, 1, ... 18
+    random_level = np.random.randint(13, 19)
+    downsample_factor = 2 ** (18 - random_level)
 
-#     # find a random x and y coordinate
-#     random_x = np.random.randint(0, max((width / downsample_factor) // tile_size, 1))
-#     random_y = np.random.randint(0, max((height / downsample_factor) // tile_size, 1))
+    # find a random x and y coordinate
+    random_x = np.random.randint(0, max((width / downsample_factor) // tile_size, 1))
+    random_y = np.random.randint(0, max((height / downsample_factor) // tile_size, 1))
 
-#     start_time = time.time()
-#     h5_tile = retrieve_tile_h5(isilon_h5_path, random_level, random_x, random_y)
-#     retrieval_time_h5 += time.time() - start_time
+    start_time = time.time()
+    h5_tile = retrieve_tile_h5(h5_path, random_level, random_x, random_y)
+    retrieval_time_h5 += time.time() - start_time
 
-#     # save the tile as a jpeg image in the example_img_dir/h5
-#     h5_tile.save(
-#         os.path.join(example_img_dir, "h5", f"{random_x}_{random_y}_{current_idx}.jpeg")
-#     )
+    # save the tile as a jpeg image in the example_img_dir/h5
+    h5_tile.save(
+        os.path.join(example_img_dir, "h5", f"{random_x}_{random_y}_{current_idx}.jpeg")
+    )
 
-#     start_time = time.time()
-#     tile_path = retrieve_tile(
-#         isilon_dzsave_dir,
-#         random_level,
-#         random_x,
-#         random_y,
-#     )
-#     retrieval_time_dzsave += time.time() - start_time
+    start_time = time.time()
+    tile_path = retrieve_tile(
+        dzsave_tiles_dir,
+        random_level,
+        random_x,
+        random_y,
+    )
+    retrieval_time_dzsave += time.time() - start_time
 
-#     # save the tile as a jpeg image in the example_img_dir/dzsave
-#     tile_path.save(os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}_{current_idx}.jpeg"))
+    # save the tile as a jpeg image in the example_img_dir/dzsave
+    tile_path.save(os.path.join(example_img_dir, "dzi", f"{random_x}_{random_y}_{current_idx}.jpeg"))
 
-#     current_idx += 1
+    current_idx += 1
 
 
-# print(
-#     f"Retrieval H5 time on isilon: {retrieval_time_h5} for {num_to_retrieve} random tiles"
-# )
-# print(
-#     f"Retrieval DZSave time on isilon: {retrieval_time_dzsave} for {num_to_retrieve} random tiles"
-# )
+print(
+    f"Retrieval H5 time on isilon: {retrieval_time_h5} for {num_to_retrieve} random tiles"
+)
+print(
+    f"Retrieval DZSave time on isilon: {retrieval_time_dzsave} for {num_to_retrieve} random tiles"
+)
