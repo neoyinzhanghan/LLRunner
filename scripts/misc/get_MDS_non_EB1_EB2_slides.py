@@ -74,18 +74,18 @@ slide_source_dir = "/pesgisipth/NDPI"
 for wsi_name in tqdm(MDS_wsi_names, desc="Running LLBMA on MDS Slides"):
     wsi_path = os.path.join(slide_source_dir, wsi_name)
 
-    rsync_slide(wsi_path, slide_save_dir)
+    # rsync_slide(wsi_path, slide_save_dir)
 
-    # slide_path = os.path.join(slide_save_dir, wsi_name)
+    slide_path = os.path.join(slide_save_dir, wsi_name)
 
-    # print(f"Processing {wsi_name}...")
+    print(f"Processing {wsi_name}...")
 
-    # analyse_bma(
-    #     slide_path=slide_path,
-    #     dump_dir=MDS_results_dir,
-    #     hoarding=True,
-    #     continue_on_error=True,
-    #     do_extract_features=False,
-    #     check_specimen_False=False,
-    #     ignore_specimen_clf=False,
-    # )
+    analyse_bma(
+        slide_path=slide_path,
+        dump_dir=MDS_results_dir,
+        hoarding=True,
+        continue_on_error=True,
+        do_extract_features=False,
+        check_specimen_False=False,
+        ignore_specimen_clf=False,
+    )
