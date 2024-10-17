@@ -43,13 +43,13 @@ print("MDS Slides Found: ", len(MDS_wsi_names_df_dict["wsi_name"]))
 # create a dataframe from the dictionary
 MDS_wsi_names_df = pd.DataFrame(MDS_wsi_names_df_dict)
 
-slide_save_dir = "/media/hdd3/neo/BMA_MDS"
+slide_save_dir = "/media/hdd3/neo/BMA_MDS_non_EB1_EB2"
 os.makedirs(slide_save_dir, exist_ok=True)
 
 # save the dataframe to a csv file in media/hdd3/neo
 MDS_wsi_names_df.to_csv("/media/hdd3/neo/BMA_MDS/MDS_wsi_names.csv", index=False)
 
-MDS_results_dir = "/media/hdd3/neo/MDS_results"
+MDS_results_dir = "/media/hdd3/neo/MDS_non_EB1_EB2_results"
 os.makedirs(MDS_results_dir, exist_ok=True)
 
 
@@ -74,16 +74,18 @@ slide_source_dir = "/pesgisipth/NDPI"
 for wsi_name in tqdm(MDS_wsi_names, desc="Running LLBMA on MDS Slides"):
     wsi_path = os.path.join(slide_source_dir, wsi_name)
 
-    slide_path = os.path.join(slide_save_dir, wsi_name)
+    rsync_slide(wsi_path, slide_save_dir)
 
-    print(f"Processing {wsi_name}...")
+    # slide_path = os.path.join(slide_save_dir, wsi_name)
 
-    analyse_bma(
-        slide_path=slide_path,
-        dump_dir=MDS_results_dir,
-        hoarding=True,
-        continue_on_error=True,
-        do_extract_features=False,
-        check_specimen_False=False,
-        ignore_specimen_clf=False,
-    )
+    # print(f"Processing {wsi_name}...")
+
+    # analyse_bma(
+    #     slide_path=slide_path,
+    #     dump_dir=MDS_results_dir,
+    #     hoarding=True,
+    #     continue_on_error=True,
+    #     do_extract_features=False,
+    #     check_specimen_False=False,
+    #     ignore_specimen_clf=False,
+    # )
