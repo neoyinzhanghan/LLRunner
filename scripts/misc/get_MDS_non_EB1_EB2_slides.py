@@ -47,7 +47,7 @@ slide_save_dir = "/media/hdd3/neo/BMA_MDS_non_EB1_EB2"
 os.makedirs(slide_save_dir, exist_ok=True)
 
 # save the dataframe to a csv file in media/hdd3/neo
-MDS_wsi_names_df.to_csv("/media/hdd3/neo/BMA_MDS/MDS_wsi_names.csv", index=False)
+MDS_wsi_names_df.to_csv("/media/hdd3/neo/BMA_MDS_non_EB1_EB2/MDS_wsi_names.csv", index=False)
 
 MDS_results_dir = "/media/hdd3/neo/MDS_non_EB1_EB2_results"
 os.makedirs(MDS_results_dir, exist_ok=True)
