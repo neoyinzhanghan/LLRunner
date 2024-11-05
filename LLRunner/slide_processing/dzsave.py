@@ -235,7 +235,11 @@ def get_depth_from_0_to_11(wsi_path, save_dir, tile_size=256):
                 patch = current_image.crop((x, y, right, bottom))
 
                 # Save the patch
-                path = os.path.join(save_dir, str(depth), f"{int(x//tile_size)}_{int(y//tile_size)}.jpeg")
+                path = os.path.join(
+                    save_dir,
+                    str(depth),
+                    f"{int(x//tile_size)}_{int(y//tile_size)}.jpeg",
+                )
                 patch.save(path)
 
 
@@ -270,16 +274,12 @@ def dzsave(
 
     with open(dzi_path, "w") as f:
         dzi_message = f"""<?xml version="1.0" encoding="UTF-8"?>
-        <Image xmlns="http://schemas.microsoft.com/deepzoom/2008"
+    <Image xmlns="http://schemas.microsoft.com/deepzoom/2008"
         Format="jpeg"
         Overlap="0"
-        TileSize={tile_size}
-        >
-        <Size
-            Height={height}
-            Width={width}
-        />
-        </Image>"""
+        TileSize="{tile_size}">
+        <Size Height="{height}" Width="{width}"/>
+    </Image>"""
         f.write(dzi_message)
 
     starttime = time.time()

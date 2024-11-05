@@ -385,6 +385,14 @@ def dzsave_h5(
 
     wsi = openslide.OpenSlide(wsi_path)
     width, height = wsi.dimensions
+    image_width, image_height = wsi.dimensions
+
+    initialize_final_h5py_file(
+        h5_path,
+        image_width=image_width,
+        image_height=image_height,
+        patch_size=tile_size,
+    )
 
     print(f"Width: {width}, Height: {height}")
 
@@ -419,16 +427,6 @@ def dzsave_wsi_name_h5(
     wsi_name_no_ext = wsi_name_path.stem
 
     h5_path = os.path.join(dzsave_dir, wsi_name_no_ext) + ".h5"
-
-    wsi = openslide.OpenSlide(wsi_path)
-    image_width, image_height = wsi.dimensions
-
-    initialize_final_h5py_file(
-        h5_path,
-        image_width=image_width,
-        image_height=image_height,
-        patch_size=tile_size,
-    )
 
     starttime = time.time()
 
