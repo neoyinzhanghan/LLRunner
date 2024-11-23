@@ -12,15 +12,15 @@ class SST:
 
     xlsx_path: str = slide_scanning_tracker_path
     sheet_name: str = slide_scanning_tracker_sheet_name
-    df: pd.DataFrame = None
+    df: pd.DataFrame = pd.read_excel(xlsx_path, sheet_name=sheet_name)
 
     def get_dx(self, accession_number: str) -> tuple:
         """
         Get the diagnosis and sub-diagnosis of the slide.
         """
 
-        if self.df is None:
-            self.df = pd.read_excel(self.xlsx_path, sheet_name=self.sheet_name)
+        # if self.df is None:
+        #     self.df = pd.read_excel(self.xlsx_path, sheet_name=self.sheet_name)
 
         rows = self.df.loc[self.df["Accession Number"] == accession_number]
         dx_box = rows["General Dx"]
