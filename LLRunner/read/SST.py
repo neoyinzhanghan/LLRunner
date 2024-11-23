@@ -12,7 +12,11 @@ class SST:
 
     xlsx_path: str = slide_scanning_tracker_path
     sheet_name: str = slide_scanning_tracker_sheet_name
-    df: pd.DataFrame = pd.read_excel(xlsx_path, sheet_name=sheet_name)
+    df: None
+
+    def __post_init__(self):
+        df = pd.DataFrame = pd.read_excel(self.xlsx_path, sheet_name=self.sheet_name)
+        self.df = df
 
     def get_dx(self, accession_number: str) -> tuple:
         """
@@ -41,4 +45,3 @@ class SST:
 
 
 sst = SST()
-
