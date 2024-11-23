@@ -47,3 +47,5 @@ class SST:
             raise AccessionNumberNotFoundError(accession_number)
         
         return dx_str, subdx_str
+
+sst = SST()
