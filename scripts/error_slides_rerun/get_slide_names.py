@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 from tqdm import tqdm
+from LLRunner.slide_processing.concurrent_processing import main_concurrent_processing
+
 
 error_results_df_path = "/home/greg/Documents/neo/LL-Eval/pipeline_error_df.csv"
 error_results_df = pd.read_csv(error_results_df_path)
@@ -39,4 +41,28 @@ for result_dir_name in tqdm(result_dir_names, desc="Getting slide names"):
     list_of_slide_names.append(wsi_name)
 
 
+list_of_slide_names = list_of_slide_names[
+    :5
+]  # TODO remove this line after debugging is complete
+
+
 print(f"Number of slide names found: {len(list_of_slide_names)}")
+
+
+def error_slide_name_filter(wsi_name):
+    return wsi_name in list_of_slide_names
+
+
+def identity_filter(pipeline_history_df):
+    return pipeline_history_df
+
+
+note = "Rerunning error slide with V3 pipeline. Started on December 11th, 2024."
+
+main_concurrent_processing(
+    wsi_name_filter_func=error_slide_name_filter,
+    processing_filter_func=identity_filter,
+    num_rsync_workers=4,
+    note=note,
+    delete_slide=True,
+)
