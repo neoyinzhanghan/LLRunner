@@ -40,12 +40,6 @@ for result_dir_name in tqdm(result_dir_names, desc="Getting slide names"):
 
     list_of_slide_names.append(wsi_name)
 
-
-list_of_slide_names = list_of_slide_names[
-    :5
-]  # TODO remove this line after debugging is complete
-
-
 print(f"Number of slide names found: {len(list_of_slide_names)}")
 
 
