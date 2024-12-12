@@ -52,7 +52,9 @@ if __name__ == "__main__":
             delete_slide=False,
             note="Running BMA-diff Pipeline on H-even-year slides reported as BMA in part description.",
             hoarding=True,
+            extra_hoarding=False,
             continue_on_error=True,
             do_extract_features=False,
             check_specimen_clf=False,
+            run_low_mag=False,
         )
