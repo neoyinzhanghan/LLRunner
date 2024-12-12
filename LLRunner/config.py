@@ -10,7 +10,7 @@ dzsave_dir = "/media/hdd3/neo/dzsave_dir"
 
 ssh_config = {
     "glv2": {"hostname": "172.28.164.44", "username": "greg", "key_filename": None},
-    "glv3": {"hostname": "172.28.164.114", "username": "greg", "key_filename": None},
+    # "glv3": {"hostname": "172.28.164.114", "username": "greg", "key_filename": None},
 }
 
 available_machines = list(ssh_config.keys())
