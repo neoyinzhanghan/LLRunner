@@ -11,11 +11,6 @@ import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
 from PIL import Image
-from LLRunner.config import (
-    dzsave_dir,
-    dzsave_metadata_path,
-    tmp_slide_dir,
-)
 
 
 def image_to_jpeg_string(image):
@@ -271,6 +266,8 @@ def crop_wsi_images_all_levels(
 ):
     num_croppers = num_cpus  # Number of croppers is the same as num_cpus
 
+    wsi = openslide.OpenSlide(wsi_path)
+    level_count = wsi.level_count
     if verbose:
         print("Initializing WSICropManager")
 
@@ -279,7 +276,7 @@ def crop_wsi_images_all_levels(
     # Get all the coordinates for 256x256 patches
     focus_regions_coordinates = []
 
-    for level in range(0, 8):
+    for level in range(level_count):
         focus_regions_coordinates.extend(
             ray.get(
                 manager.get_tile_coordinate_level_pairs.remote(
@@ -315,6 +312,8 @@ def crop_wsi_images_all_levels(
                             x, y, wsi_level, jpeg_string = indices_jpeg
                             level = int(18 - wsi_level)
                             f[str(level)][x, y] = jpeg_string
+                            # print(f"Saved patch at level: {level}, x: {x}, y: {y}")
+                            # print(f"jpeg_string: {jpeg_string}")
 
                         pbar.update(len(batch))
 
@@ -324,23 +323,24 @@ def crop_wsi_images_all_levels(
                     del tasks[done_id]
 
 
-def get_depth_from_0_to_11(wsi_path, h5_path, tile_size=256):
-    # the depth 11 image the the level 7 image from the slide
-    # each depth decrease is a downsample by factor of 2
+def get_depth_from_0_to_N(wsi_path, h5_path, tile_size=256):
 
-    # get the depth_11 image
     wsi = openslide.OpenSlide(wsi_path)
-    level_7_dimensions = wsi.level_dimensions[7]
-    image = wsi.read_region((0, 0), 7, level_7_dimensions)
+    level_count = wsi.level_count
+
+    assert level_count <= 18, "The slide has more than 18 levels"
+
+    level_top_dimensions = wsi.level_dimensions[level_count - 1]
+    image = wsi.read_region((0, 0), level_count - 1, level_top_dimensions)
     image = image.convert("RGB")
 
     current_image = image
-    for depth in range(10, -1, -1):
+    for depth in range(18 - level_count, -1, -1):
         # downsample the image by a factor of 2
         current_image = image.resize(
             (
-                max(image.width // (2 ** (10 - depth)), 1),
-                max(image.height // (2 ** (10 - depth)), 1),
+                int(max(image.width // (2 ** ((18 - level_count + 1) - depth)), 1)),
+                int(max(image.height // (2 ** ((18 - level_count + 1) - depth)), 1)),
             )
         )
         # crop 256x256 patches from the downsampled image (don't overlap, dont leave out any boundary patches)
@@ -396,7 +396,7 @@ def dzsave_h5(
 
     starttime = time.time()
 
-    print("Cropping from NDPI")
+    print("Cropping from WSI using native levels")
     crop_wsi_images_all_levels(
         wsi_path,
         h5_path,
@@ -404,76 +404,13 @@ def dzsave_h5(
         crop_size=tile_size,
         num_cpus=num_cpus,
     )
+
     print("Cropping Lower Resolution Levels")
-    get_depth_from_0_to_11(wsi_path, h5_path, tile_size=tile_size)
+    get_depth_from_0_to_N(wsi_path, h5_path, tile_size=tile_size)
+
     time_taken = time.time() - starttime
 
     return time_taken
-
-
-def dzsave_wsi_name_h5(
-    wsi_name, tile_size=256, num_cpus=32, region_cropping_batch_size=256
-):
-    """Check if the wsi_name is in the dzsave_metadata_path. If not then create a subfolder in dzsave_dir with the wsi_name with out the extention
-    The in that folder save the wsi_name_files folder and the wsi_name.dzi file.
-    Add the processing time and datetime processed to the dzsave_metadata_path.
-    """
-    wsi_name_path = Path(wsi_name)
-    wsi_path = os.path.join(tmp_slide_dir, wsi_name)
-
-    assert os.path.exists(wsi_path), f"Error: {wsi_path} does not exist."
-    wsi_name_no_ext = wsi_name_path.stem
-
-    h5_path = os.path.join(dzsave_dir, wsi_name_no_ext) + ".h5"
-
-    starttime = time.time()
-
-    try:
-        dzsave_h5(
-            wsi_path=wsi_path,
-            h5_path=h5_path,
-            tile_size=tile_size,
-            num_cpus=num_cpus,
-            region_cropping_batch_size=region_cropping_batch_size,
-        )
-        error = None
-
-    except Exception as e:
-        error = str(e)
-        print(
-            f"UserWarningL: Error: {error} occurred while processing {wsi_name}. While continue on error is on, the error should not be ignored if it happens to too many slides."
-        )
-
-        raise e
-
-    processing_time = time.time() - starttime
-    datetime_processed = time.strftime("%Y-%m-%d %H:%M:%S")
-
-    dzsave_metadata_df = pd.read_csv(dzsave_metadata_path)
-
-    new_row = {
-        "wsi_name": wsi_name,
-        "tile_size": tile_size,
-        "processing_time": processing_time,
-        "datetime_processed": datetime_processed,
-        "error": error,
-    }
-
-    new_row_df = pd.DataFrame([new_row])
-
-    # Add a row to the dataframe
-    dzsave_metadata_df = pd.concat([dzsave_metadata_df, new_row_df], ignore_index=True)
-
-    # Save the dataframe back to the dzsave_metadata_path
-    dzsave_metadata_df.to_csv(dzsave_metadata_path, index=False)
-
-
-def initialize_dzsave_dir():
-    os.makedirs(dzsave_dir, exist_ok=True)
-    # if the dzsave_metadata_path does not exist, then create it
-    if not os.path.exists(dzsave_metadata_path):
-        with open(dzsave_metadata_path, "w") as f:
-            f.write("wsi_name,tile_size,processing_time,datetime_processed,error\n")
 
 
 def retrieve_tile_h5(h5_path, level, row, col):
@@ -495,34 +432,161 @@ def retrieve_tile_h5(h5_path, level, row, col):
         return image
 
 
-if __name__ == "__main__":
-    # import time
+import openslide
+from PIL import Image
+import pyvips
+import numpy as np
+import time
 
-    # # start_time = time.time()
-    # # print("Rsyncing slide")
-    # # original_slide_path = (
-    # #     "/pesgisipth/NDPI/H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"
-    # # )
 
-    # # # run sudo rsync -av the slide from original_slide_path to slide_path
-    # # save_path = "/media/hdd3/neo/"
+def dyadically_reorganize_svs_levels(input_svs_path, output_svs_path):
+    """
+    Process an SVS file to reorganize its levels to have a consistent downsampling factor of 2
+    and save the result as a new SVS file with preserved metadata.
 
-    slide_name = "H19-5749;S10;MSKI - 2023-05-24 21.38.53.ndpi"  # NOTE THIS IS MEANT TO BE RUN ON GLV2
-
-    # # # copy the slide from original_slide_path to slide_path
-    # # os.system(f"sudo rsync -av {original_slide_path} {slide_path}")
-    # # rsync_slide_time = time.time() - start_time
-
+    Args:
+        input_svs_path (str): Path to the input SVS file.
+        output_svs_path (str): Path to save the output SVS file.
+    """
     start_time = time.time()
-    print("DZSaving slide")
-    initialize_dzsave_dir()
-    dzsave_wsi_name_h5(
-        slide_name,
+    try:
+        print(f"Starting processing for: {input_svs_path}")
+
+        # Open the original SVS file
+        print("Opening the input SVS file...")
+        slide = openslide.OpenSlide(input_svs_path)
+
+        # Retrieve metadata
+        print("Retrieving metadata...")
+        mpp_x = float(slide.properties.get(openslide.PROPERTY_NAME_MPP_X, 0))
+        mpp_y = float(slide.properties.get(openslide.PROPERTY_NAME_MPP_Y, 0))
+        level_dimensions = slide.level_dimensions
+        level_downsamples = slide.level_downsamples
+
+        level_downsamples = [int(downsample) for downsample in level_downsamples]
+
+        if mpp_x == 0 or mpp_y == 0:
+            print("Warning: MPP values not found in the input file.")
+
+        print(f"Metadata retrieved: MPP X: {mpp_x}, MPP Y: {mpp_y}")
+        print(f"Level dimensions: {level_dimensions}")
+        print(f"Level downsamples: {level_downsamples}")
+
+        # Read the base level image
+        base_level = 0
+        print(f"Reading base level: {base_level}")
+        base_image = slide.read_region((0, 0), base_level, level_dimensions[base_level])
+        base_image = base_image.convert("RGB")
+        print(f"Base level dimensions: {level_dimensions[base_level]}")
+
+        # Generate pyramid levels with downsampling factor of 2
+        print("Generating pyramid levels with a downsampling factor of 2...")
+        pyramid = [base_image]
+        current_level = 0
+        while pyramid[-1].size[0] > 1 and pyramid[-1].size[1] > 1:
+            print(f"Processing level {current_level + 1}...")
+            next_level = pyramid[-1].resize(
+                (pyramid[-1].size[0] // 2, pyramid[-1].size[1] // 2), Image.LANCZOS
+            )
+            print(f"Level {current_level + 1} dimensions: {next_level.size}")
+            pyramid.append(next_level)
+            current_level += 1
+
+        print(f"Generated {len(pyramid)} pyramid levels.")
+
+        # Convert PIL images to pyvips images
+        print("Converting pyramid levels to pyvips images...")
+        vips_images = []
+        for idx, img in enumerate(pyramid):
+            print(f"Converting level {idx}...")
+            vips_image = pyvips.Image.new_from_array(np.array(img))
+            vips_images.append(vips_image)
+
+        # Merge the images into a single pyvips pyramid
+        print("Merging all levels into a single pyvips pyramid...")
+        vips_pyramid = vips_images[0]
+        for idx, level in enumerate(vips_images[1:], start=1):
+            print(f"Merging level {idx}...")
+            vips_pyramid = vips_pyramid.insert(level, 0, 0)
+
+        # Add metadata to the new SVS file
+        print("Adding metadata to the new SVS file...")
+        metadata_description = {
+            "openslide.mpp-x": str(mpp_x),
+            "openslide.mpp-y": str(mpp_y),
+            "openslide.level-count": str(len(pyramid)),
+        }
+        for level, dimensions in enumerate(level_dimensions):
+            metadata_description[f"openslide.level[{level}].width"] = str(dimensions[0])
+            metadata_description[f"openslide.level[{level}].height"] = str(
+                dimensions[1]
+            )
+            metadata_description[f"openslide.level[{level}].downsample"] = str(
+                level_downsamples[level]
+            )
+
+        # Create a metadata string for ImageDescription
+        image_description = "\n".join(
+            f"{k}: {v}" for k, v in metadata_description.items()
+        )
+        print("Metadata string created for ImageDescription.")
+
+        # Save the pyramid as a new SVS file
+        print(f"Saving the new SVS file to: {output_svs_path}")
+        vips_pyramid.tiffsave(
+            output_svs_path,
+            tile=True,
+            pyramid=True,
+            compression="jpeg",
+            tile_width=256,
+            tile_height=256,
+            bigtiff=True,
+            properties=False,  # Disable automatic properties writing
+            xres=mpp_x,  # Horizontal resolution
+            yres=mpp_y,  # Vertical resolution
+        )
+        print(f"Reorganized SVS saved successfully to: {output_svs_path}")
+
+    except Exception as e:
+        print(f"Error processing {input_svs_path}: {e}")
+        raise e
+
+    finally:
+        elapsed_time = time.time() - start_time
+        print(
+            f"Time taken to dyadically reorganize SVS levels: {elapsed_time:.2f} seconds"
+        )
+
+
+if __name__ == "__main__":
+    svs_path = "/media/hdd3/neo/viewer_sample_huong/390359.svs"
+    new_svs_path = "/media/hdd3/neo/viewer_sample_huong/390359_dyadic.svs"
+    h5_path = "/media/hdd3/neo/viewer_sample_huong/390359.h5"
+
+    dyadically_reorganize_svs_levels(
+        svs_path,
+        new_svs_path,
+    )
+
+    # if the h5 file already exists, delete it
+    if os.path.exists(h5_path):
+        os.remove(h5_path)
+
+    dzsave_h5(
+        new_svs_path,
+        h5_path,
         tile_size=256,
-        num_cpus=128,
+        num_cpus=32,
         region_cropping_batch_size=256,
     )
 
-    dzsave_time = time.time() - start_time
+    start_time = time.time()
 
-    print(f"DZSave time: {dzsave_time}")
+    print(
+        f"Time taken to dyadically reorganize SVS levels: {time.time() - start_time:.2f} seconds"
+    )
+
+    # image = retrieve_tile_h5(h5_path, 18, 93, 81)
+
+    # # save the image at /media/hdd3/neo/test.jpeg
+    # image.save("/media/hdd3/neo/test_convert.jpeg")
