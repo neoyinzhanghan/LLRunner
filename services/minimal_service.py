@@ -24,6 +24,7 @@ for header in HEADERS:
         slide_name
         for slide_name in os.listdir(slide_source_dir)
         if slide_name.startswith(header) and slide_name.endswith(".ndpi")
+        and os.path.isfile(os.path.join(slide_source_dir, slide_name))
     ]
 
     all_slide_names.extend(slide_names)
@@ -31,11 +32,15 @@ for header in HEADERS:
 print(f"Found a total of {len(all_slide_names)} slides.")
 
 def get_slide_datetime(slide_name):
-    name = slide_name.split(".ndpi")[0]
-    datetime = name.split(" - ")[-1]
+    try:
+        name = slide_name.split(".ndpi")[0]
+        datetime = name.split(" - ")[-1]
 
-    # convert the datetime to a datetime object
-    datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
+        # convert the datetime to a datetime object
+        datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
+    except Exception as e:
+        print(f"Error getting datetime for {slide_name}: {e}")
+        raise e
     return datetime
 
 # get the list of all the slides that are newer than the CUTOFFDATETIME
