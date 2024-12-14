@@ -213,7 +213,6 @@ def process_slide(slide_name, metadata_df):
 
     # save the metadata_df back to the metadata_path
     metadata_df.to_csv(metadata_path, index=False)
-    print("By the way, Eugene is the best!")
 
 for slide in tqdm(newer_slides_to_process, desc="Processing slides"):
     process_slide(slide, metadata_df)
