@@ -59,7 +59,7 @@ for slide_name in all_slide_names:
 
 print(f"Found a total of {len(newer_slides)} slides newer than the cutoff datetime.")
 
-def process_slide(slide_name):
+def process_slide(slide_name, metadata_df):
     # first copy the slide to the tmp_slide_dir
     slide_path = os.path.join(slide_source_dir, slide_name)
     tmp_slide_path = os.path.join(tmp_slide_dir, slide_name)
@@ -194,5 +194,5 @@ def process_slide(slide_name):
     metadata_df.to_csv(metadata_path)
 
 for slide in all_slide_names:
-    process_slide(slide)
+    process_slide(slide, metadata_df)
     break
