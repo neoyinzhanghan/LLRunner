@@ -2,8 +2,10 @@ import os
 import time
 import shutil
 import datetime
+import openslide    
 import pandas as pd
 from LLRunner.slide_processing.dzsave_h5 import dzsave_h5
+from LLRunner.slide_processing.specimen_clf import get_topview_bma_score, get_topview_pbs_score
 
 cutoffdatetime = "2024-12-10 00:00:00"
 # convert the cutoff datetime to a datetime object
@@ -17,7 +19,7 @@ dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
 metdata_path = "/media/hdd2/neo/SameDayDzsave/same_day_processing_metadata.csv"
 
 # the same_day_processing_metadata.csv should have the following columns
-# wsi_name, result_dir_name, datetime_processed, pipeline, specimen_type, datetime_dzsaved, dzsave_error, pipeline_error, slide_copy_time, dzsave_time, pipeline_time
+# wsi_name, result_dir_name, datetime_processed, pipeline, datetime_dzsaved, slide_copy_error, dzsave_error, pipeline_error, slide_copy_time, dzsave_time, pipeline_time, bma_score, pbs_score, is_bma, is_pbs
 
 metadata_df = pd.read_csv(metdata_path)
 
@@ -68,7 +70,6 @@ def process_slide(slide_name):
         "result_dir_name": None,
         "datetime_processed": None,
         "pipeline": None,
-        "specimen_type": None,
         "datetime_dzsaved": None,
         "slide_copy_error": None,
         "dzsave_error": None,
@@ -76,6 +77,10 @@ def process_slide(slide_name):
         "slide_copy_time": None,
         "dzsave_time": None,
         "pipeline_time": None,
+        "bma_score": None,
+        "pbs_score": None,
+        "is_bma": None,
+        "is_pbs": None,
     }
 
     print(f"Copying slide from {slide_name} to {tmp_slide_path}")
@@ -90,17 +95,44 @@ def process_slide(slide_name):
     new_metadata_row_dict["slide_copy_time"] = slide_copy_time
     print(f"Slide copy completed. Took {slide_copy_time} seconds.")
 
-    print(f"dzsaving slide {slide_name} to {dzsave_h5_path}")
-    dzsave_start_time = time.time()
+    print(f"Performing specimen classification on slide {slide_name}")
     try:
-        dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+        wsi = openslide.OpenSlide(tmp_slide_path)
+        # topview is the entire level 7 image
+        topview = wsi.read_region((0, 0), 7, wsi.level_dimensions[7])
+        # if RGBA then convert to RGB
+        if topview.mode == "RGBA":
+            topview = topview.convert("RGB")
+    
+        bma_score = get_topview_bma_score(topview)
+        pbs_score = get_topview_pbs_score(topview)
+        new_metadata_row_dict["bma_score"] = bma_score
+        new_metadata_row_dict["pbs_score"] = pbs_score
+        is_bma = bma_score >= 0.5
+        is_pbs = pbs_score >= 0.5
+        new_metadata_row_dict["is_bma"] = is_bma
+        new_metadata_row_dict["is_pbs"] = is_pbs
+
+        print(f"Specimen BMA classification score for {slide_name}: {bma_score}")
+        print(f"Specimen PBS classification score for {slide_name}: {pbs_score}")
+    
     except Exception as e:
-        print(f"Error dzsaving slide {slide_name}: {e}")
-        new_metadata_row_dict["dzsave_error"] = str(e)
-    dzsave_time = time.time() - dzsave_start_time
-    new_metadata_row_dict["dzsave_time"] = dzsave_time
-    new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Error performing specimen classification on slide {slide_name}: {e}")
+        new_metadata_row_dict["pipeline_error"] = str(e)
+
+
+    # print(f"dzsaving slide {slide_name} to {dzsave_h5_path}")
+    # dzsave_start_time = time.time()
+    # try:
+    #     dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+    # except Exception as e:
+    #     print(f"Error dzsaving slide {slide_name}: {e}")
+    #     new_metadata_row_dict["dzsave_error"] = str(e)
+    # dzsave_time = time.time() - dzsave_start_time
+    # new_metadata_row_dict["dzsave_time"] = dzsave_time
+    # new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     print(new_metadata_row_dict)
+
 
 process_slide(all_slide_names[0])
