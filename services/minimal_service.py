@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 
-CUTOFFDATETIME = "2022-12-10 00:00:00"
+cutoffdatetime = "2022-12-10 00:00:00"
 # convert the cutoff datetime to a datetime object
-CUTOFFDATETIME = pd.to_datetime(CUTOFFDATETIME, format="%Y-%m-%d %H:%M:%S")
-HEADERS = ["H24", "H26", "H27"]
+cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
+headers = ["H24", "H25", "H26"]
 
 slide_source_dir = "/pesgisipth/NDPI"
 tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
@@ -19,7 +19,7 @@ metadata_df = pd.read_csv(metdata_path)
 
 # get the list of all the .ndpi files in the slide_source_dir with name starting with something from the HEADERS
 all_slide_names = os.listdir(slide_source_dir)
-for header in HEADERS:
+for header in headers:
     slide_names = [
         slide_name
         for slide_name in os.listdir(slide_source_dir)
@@ -48,7 +48,7 @@ newer_slides = []
 
 for slide_name in all_slide_names:
     slide_datetime = get_slide_datetime(slide_name)
-    if slide_datetime > CUTOFFDATETIME:
+    if slide_datetime > cutoffdatetime:
         newer_slides.append(slide_name)
 
 print(f"Found a total of {len(newer_slides)} slides newer than the cutoff datetime.")
