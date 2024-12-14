@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-CUTOFFDATETIME = "2024-12-10 00:00:00"
+CUTOFFDATETIME = "2022-12-10 00:00:00"
 # convert the cutoff datetime to a datetime object
 CUTOFFDATETIME = pd.to_datetime(CUTOFFDATETIME, format="%Y-%m-%d %H:%M:%S")
 HEADERS = ["H24", "H26", "H27"]
