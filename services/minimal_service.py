@@ -130,6 +130,11 @@ def process_slide(slide_name, metadata_df):
         print(f"Error performing specimen classification on slide {slide_name}: {e}")
         new_metadata_row_dict["pipeline_error"] = str(e)
 
+        is_bma = False
+        is_pbs = False
+        new_metadata_row_dict["is_bma"] = is_bma
+        new_metadata_row_dict["is_pbs"] = is_pbs
+
     if not is_bma:
         print(f"dzsaving slide {slide_name} to {dzsave_h5_path}")
         dzsave_start_time = time.time()
