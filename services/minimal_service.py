@@ -96,8 +96,8 @@ def process_slide(slide_name, metadata_df):
     print(f"Copying slide from {slide_name} to {tmp_slide_path}")
     copy_start_time = time.time()
     try:
-        # shutil.copy(slide_path, tmp_slide_path)
-        print("already copied")
+        shutil.copy(slide_path, tmp_slide_path)
+        # print("already copied")
     except Exception as e:
         print(f"Error copying slide {slide_name}: {e}")
         new_metadata_row_dict["slide_copy_error"] = str(e)
