@@ -140,13 +140,14 @@ def process_slide(slide_name, metadata_df):
         dzsave_start_time = time.time()
         try:
             dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+            new_metadata_row_dict["dzsave_time"] = dzsave_time
+            new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
+            new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         except Exception as e:
             print(f"Error dzsaving slide {slide_name}: {e}")
             new_metadata_row_dict["dzsave_error"] = str(e)
         dzsave_time = time.time() - dzsave_start_time
-        new_metadata_row_dict["dzsave_time"] = dzsave_time
-        new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
-        new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     
     else:
         print(f"We will run the LLBMA pipeline on slide {slide_name}")
@@ -190,13 +191,14 @@ def process_slide(slide_name, metadata_df):
             dzsave_start_time = time.time()
             try:
                 dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+                dzsave_time = time.time() - dzsave_start_time
+                new_metadata_row_dict["dzsave_time"] = dzsave_time
+                new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
+                new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
             except Exception as e:
                 print(f"Error dzsaving slide {slide_name}: {e}")
                 new_metadata_row_dict["dzsave_error"] = str(e)
-            dzsave_time = time.time() - dzsave_start_time
-            new_metadata_row_dict["dzsave_time"] = dzsave_time
-            new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
-            new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     print(new_metadata_row_dict)
 
