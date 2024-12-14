@@ -17,11 +17,14 @@ slide_source_dir = "/pesgisipth/NDPI"
 tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
 LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
-metadata_path = "/media/hdd2/neo/SameDayDzsave/same_day_processing_metadata.csv"
+metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
 
 # the same_day_processing_metadata.csv should have the following columns
 # wsi_name, result_dir_name, dzsave_h5_path, datetime_processed, pipeline, datetime_dzsaved, slide_copy_error, dzsave_error, pipeline_error, slide_copy_time, dzsave_time, pipeline_time, bma_score, pbs_score, is_bma, is_pbs
 metadata_df = pd.read_csv(metadata_path)
+
+# get the wsi_name column of the metadata_df as a list of strings
+wsi_names = metadata_df["wsi_name"].tolist()
 
 # get the list of all the .ndpi files in the slide_source_dir with name starting with something from the HEADERS
 all_slide_names = []
@@ -36,6 +39,12 @@ for header in headers:
     all_slide_names.extend(slide_names)
 
 print(f"Found a total of {len(all_slide_names)} slides.")
+print(f"This many has already been processed: {len(wsi_names)}")
+
+# only keep the slides that have not been processed
+all_slide_names = [slide_name for slide_name in all_slide_names if slide_name not in wsi_names]
+print(f"Found a total of {len(all_slide_names)} slides to process.")
+
 
 def get_slide_datetime(slide_name):
     try:
@@ -191,7 +200,7 @@ def process_slide(slide_name, metadata_df):
     metadata_df = pd.concat([metadata_df, new_metadata_row_df], ignore_index=True)
 
     # save the metadata_df back to the metadata_path
-    metadata_df.to_csv(metadata_path)
+    metadata_df.to_csv(metadata_path, index=False)
 
 for slide in all_slide_names:
     process_slide(slide, metadata_df)
