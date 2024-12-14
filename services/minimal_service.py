@@ -84,3 +84,4 @@ def process_slide(slide_name):
 
     print(new_metadata_row_dict)
 
+process_slide(all_slide_names[0])
