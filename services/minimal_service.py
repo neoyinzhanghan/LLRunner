@@ -46,6 +46,9 @@ print(f"This many has already been processed: {len(wsi_names)}")
 all_slide_names = [slide_name for slide_name in all_slide_names if slide_name not in wsi_names]
 print(f"Found a total of {len(all_slide_names)} slides to process.")
 
+import sys
+sys.exit()
+
 
 def get_slide_datetime(slide_name):
     try:
