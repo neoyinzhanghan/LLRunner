@@ -155,7 +155,7 @@ def process_slide(slide_name, metadata_df):
             pipeline_start_time = time.time()
             # Run the heme_analyze function
             analyse_bma(
-                slide_path=slide_path,
+                slide_path=tmp_slide_path,
                 dump_dir=LLBMA_results_dir,
                 hoarding=True,
                 extra_hoarding=False,
