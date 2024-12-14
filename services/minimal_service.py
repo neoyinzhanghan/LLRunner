@@ -19,6 +19,7 @@ tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
 LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
 metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
+topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
 
 # the same_day_processing_metadata.csv should have the following columns
 # wsi_name, result_dir_name, dzsave_h5_path, datetime_processed, pipeline, datetime_dzsaved, slide_copy_error, dzsave_error, pipeline_error, slide_copy_time, dzsave_time, pipeline_time, bma_score, pbs_score, is_bma, is_pbs
@@ -115,6 +116,10 @@ def process_slide(slide_name, metadata_df):
         # if RGBA then convert to RGB
         if topview.mode == "RGBA":
             topview = topview.convert("RGB")
+
+        # save the topview image
+        topview_path = os.path.join(topview_save_dir, slide_name.replace(".ndpi", ".jpg"))
+        topview.save(topview_path)
     
         bma_score = get_topview_bma_score(topview)
         pbs_score = get_topview_pbs_score(topview)
