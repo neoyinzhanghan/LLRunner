@@ -54,6 +54,11 @@ def get_slide_datetime(slide_name):
 # get the list of all the slides that are newer than the CUTOFFDATETIME
 newer_slides = []
 
+for slide_name in all_slide_names:
+    slide_datetime = get_slide_datetime(slide_name)
+    if slide_datetime > cutoffdatetime:
+        newer_slides.append(slide_name)
+
 print(f"Found a total of {len(newer_slides)} slides.")
 print(f"This many has already been processed: {len(wsi_names)}")
 
@@ -63,14 +68,6 @@ print(f"Found a total of {len(newer_slides_to_process)} slides to process.")
 
 import sys
 sys.exit()
-
-
-for slide_name in newer_slides_to_process:
-    slide_datetime = get_slide_datetime(slide_name)
-    if slide_datetime > cutoffdatetime:
-        newer_slides.append(slide_name)
-
-print(f"Found a total of {len(newer_slides)} slides newer than the cutoff datetime.")
 
 def process_slide(slide_name, metadata_df):
     metadata_df = pd.read_csv(metadata_path)
@@ -216,5 +213,5 @@ def process_slide(slide_name, metadata_df):
     metadata_df.to_csv(metadata_path, index=False)
     print("By the way, Eugene is the best!")
 
-for slide in tqdm(all_slide_names, desc="Processing slides"):
+for slide in tqdm(newer_slides_to_process, desc="Processing slides"):
     process_slide(slide, metadata_df)
