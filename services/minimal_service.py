@@ -33,11 +33,17 @@ print(f"Found a total of {len(all_slide_names)} slides.")
 def get_slide_datetime(slide_name):
     name = slide_name.split(".ndpi")[0]
     datetime = name.split(" - ")[-1]
+
+    # convert the datetime to a datetime object
+    datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
     return datetime
 
-example_slide = all_slide_names[0]
-example_datetime = get_slide_datetime(example_slide)
-# conver the datetime to a datetime object
-example_datetime = pd.to_datetime(example_datetime, format="%Y-%m-%d %H.%M.%S")
-print(f"Example slide name: {example_slide}, datetime: {example_datetime}")
-print(f"The slide is after the cutoff datetime: {example_datetime > CUTOFFDATETIME}")
+# get the list of all the slides that are newer than the CUTOFFDATETIME
+newer_slides = []
+
+for slide_name in all_slide_names:
+    slide_datetime = get_slide_datetime(slide_name)
+    if slide_datetime > CUTOFFDATETIME:
+        newer_slides.append(slide_name)
+
+print(f"Found a total of {len(newer_slides)} slides newer than the cutoff datetime.")
