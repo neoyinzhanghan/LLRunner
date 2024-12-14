@@ -9,7 +9,7 @@ from LLBMA.front_end.api import analyse_bma
 from LLRunner.slide_processing.dzsave_h5 import dzsave_h5
 from LLRunner.slide_processing.specimen_clf import get_topview_bma_score, get_topview_pbs_score
 
-cutoffdatetime = "2024-12-12 12:00:00"
+cutoffdatetime = "2024-12-10 12:00:00"
 # convert the cutoff datetime to a datetime object
 cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
 headers = ["H24", "H25", "H26"]
@@ -145,13 +145,14 @@ def process_slide(slide_name, metadata_df):
         dzsave_start_time = time.time()
         try:
             dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+            dzsave_time = time.time() - dzsave_start_time
             new_metadata_row_dict["dzsave_time"] = dzsave_time
             new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
             new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         except Exception as e:
             print(f"Error dzsaving slide {slide_name}: {e}")
             new_metadata_row_dict["dzsave_error"] = str(e)
-        dzsave_time = time.time() - dzsave_start_time
+        
 
     
     else:
