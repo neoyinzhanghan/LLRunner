@@ -9,7 +9,7 @@ from LLBMA.front_end.api import analyse_bma
 from LLRunner.slide_processing.dzsave_h5 import dzsave_h5
 from LLRunner.slide_processing.specimen_clf import get_topview_bma_score, get_topview_pbs_score
 
-cutoffdatetime = "2024-12-12 12:00:00"
+cutoffdatetime = "2024-12-13 12:00:00"
 # convert the cutoff datetime to a datetime object
 cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
 headers = ["H24", "H25", "H26"]
