@@ -4,10 +4,11 @@ import shutil
 import datetime
 import openslide    
 import pandas as pd
+from LLBMA.front_end.api import analyse_bma
 from LLRunner.slide_processing.dzsave_h5 import dzsave_h5
 from LLRunner.slide_processing.specimen_clf import get_topview_bma_score, get_topview_pbs_score
 
-cutoffdatetime = "2024-12-10 00:00:00"
+cutoffdatetime = "2024-12-12 00:00:00"
 # convert the cutoff datetime to a datetime object
 cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
 headers = ["H24", "H25", "H26"]
@@ -16,12 +17,11 @@ slide_source_dir = "/pesgisipth/NDPI"
 tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
 LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
-metdata_path = "/media/hdd2/neo/SameDayDzsave/same_day_processing_metadata.csv"
+metadata_path = "/media/hdd2/neo/SameDayDzsave/same_day_processing_metadata.csv"
 
 # the same_day_processing_metadata.csv should have the following columns
-# wsi_name, result_dir_name, datetime_processed, pipeline, datetime_dzsaved, slide_copy_error, dzsave_error, pipeline_error, slide_copy_time, dzsave_time, pipeline_time, bma_score, pbs_score, is_bma, is_pbs
-
-metadata_df = pd.read_csv(metdata_path)
+# wsi_name, result_dir_name, dzsave_h5_path, datetime_processed, pipeline, datetime_dzsaved, slide_copy_error, dzsave_error, pipeline_error, slide_copy_time, dzsave_time, pipeline_time, bma_score, pbs_score, is_bma, is_pbs
+metadata_df = pd.read_csv(metadata_path)
 
 # get the list of all the .ndpi files in the slide_source_dir with name starting with something from the HEADERS
 all_slide_names = []
@@ -68,6 +68,7 @@ def process_slide(slide_name):
     new_metadata_row_dict = {
         "wsi_name": slide_name,
         "result_dir_name": None,
+        "dzsave_h5_path": dzsave_h5_path,
         "datetime_processed": None,
         "pipeline": None,
         "datetime_dzsaved": None,
@@ -120,19 +121,69 @@ def process_slide(slide_name):
         print(f"Error performing specimen classification on slide {slide_name}: {e}")
         new_metadata_row_dict["pipeline_error"] = str(e)
 
+    if not is_bma:
+        print(f"dzsaving slide {slide_name} to {dzsave_h5_path}")
+        dzsave_start_time = time.time()
+        try:
+            dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+        except Exception as e:
+            print(f"Error dzsaving slide {slide_name}: {e}")
+            new_metadata_row_dict["dzsave_error"] = str(e)
+        dzsave_time = time.time() - dzsave_start_time
+        new_metadata_row_dict["dzsave_time"] = dzsave_time
+        new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
+        new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    else:
+        print(f"We will run the LLBMA pipeline on slide {slide_name}")
+        try:
+            pipeline_start_time = time.time()
+            # Run the heme_analyze function
+            analyse_bma(
+                slide_path=slide_path,
+                dump_dir=LLBMA_results_dir,
+                hoarding=True,
+                extra_hoarding=False,
+                continue_on_error=True,
+                do_extract_features=False,
+                check_specimen_clf=False,
+                pretiled_h5_path=None,
+            )
+            pipeline_time = time.time() - pipeline_start_time
+            new_metadata_row_dict["pipeline"] = "BMA-diff"
+            new_metadata_row_dict["pipeline_time"] = pipeline_time
+            new_metadata_row_dict["datetime_processed"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # print(f"dzsaving slide {slide_name} to {dzsave_h5_path}")
-    # dzsave_start_time = time.time()
-    # try:
-    #     dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
-    # except Exception as e:
-    #     print(f"Error dzsaving slide {slide_name}: {e}")
-    #     new_metadata_row_dict["dzsave_error"] = str(e)
-    # dzsave_time = time.time() - dzsave_start_time
-    # new_metadata_row_dict["dzsave_time"] = dzsave_time
-    # new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            slide_name_no_ext = slide_name.split(".ndpi")[0]
+            pipeline_slide_h5_path = os.path.join(LLBMA_results_dir, slide_name_no_ext, "slide.h5")
+
+            # copying the slide.h5 to the dzsave_dir
+            print(f"Copying slide.h5 from {pipeline_slide_h5_path} to {dzsave_h5_path}")
+            dzsave_start_time = time.time()
+            shutil.copy(pipeline_slide_h5_path, dzsave_h5_path)
+            dzsave_time = time.time() - dzsave_start_time
+
+            new_metadata_row_dict["result_dir_name"] = os.path.join(LLBMA_results_dir, slide_name_no_ext)
+            new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
+            new_metadata_row_dict["dzsave_time"] = dzsave_time  
+
+
+        except Exception as e:
+            print(f"Error running LLBMA pipeline on slide {slide_name}: {e}")
+            new_metadata_row_dict["pipeline_error"] = str(e)
+
+            print(f"Due to pipeline error, we are dzsaving slide {slide_name} to {dzsave_h5_path}")
+            dzsave_start_time = time.time()
+            try:
+                dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+            except Exception as e:
+                print(f"Error dzsaving slide {slide_name}: {e}")
+                new_metadata_row_dict["dzsave_error"] = str(e)
+            dzsave_time = time.time() - dzsave_start_time
+            new_metadata_row_dict["dzsave_time"] = dzsave_time
+            new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
+            new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     print(new_metadata_row_dict)
-
 
 process_slide(all_slide_names[0])
