@@ -2,6 +2,8 @@ import os
 import pandas as pd
 
 CUTOFFDATETIME = "2024-12-10 00:00:00"
+# convert the cutoff datetime to a datetime object
+CUTOFFDATETIME = pd.to_datetime(CUTOFFDATETIME, format="%Y-%m-%d %H:%M:%S")
 HEADERS = ["H24", "H26", "H27"]
 
 slide_source_dir = "/pesgisipth/NDPI"
@@ -27,3 +29,15 @@ for header in HEADERS:
     all_slide_names.extend(slide_names)
 
 print(f"Found a total of {len(all_slide_names)} slides.")
+
+def get_slide_datetime(slide_name):
+    name = slide_name.split(".ndpi")[0]
+    datetime = name.split(" - ")[-1]
+    return datetime
+
+example_slide = all_slide_names[0]
+example_datetime = get_slide_datetime(example_slide)
+# conver the datetime to a datetime object
+example_datetime = pd.to_datetime(example_datetime, format="%Y-%m-%d %H.%M.%S")
+print(f"Example slide name: {example_slide}, datetime: {example_datetime}")
+print(f"The slide is after the cutoff datetime: {example_datetime > CUTOFFDATETIME}")
