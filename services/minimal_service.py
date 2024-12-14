@@ -18,7 +18,7 @@ metdata_path = "/media/hdd2/neo/SameDayDzsave/same_day_processing_metadata.csv"
 metadata_df = pd.read_csv(metdata_path)
 
 # get the list of all the .ndpi files in the slide_source_dir with name starting with something from the HEADERS
-all_slide_names = os.listdir(slide_source_dir)
+all_slide_names = []
 for header in headers:
     slide_names = [
         slide_name
