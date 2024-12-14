@@ -39,17 +39,6 @@ for header in headers:
 
     all_slide_names.extend(slide_names)
 
-print(f"Found a total of {len(all_slide_names)} slides.")
-print(f"This many has already been processed: {len(wsi_names)}")
-
-# only keep the slides that have not been processed
-all_slide_names = [slide_name for slide_name in all_slide_names if slide_name not in wsi_names]
-print(f"Found a total of {len(all_slide_names)} slides to process.")
-
-import sys
-sys.exit()
-
-
 def get_slide_datetime(slide_name):
     try:
         name = slide_name.split(".ndpi")[0]
@@ -65,7 +54,18 @@ def get_slide_datetime(slide_name):
 # get the list of all the slides that are newer than the CUTOFFDATETIME
 newer_slides = []
 
-for slide_name in all_slide_names:
+print(f"Found a total of {len(newer_slides)} slides.")
+print(f"This many has already been processed: {len(wsi_names)}")
+
+# only keep the slides that have not been processed
+newer_slides_to_process = [slide_name for slide_name in all_slide_names if slide_name not in wsi_names]
+print(f"Found a total of {len(newer_slides_to_process)} slides to process.")
+
+import sys
+sys.exit()
+
+
+for slide_name in newer_slides_to_process:
     slide_datetime = get_slide_datetime(slide_name)
     if slide_datetime > cutoffdatetime:
         newer_slides.append(slide_name)
