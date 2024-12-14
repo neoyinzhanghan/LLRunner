@@ -59,9 +59,6 @@ for slide_name in all_slide_names:
 
 print(f"Found a total of {len(newer_slides)} slides newer than the cutoff datetime.")
 
-import sys
-sys.exit()
-
 def process_slide(slide_name):
     # first copy the slide to the tmp_slide_dir
     slide_path = os.path.join(slide_source_dir, slide_name)
