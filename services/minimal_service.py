@@ -4,6 +4,7 @@ import shutil
 import datetime
 import openslide    
 import pandas as pd
+from tqdm import tqdm
 from LLBMA.front_end.api import analyse_bma
 from LLRunner.slide_processing.dzsave_h5 import dzsave_h5
 from LLRunner.slide_processing.specimen_clf import get_topview_bma_score, get_topview_pbs_score
@@ -209,6 +210,5 @@ def process_slide(slide_name, metadata_df):
     # save the metadata_df back to the metadata_path
     metadata_df.to_csv(metadata_path, index=False)
 
-for slide in all_slide_names:
+for slide in tqdm(all_slide_names, desc="Processing slides"):
     process_slide(slide, metadata_df)
-    break
