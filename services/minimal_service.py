@@ -3,6 +3,7 @@ import time
 import shutil
 import datetime
 import pandas as pd
+from LLRunner.slide_processing.dzsave_h5 import dzsave_h5
 
 cutoffdatetime = "2024-12-10 00:00:00"
 # convert the cutoff datetime to a datetime object
@@ -60,6 +61,7 @@ def process_slide(slide_name):
     # first copy the slide to the tmp_slide_dir
     slide_path = os.path.join(slide_source_dir, slide_name)
     tmp_slide_path = os.path.join(tmp_slide_dir, slide_name)
+    dzsave_h5_path = os.path.join(dzsave_dir, slide_name.replace(".ndpi", ".h5"))
 
     new_metadata_row_dict = {
         "wsi_name": slide_name,
@@ -68,6 +70,7 @@ def process_slide(slide_name):
         "pipeline": None,
         "specimen_type": None,
         "datetime_dzsaved": None,
+        "slide_copy_error": None,
         "dzsave_error": None,
         "pipeline_error": None,
         "slide_copy_time": None,
@@ -77,10 +80,26 @@ def process_slide(slide_name):
 
     print(f"Copying slide from {slide_name} to {tmp_slide_path}")
     copy_start_time = time.time()
-    shutil.copy(slide_path, tmp_slide_path)
+    try:
+        # shutil.copy(slide_path, tmp_slide_path)
+        print("already copied")
+    except Exception as e:
+        print(f"Error copying slide {slide_name}: {e}")
+        new_metadata_row_dict["slide_copy_error"] = str(e)
     slide_copy_time = time.time() - copy_start_time
     new_metadata_row_dict["slide_copy_time"] = slide_copy_time
     print(f"Slide copy completed. Took {slide_copy_time} seconds.")
+
+    print(f"dzsaving slide {slide_name} to {dzsave_h5_path}")
+    dzsave_start_time = time.time()
+    try:
+        dzsave_h5(wsi_path=tmp_slide_path, h5_path=dzsave_h5_path, num_cpus=32, tile_size=512)
+    except Exception as e:
+        print(f"Error dzsaving slide {slide_name}: {e}")
+        new_metadata_row_dict["dzsave_error"] = str(e)
+    dzsave_time = time.time() - dzsave_start_time
+    new_metadata_row_dict["dzsave_time"] = dzsave_time
+    new_metadata_row_dict["datetime_dzsaved"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     print(new_metadata_row_dict)
 
