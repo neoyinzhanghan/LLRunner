@@ -219,6 +219,9 @@ while True:
                     new_metadata_row_dict["pipeline_error"] = pipeline_error
                 new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
                 new_metadata_row_dict["dzsave_time"] = dzsave_time
+                new_metadata_row_dict["datetime_dzsaved"] = (
+                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                )
 
             except Exception as e:
                 print(f"Error running LLBMA pipeline on slide {slide_name}: {e}")
