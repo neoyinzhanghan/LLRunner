@@ -38,7 +38,7 @@ def index():
     slide_h5_paths = [
         os.path.join(root_dir, slide_name, "slide.h5")
         for slide_name in os.listdir(root_dir)
-        if os.path.exists(os.path.join(root_dir, slide_name, "slide.h5"))
+        if slide_name.endswith(".h5")
     ]
 
     slide_options = "".join(
@@ -252,7 +252,6 @@ def index():
                             showNavigator: true,
                             navigatorPosition: "BOTTOM_RIGHT",
                             minZoomLevel: 0.5,
-                            maxZoomLevel: 20
                         }});
 
                         document.getElementById('openseadragon1').classList.add('show');
