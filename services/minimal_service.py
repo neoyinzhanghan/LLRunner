@@ -77,8 +77,6 @@ newer_slides_to_process = [
 ]
 print(f"Found a total of {len(newer_slides_to_process)} slides to process.")
 
-import sys
-sys.exit()  
 
 def process_slide(slide_name, metadata_df):
     metadata_df = pd.read_csv(metadata_path)
