@@ -203,12 +203,12 @@ while True:
                     LLBMA_results_dir, slide_name_no_ext, "slide.h5"
                 )
 
-                # copying the slide.h5 to the dzsave_dir
+                # Moving the slide.h5 to the dzsave_dir
                 print(
-                    f"Copying slide.h5 from {pipeline_slide_h5_path} to {dzsave_h5_path}"
+                    f"Moving slide.h5 from {pipeline_slide_h5_path} to {dzsave_h5_path}"
                 )
                 dzsave_start_time = time.time()
-                shutil.copy(pipeline_slide_h5_path, dzsave_h5_path)
+                shutil.move(pipeline_slide_h5_path, dzsave_h5_path)
                 dzsave_time = time.time() - dzsave_start_time
 
                 new_metadata_row_dict["result_dir_name"] = os.path.basename(save_path)
