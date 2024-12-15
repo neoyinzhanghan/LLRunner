@@ -90,6 +90,21 @@ if __name__ == "__main__":
                     font-size: 28px;
                 }}
 
+                /* Slide Path Display */
+                .slide-path {{
+                    margin: 10px 0 20px;
+                    font-size: 16px;
+                    color: #d3e3f1;
+                    text-align: center;
+                    word-wrap: break-word;
+                    width: 90%;
+                    max-width: 1000px;
+                    border: 1px solid #0e6ba8;
+                    padding: 10px;
+                    border-radius: 5px;
+                    background-color: #162b44;
+                }}
+
                 /* OpenSeadragon Viewer */
                 #openseadragon1 {{
                     width: 90%;
@@ -103,6 +118,7 @@ if __name__ == "__main__":
         </head>
         <body>
             <div class="header">H5 Slide Viewer</div>
+            <div class="slide-path">Current Slide: {args.slide_h5_path}</div>
             <div id="openseadragon1"></div>
 
             <script>
@@ -137,7 +153,6 @@ if __name__ == "__main__":
         </body>
         </html>
         """
-
         return render_template_string(template)
 
     @app.route("/get_dimensions", methods=["GET"])
