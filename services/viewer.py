@@ -221,7 +221,7 @@ def index():
             function toggleTheme() {{
                 isDarkTheme = !isDarkTheme;
                 document.body.className = isDarkTheme ? "" : "light-theme";
-                document.querySelector('.theme-toggle').textContent = isDarkTheme ? '🌙 Switch to Light Theme' : '🔆 Switch to Dark Theme';
+                document.querySelector('.theme-toggle').textContent = isDarkTheme ? '🔆 Switch to Light Theme' : '🌙 Switch to Dark Theme';
             }}
 
             // Initialize OpenSeadragon viewer
