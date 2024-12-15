@@ -258,6 +258,9 @@ while True:
         # save the metadata_df back to the metadata_path
         metadata_df.to_csv(metadata_path, index=False)
 
+        print(f"Deleting slide {tmp_slide_path}")
+        os.remove(tmp_slide_path)
+
     for slide in tqdm(newer_slides_to_process, desc="Processing slides"):
         process_slide(slide, metadata_df)
 
