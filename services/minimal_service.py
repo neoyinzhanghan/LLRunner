@@ -13,7 +13,7 @@ from LLRunner.slide_processing.specimen_clf import (
 )
 from intialize_csv_file import initialize_minimal_servcice_csv_file
 
-cutoffdatetime = "2024-12-14 11:00:00"
+cutoffdatetime = "2024-12-14 10:00:00"
 # convert the cutoff datetime to a datetime object
 cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
 headers = ["H24", "H25", "H26"]
