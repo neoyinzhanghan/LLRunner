@@ -261,4 +261,8 @@ while True:
     for slide in tqdm(newer_slides_to_process, desc="Processing slides"):
         process_slide(slide, metadata_df)
 
-    time.sleep(30)  # currently set to 30 seconds
+    sleep_num_seconds = 30
+    print("Service complete.")
+    print(f"Sleeping for {sleep_num_seconds} seconds...")
+    time.sleep(sleep_num_seconds)  # currently set to 30 seconds
+    print("Service reiterating...")
