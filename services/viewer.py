@@ -1,6 +1,7 @@
 import os
 import io
 import h5py
+import pandas as pd
 from flask import Flask, send_file, request, render_template_string
 from LLBMA.tiling.dzsave_h5 import retrieve_tile_h5
 
@@ -13,6 +14,19 @@ def get_dimensions(h5_path):
         height = int(f["level_0_height"][()])
         width = int(f["level_0_width"][()])
     return width, height
+
+
+def get_slide_datetime(slide_name):
+    try:
+        name = slide_name.split(".h5")[0]
+        datetime = name.split(" - ")[-1]
+
+        # convert the datetime to a datetime object
+        datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
+    except Exception as e:
+        print(f"Error getting datetime for {slide_name}: {e}")
+        raise e
+    return datetime
 
 
 @app.route("/tile_api", methods=["GET"])
@@ -35,10 +49,15 @@ def index():
     root_dir = "/media/hdd2/neo/SameDayDzsave"
 
     # find all the h5 files in the root_dir
+    slide_h5_names = [
+        slide_name for slide_name in os.listdir(root_dir) if slide_name.endswith(".h5")
+    ]
+
+    # sort the slide names by datetime
+    slide_h5_names.sort(key=get_slide_datetime)
+
     slide_h5_paths = [
-        os.path.join(root_dir, slide_name, "slide.h5")
-        for slide_name in os.listdir(root_dir)
-        if slide_name.endswith(".h5")
+        os.path.join(root_dir, slide_name) for slide_name in slide_h5_names
     ]
 
     slide_options = "".join(
