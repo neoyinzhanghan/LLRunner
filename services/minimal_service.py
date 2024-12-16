@@ -199,7 +199,7 @@ def process_slide(slide_name, metadata_df):
 
             slide_name_no_ext = slide_name.split(".ndpi")[0]
             pipeline_slide_h5_path = os.path.join(
-                LLBMA_results_dir, slide_name_no_ext, "slide.h5"
+                LLBMA_results_dir, save_path, "slide.h5"
             )
 
             # copying the slide.h5 to the dzsave_dir

@@ -269,6 +269,7 @@ def index():
                             showNavigator: true,
                             navigatorPosition: "BOTTOM_RIGHT",
                             minZoomLevel: 0.5,
+                            zoomPerScroll: 1.5,
                         }});
 
                         document.getElementById('openseadragon1').classList.add('show');
@@ -291,4 +292,4 @@ def get_dimensions_api():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=7991)
