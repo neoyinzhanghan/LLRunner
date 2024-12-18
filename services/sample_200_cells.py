@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-result_dir_path = "/media/hdd2/neo/test_slide_result"
+result_dir_path = "/media/hdd2/neo/test_slide_result_dir"
 
 high_mag_region_result_path = os.path.join(
     result_dir_path, "focus_regions", "high_mag_focus_regions_info.csv"
