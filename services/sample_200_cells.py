@@ -35,6 +35,11 @@ high_mag_region_result_df = high_mag_region_result_df.sort_values(
 )
 
 
+import sys
+
+sys.exit()
+
+
 # iterate through the rows of the high_mag_region_result_df
 for idx, row in high_mag_region_result_df.iterrows():
     print(row["adequate_confidence_score_high_mag"])
@@ -52,8 +57,3 @@ for idx, row in high_mag_region_result_df.iterrows():
 
     if cell_info_df_filtered.shape[0] == 0:
         break
-
-
-import sys
-
-sys.exit()
