@@ -16,6 +16,20 @@ low_mag_region_result_path = os.path.join(
 cell_info_path = os.path.join(result_dir_path, "cells", "cells_info.csv")
 
 
+cell_save_subdir = "selected_cells"
+focus_regions_save_subdir = "selected_focus_regions"
+
+os.makedirs(os.path.join(result_dir_path, cell_save_subdir), exist_ok=True)
+os.makedirs(os.path.join(result_dir_path, focus_regions_save_subdir), exist_ok=True)
+os.makedirs(
+    os.path.join(result_dir_path, focus_regions_save_subdir, "high_mag_annotated"),
+    exist_ok=True,
+)
+os.makedirs(
+    os.path.join(result_dir_path, focus_regions_save_subdir, "high_mag_unannotated"),
+    exist_ok=True,
+)
+
 # open all these paths as dataframes
 high_mag_region_result_df = pd.read_csv(high_mag_region_result_path)
 low_mag_region_result_df = pd.read_csv(low_mag_region_result_path)
@@ -30,6 +44,12 @@ print(low_mag_region_result_df.columns)
 
 print("\nCell Info Columns:")
 print(cell_info_df.columns)
+
+
+import sys
+
+sys.exit()
+
 
 # sort the high_mag_region_result_df by the confidence score in descending order
 high_mag_region_result_df = high_mag_region_result_df.sort_values(
@@ -80,6 +100,7 @@ print(f"Number of cells: {num_cells}")
 print(f"Number of cells before removal: {num_cells_pre_removal}")
 
 # find all the cells whose focus_region_idx that are in the regions_to_keep
-cell_info_df = cell_info_df.loc[cell_info_df["focus_region_idx"].isin(regions_to_keep)]
-
+cell_info_df_selected = cell_info_df.loc[
+    cell_info_df["focus_region_idx"].isin(regions_to_keep)
+]
 print(f"Number of cells after filtering: {cell_info_df.shape[0]}")
