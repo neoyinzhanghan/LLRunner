@@ -50,6 +50,10 @@ for idx, row in high_mag_region_result_df.iterrows():
         f"Number of cells in focus region {focus_region_idx}: {cell_info_df_filtered.shape[0]}"
     )
 
+    if cell_info_df_filtered.shape[0] == 0:
+        break
+
+
 import sys
 
 sys.exit()
