@@ -34,9 +34,6 @@ high_mag_region_result_df = high_mag_region_result_df.sort_values(
     by="adequate_confidence_score_high_mag", ascending=False
 )
 
-import sys
-
-sys.exit()
 
 # iterate through the rows of the high_mag_region_result_df
 for idx, row in high_mag_region_result_df.iterrows():
@@ -52,3 +49,7 @@ for idx, row in high_mag_region_result_df.iterrows():
     print(
         f"Number of cells in focus region {focus_region_idx}: {cell_info_df_filtered.shape[0]}"
     )
+
+import sys
+
+sys.exit()
