@@ -41,4 +41,14 @@ sys.exit()
 # iterate through the rows of the high_mag_region_result_df
 for idx, row in high_mag_region_result_df.iterrows():
     print(row["adequate_confidence_score_high_mag"])
-    # region_idx = row["region_idx"]  
+    focus_region_idx = row["idx"]
+
+    # look for all the rows in the the cells df that have the focus_region_idx column equal to the focus_region_idx
+    cell_info_df_filtered = cell_info_df.loc[
+        cell_info_df["focus_region_idx"] == focus_region_idx
+    ]
+
+    # print the number of cells in this focus region
+    print(
+        f"Number of cells in focus region {focus_region_idx}: {cell_info_df_filtered.shape[0]}"
+    )
