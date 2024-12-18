@@ -36,6 +36,9 @@ high_mag_region_result_df = high_mag_region_result_df.sort_values(
     by="adequate_confidence_score_high_mag", ascending=False
 )
 
+regions_to_keep = []
+num_cells = 0
+
 # iterate through the rows of the high_mag_region_result_df
 for idx, row in high_mag_region_result_df.iterrows():
     print(row["adequate_confidence_score_high_mag"])
@@ -60,5 +63,13 @@ for idx, row in high_mag_region_result_df.iterrows():
         f"Number of cells in focus region {focus_region_idx} after removing classes to remove: {cell_info_df_filtered.shape[0]}"
     )
 
-    if cell_info_df_filtered.shape[0] == 0:
+    if cell_info_df_filtered.shape[0] > 0:
+        regions_to_keep.append(focus_region_idx)
+
+        num_cells += cell_info_df_filtered.shape[0]
+
+    if num_cells > 200:
         break
+
+print(f"Number of regions to keep: {len(regions_to_keep)}")
+print(f"Number of cells: {num_cells}")
