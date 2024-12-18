@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from tqdm import tqdm
 
 classes_to_remove = ["U1", "PL2", "PL3", "ER5", "ER6", "U4", "B1", "B2"]
 
@@ -44,12 +45,6 @@ print(low_mag_region_result_df.columns)
 
 print("\nCell Info Columns:")
 print(cell_info_df.columns)
-
-
-import sys
-
-sys.exit()
-
 
 # sort the high_mag_region_result_df by the confidence score in descending order
 high_mag_region_result_df = high_mag_region_result_df.sort_values(
@@ -104,3 +99,40 @@ cell_info_df_selected = cell_info_df.loc[
     cell_info_df["focus_region_idx"].isin(regions_to_keep)
 ]
 print(f"Number of cells after filtering: {cell_info_df.shape[0]}")
+
+for focus_region_id in tqdm(regions_to_keep, desc="Copying Regions"):
+    filename = f"{focus_region_id}.jpg"
+
+    # copy the high mag annotated focus region symbolic link
+    src = os.path.join(
+        result_dir_path,
+        "focus_regions",
+        "high_mag_annotated",
+        filename,
+    )
+
+    dst = os.path.join(
+        result_dir_path,
+        focus_regions_save_subdir,
+        "high_mag_annotated",
+        filename,
+    )
+
+    os.symlink(src, dst)
+
+    # copy the high mag unannotated focus region symbolic link
+    src = os.path.join(
+        result_dir_path,
+        "focus_regions",
+        "high_mag_unannotated",
+        filename,
+    )
+
+    dst = os.path.join(
+        result_dir_path,
+        focus_regions_save_subdir,
+        "high_mag_unannotated",
+        filename,
+    )
+
+    os.symlink(src, dst)
