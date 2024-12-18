@@ -14,6 +14,7 @@ while True:
         get_topview_pbs_score,
     )
     from intialize_csv_file import initialize_minimal_servcice_csv_file
+    from sample_N_cells import sample_N_cells
 
     cutoffdatetime = "2024-12-08 00:00:00"
     # convert the cutoff datetime to a datetime object
@@ -217,6 +218,9 @@ while True:
                     with open(os.path.join(save_path, "error.txt"), "r") as f:
                         pipeline_error = f.read()
                     new_metadata_row_dict["pipeline_error"] = pipeline_error
+
+                else:
+                    sample_N_cells(os.path.join(LLBMA_results_dir, save_path), N=200)
                 new_metadata_row_dict["dzsave_h5_path"] = dzsave_h5_path
                 new_metadata_row_dict["dzsave_time"] = dzsave_time
                 new_metadata_row_dict["datetime_dzsaved"] = (
