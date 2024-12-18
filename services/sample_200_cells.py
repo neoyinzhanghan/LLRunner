@@ -78,3 +78,8 @@ for idx, row in high_mag_region_result_df.iterrows():
 print(f"Number of regions to keep: {len(regions_to_keep)}")
 print(f"Number of cells: {num_cells}")
 print(f"Number of cells before removal: {num_cells_pre_removal}")
+
+# find all the cells whose focus_region_idx that are in the regions_to_keep
+cell_info_df = cell_info_df.loc[cell_info_df["focus_region_idx"].isin(regions_to_keep)]
+
+print(f"Number of cells after filtering: {cell_info_df.shape[0]}")
