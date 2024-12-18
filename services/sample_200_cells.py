@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+classes_to_remove = ["U1", "PL2", "PL3", "ER5", "ER6", "U4", "B1", "B2"]
+
 result_dir_path = "/media/hdd2/neo/test_slide_result_dir"
 
 high_mag_region_result_path = os.path.join(
@@ -34,12 +36,6 @@ high_mag_region_result_df = high_mag_region_result_df.sort_values(
     by="adequate_confidence_score_high_mag", ascending=False
 )
 
-
-import sys
-
-sys.exit()
-
-
 # iterate through the rows of the high_mag_region_result_df
 for idx, row in high_mag_region_result_df.iterrows():
     print(row["adequate_confidence_score_high_mag"])
@@ -53,6 +49,15 @@ for idx, row in high_mag_region_result_df.iterrows():
     # print the number of cells in this focus region
     print(
         f"Number of cells in focus region {focus_region_idx}: {cell_info_df_filtered.shape[0]}"
+    )
+
+    # remove all the rows where label is in classes_to_remove
+    cell_info_df_filtered = cell_info_df_filtered.loc[
+        ~cell_info_df_filtered["label"].isin(classes_to_remove)
+    ]
+
+    print(
+        f"Number of cells in focus region {focus_region_idx} after removing classes to remove: {cell_info_df_filtered.shape[0]}"
     )
 
     if cell_info_df_filtered.shape[0] == 0:
