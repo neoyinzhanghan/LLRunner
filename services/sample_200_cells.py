@@ -20,6 +20,12 @@ cell_info_path = os.path.join(result_dir_path, "cells", "cells_info.csv")
 cell_save_subdir = "selected_cells"
 focus_regions_save_subdir = "selected_focus_regions"
 
+if os.path.exists(os.path.join(result_dir_path, cell_save_subdir)):
+    os.rmdir(os.path.join(result_dir_path, cell_save_subdir))
+
+if os.path.exists(os.path.join(result_dir_path, focus_regions_save_subdir)):
+    os.rmdir(os.path.join(result_dir_path, focus_regions_save_subdir))
+
 os.makedirs(os.path.join(result_dir_path, cell_save_subdir), exist_ok=True)
 os.makedirs(os.path.join(result_dir_path, focus_regions_save_subdir), exist_ok=True)
 os.makedirs(
