@@ -28,3 +28,7 @@ print(low_mag_region_result_df.columns)
 
 print("\nCell Info Columns:")
 print(cell_info_df.columns)
+
+# iterate through the rows of the high_mag_region_result_df
+for idx, row in high_mag_region_result_df.iterrows():
+    print(row["adequate_confidence_score_high_mag"])
