@@ -56,8 +56,8 @@ print("\nCell Info Columns:")
 print(cell_info_df.columns)
 
 
-# import sys
-# sys.exit()
+import sys
+sys.exit()
 
 
 # sort the high_mag_region_result_df by the confidence score in descending order
