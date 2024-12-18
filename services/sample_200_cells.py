@@ -11,7 +11,7 @@ low_mag_region_result_path = os.path.join(
     result_dir_path, "focus_regions", "focus_regions_info.csv"
 )
 
-cell_info_path = os.path.join(result_dir_path, "cells", "cell_info.csv")
+cell_info_path = os.path.join(result_dir_path, "cells", "cells_info.csv")
 
 
 # open all these paths as dataframes
