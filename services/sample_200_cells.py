@@ -152,5 +152,23 @@ for focus_region_id in tqdm(regions_to_keep, desc="Copying Regions"):
     os.symlink(src, dst)
 
 # iterate over the rows of the cell_info_df_selected
-for idx, row in tqdm(cell_info_df_selected.iterrows(), desc="Copying Cells"):
-    print(f"Copying cell named {row['name']} at {row['local_idx']} from {row['focus_region_idx']}")
+for idx, row in tqdm(
+    cell_info_df_selected.iterrows(), desc="Copying Cells", total=num_cells_pre_removal
+):
+    print(
+        f"Copying cell named {row['name']} at {row['local_idx']} from {row['focus_region_idx']}"
+    )
+
+    cellname = row["name"]
+    label = row["label"]
+
+    name_label = cellname.split("-")[0]
+
+    assert name_label == label, f"Name label {name_label} does not match label {label}"
+
+    os.makedirs(os.path.join(result_dir_path, cell_save_subdir, label), exist_ok=True)
+
+    src = os.path.join(result_dir_path, "cells", label, cellname)
+    dst = os.path.join(result_dir_path, cell_save_subdir, label, cellname)
+
+    os.symlink(src, dst)
