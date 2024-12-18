@@ -38,6 +38,7 @@ high_mag_region_result_df = high_mag_region_result_df.sort_values(
 
 regions_to_keep = []
 num_cells = 0
+num_cells_pre_removal = 0
 
 # iterate through the rows of the high_mag_region_result_df
 for idx, row in high_mag_region_result_df.iterrows():
@@ -48,6 +49,8 @@ for idx, row in high_mag_region_result_df.iterrows():
     cell_info_df_filtered = cell_info_df.loc[
         cell_info_df["focus_region_idx"] == focus_region_idx
     ]
+
+    before_removal = cell_info_df_filtered.shape[0]
 
     # print the number of cells in this focus region
     print(
@@ -67,9 +70,11 @@ for idx, row in high_mag_region_result_df.iterrows():
         regions_to_keep.append(focus_region_idx)
 
         num_cells += cell_info_df_filtered.shape[0]
+        num_cells_pre_removal += before_removal
 
     if num_cells > 200:
         break
 
 print(f"Number of regions to keep: {len(regions_to_keep)}")
 print(f"Number of cells: {num_cells}")
+print(f"Number of cells before removal: {num_cells_pre_removal}")
