@@ -153,4 +153,4 @@ for focus_region_id in tqdm(regions_to_keep, desc="Copying Regions"):
 
 # iterate over the rows of the cell_info_df_selected
 for idx, row in tqdm(cell_info_df_selected.iterrows(), desc="Copying Cells"):
-    print(f"Copying cell {row['local_idx']} from {row['focus_region_idx']}")
+    print(f"Copying cell named {row['name']} at {row['local_idx']} from {row['focus_region_idx']}")
