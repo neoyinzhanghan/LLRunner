@@ -41,7 +41,7 @@ class SR:
         Get the specimen type of the slide.
         """
         specimen_type_str = self.get_part_description(slide_name)
-        
+
         if "bone marrow aspirate" in specimen_type_str.lower():
             specimen_type = "BMA"
         elif "peripheral blood" in specimen_type_str.lower():
