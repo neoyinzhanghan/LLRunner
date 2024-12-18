@@ -46,6 +46,11 @@ print(low_mag_region_result_df.columns)
 print("\nCell Info Columns:")
 print(cell_info_df.columns)
 
+
+import sys
+sys.exit()
+
+
 # sort the high_mag_region_result_df by the confidence score in descending order
 high_mag_region_result_df = high_mag_region_result_df.sort_values(
     by="adequate_confidence_score_high_mag", ascending=False
