@@ -139,8 +139,45 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
 
         return tile_image
 
-    # elif tile_level < 18:
-    #     return tile_image
+    elif tile_level < 18:
+        # iterate over the rows of the focus_regions_df
+        for idx, df_row in focus_regions_df.iterrows():
+            level_x, level_y = df_row[f"x_{tile_level}"], df_row[f"y_{tile_level}"]
+
+            region_translation_x, region_translation_y = int(tile_row * 512), int(
+                tile_col * 512
+            )
+            rel_level_x, rel_level_y = (
+                int(level_x - region_translation_x),
+                int(level_y - region_translation_y),
+            )
+
+            region_level_width, region_level_height = int(
+                512 // 2 ** (18 - tile_level)
+            ), int(512 // 2 ** (18 - tile_level))
+
+            if 0 <= rel_level_x < 512 and 0 <= rel_level_y < 512:
+                # set the corresponding pixels in the tile_image to red (should be a square of width  equal to region_level_width, and height equal to region_level_width)
+                # with topleft corner at (rel_level_x, rel_level_y)
+                tile_array = np.array(tile_image)
+
+                image_path = df_row["image_path"]
+
+                # open the image
+                image = Image.open(image_path)
+
+                # resize the image to region_level_width x region_level_height
+                image = image.resize((region_level_width, region_level_height))
+
+                # convert the image to an array
+                image_array = np.array(image)
+
+                tile_array[
+                    rel_level_y : rel_level_y + region_level_height,
+                    rel_level_x : rel_level_x + region_level_width,
+                ] = image_array
+
+                return Image.fromarray(tile_array)
 
     else:
         # iterate over the rows of the df
