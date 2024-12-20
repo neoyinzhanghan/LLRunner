@@ -215,10 +215,10 @@ def get_annotated_tile(
 
                 tile_image = Image.fromarray(tile_array)
 
-                if debug_mode:
-                    tile_image = _add_yellow_boundary(tile_image)
+        if debug_mode:
+            tile_image = _add_yellow_boundary(tile_image)
 
-                return tile_image
+        return tile_image
 
     else:
         # iterate over the rows of the df
@@ -231,13 +231,9 @@ def get_annotated_tile(
                 # open the image
                 image = Image.open(image_path)
 
-                if debug_mode:
-                    tile_image = _add_yellow_boundary(tile_image)
-                return image
-
-    if debug_mode:
-        tile_image = _add_yellow_boundary(tile_image)
-    return tile_image
+        if debug_mode:
+            tile_image = _add_yellow_boundary(tile_image)
+        return image
 
 
 if __name__ == "__main__":
