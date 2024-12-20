@@ -5,6 +5,11 @@ root_dir = "/media/hdd2/neo/SameDayDzsave"
 results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 
 
+def string_to_tuple(input_str):
+    # Remove the parentheses and split by commas
+    return tuple(map(int, input_str.strip("()").split(", ")))
+
+
 def get_LLBMA_processing_status(slide_h5_name):
 
     # check to see if there is a subdir in the results_dir that is the wsi_name without .ndpi extension
@@ -64,13 +69,7 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
         coordinate_string = df_row["coordinate"]
         coordinate = df_row["coordinate"]
 
-        # remove all the following characters from the coordinate string: '(', ')', ' ', '\n', ',
-
-        for char in ["(", ")", " ", "\n", ","]:
-            coordinate_string = coordinate_string.replace(char, "")
-
-        TLx, TLy, BRx, BRy = tuple(coordinate_string)
-        TLx, TLy, BRx, BRy = int(TLx), int(TLy), int(BRx), int(BRy)
+        TLx, TLy, BRx, BRy = string_to_tuple(coordinate_string)
 
         row = TLx // 512
         col = TLy // 512
