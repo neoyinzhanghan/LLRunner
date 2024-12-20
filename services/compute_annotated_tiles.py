@@ -167,10 +167,6 @@ def get_annotated_tile(
                 ] = [255, 0, 0]
                 tile_image = Image.fromarray(tile_array)
 
-                if debug_mode:
-                    tile_image = _add_yellow_boundary(tile_image)
-
-                return tile_image
         if debug_mode:
             tile_image = _add_yellow_boundary(tile_image)
         return tile_image
