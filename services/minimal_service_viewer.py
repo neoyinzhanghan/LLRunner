@@ -45,57 +45,56 @@ def tile_api():
     row = int(request.args.get("x"))  # Note: x corresponds to row
     col = int(request.args.get("y"))  # Note: y corresponds to col\
 
+    # if level == 18:
+
+    #     # iterate over the rows of the df
+    #     for idx, df_row in df.iterrows():
+    #         img_row, img_col = df_row["row"], df_row["col"]
+
+    #         if row == img_row and col == img_col:
+    #             image_path = df_row["image_path"]
+
+    #             img_io = io.BytesIO()
+    #             with open(image_path, "rb") as f:
+    #                 img_io.write(f.read())
+    #                 img_io.seek(0)
+    #             return send_file(img_io, mimetype="image/jpeg")
+
+    # else:
+    #     # iterate through the rows of the df
+    #     for idx, df_row in df.iterrows():
+    #         level_x, level_y = df_row[f"x_{level}"], df_row[f"y_{level}"]
+
+    #         if row == int(level_x // 512) and col == int(level_y // 512):
+    #             # return a completely green image of the same size as the tile
+
+    #             tile = retrieve_tile_h5(
+    #                 slide, level, row, col
+    #             )  # Retrieve the JPEG image file
+
+    #             # get the shape of the tile
+    #             width, height = tile.size
+
+    #             # create a new image with the same size as the tile
+    #             img = Image.new("RGB", (width, height), color="green")
+
+    #             img_io = io.BytesIO()
+    #             img.save(img_io, format="JPEG")
+
+    #             img_io.seek(0)
+    #             return send_file(img_io, mimetype="image/jpeg")
+
+    tile = retrieve_tile_h5(slide, level, row, col)  # Retrieve the JPEG image file
     if get_LLBMA_processing_status(slide_h5_name) == "Processed":
         df = get_annotated_focus_region_indices_and_coordinates(slide_h5_name)
 
-        # if level == 18:
-
-        #     # iterate over the rows of the df
-        #     for idx, df_row in df.iterrows():
-        #         img_row, img_col = df_row["row"], df_row["col"]
-
-        #         if row == img_row and col == img_col:
-        #             image_path = df_row["image_path"]
-
-        #             img_io = io.BytesIO()
-        #             with open(image_path, "rb") as f:
-        #                 img_io.write(f.read())
-        #                 img_io.seek(0)
-        #             return send_file(img_io, mimetype="image/jpeg")
-
-        # else:
-        #     # iterate through the rows of the df
-        #     for idx, df_row in df.iterrows():
-        #         level_x, level_y = df_row[f"x_{level}"], df_row[f"y_{level}"]
-
-        #         if row == int(level_x // 512) and col == int(level_y // 512):
-        #             # return a completely green image of the same size as the tile
-
-        #             tile = retrieve_tile_h5(
-        #                 slide, level, row, col
-        #             )  # Retrieve the JPEG image file
-
-        #             # get the shape of the tile
-        #             width, height = tile.size
-
-        #             # create a new image with the same size as the tile
-        #             img = Image.new("RGB", (width, height), color="green")
-
-        #             img_io = io.BytesIO()
-        #             img.save(img_io, format="JPEG")
-
-        #             img_io.seek(0)
-        #             return send_file(img_io, mimetype="image/jpeg")
-
-    tile = retrieve_tile_h5(slide, level, row, col)  # Retrieve the JPEG image file
-
-    tile = get_annotated_tile(
-        tile_image=tile,
-        tile_row=row,
-        tile_col=col,
-        tile_level=level,
-        focus_regions_df=df,
-    )
+        tile = get_annotated_tile(
+            tile_image=tile,
+            tile_row=row,
+            tile_col=col,
+            tile_level=level,
+            focus_regions_df=df,
+        )
     img_io = io.BytesIO()
     tile.save(img_io, format="JPEG")
     img_io.seek(0)
