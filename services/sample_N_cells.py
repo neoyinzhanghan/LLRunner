@@ -116,6 +116,14 @@ def sample_N_cells(
         cell_info_df["focus_region_idx"].isin(regions_to_keep)
     ]
     
+    low_mag_region_result_df = low_mag_region_result_df.loc[
+        low_mag_region_result_df["idx"].isin(regions_to_keep)   
+    ]
+
+    high_mag_region_result_df = high_mag_region_result_df.loc[
+        high_mag_region_result_df["idx"].isin(regions_to_keep)
+    ]
+    
     assert cell_info_df_selected.shape[0] == num_cells_pre_removal, f"Number of cells in cell_info_df_selected {cell_info_df_selected.shape[0]} does not match num_cells {num_cells}"
 
     for focus_region_id in tqdm(regions_to_keep, desc="Copying Regions"):
@@ -185,23 +193,47 @@ def sample_N_cells(
 
         os.symlink(src, dst)
 
+        # save the selected data frames in the respective directories
+        cell_info_df_selected.to_csv(
+            os.path.join(result_dir_path, cell_save_subdir, "cells_info.csv"),
+            index=False,
+        )
+
+        high_mag_region_result_df.to_csv(
+            os.path.join(
+                result_dir_path, focus_regions_save_subdir, "high_mag_focus_regions_info.csv"
+            ),
+            index=False,
+        )
+
+        low_mag_region_result_df.to_csv(
+            os.path.join(
+                result_dir_path, focus_regions_save_subdir, "focus_regions_info.csv"
+            ),
+            index=False,
+        )
+
 if __name__ == "__main__":
 
-    results_root_dir = "/media/hdd2/neo/SameDayLLBMAResults"
-    # find all the subdirectories of the results_root_dir
-    subdirs = [
-        subdir
-        for subdir in os.listdir(results_root_dir)
-        if os.path.isdir(os.path.join(results_root_dir, subdir))
-    ]
+    # results_root_dir = "/media/hdd2/neo/SameDayLLBMAResults"
+    # # find all the subdirectories of the results_root_dir
+    # subdirs = [
+    #     subdir
+    #     for subdir in os.listdir(results_root_dir)
+    #     if os.path.isdir(os.path.join(results_root_dir, subdir))
+    # ]
 
-    # print the number of subdirectories that start with ERROR_
-    error_dirs = [subdir for subdir in subdirs if subdir.startswith("ERROR_")]
-    non_error_dirs = [subdir for subdir in subdirs if not subdir.startswith("ERROR_")]  
+    # # print the number of subdirectories that start with ERROR_
+    # error_dirs = [subdir for subdir in subdirs if subdir.startswith("ERROR_")]
+    # non_error_dirs = [subdir for subdir in subdirs if not subdir.startswith("ERROR_")]  
 
-    print(f"Number of error directories: {len(error_dirs)}")
-    print(f"Number of non-error directories: {len(non_error_dirs)}")
-    print(f"Number of total directories: {len(subdirs)}")
+    # print(f"Number of error directories: {len(error_dirs)}")
+    # print(f"Number of non-error directories: {len(non_error_dirs)}")
+    # print(f"Number of total directories: {len(subdirs)}")
 
-    for non_error_dir in non_error_dirs:
-        sample_N_cells(os.path.join(results_root_dir, non_error_dir))
+    # for non_error_dir in non_error_dirs:
+    #     sample_N_cells(os.path.join(results_root_dir, non_error_dir))
+
+
+    test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
+    sample_N_cells(test_result_dir, verbose=True)
