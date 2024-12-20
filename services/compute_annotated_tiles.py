@@ -114,10 +114,12 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
         for idx, df_row in focus_regions_df.iterrows():
             level_x, level_y = df_row[f"x_{tile_level}"], df_row[f"y_{tile_level}"]
 
-            region_translation_x, region_translation_y = tile_row * 512, tile_col * 512
+            region_translation_x, region_translation_y = int(tile_row * 512), int(
+                tile_col * 512
+            )
             rel_level_x, rel_level_y = (
-                level_x - region_translation_x,
-                level_y - region_translation_y,
+                int(level_x - region_translation_x),
+                int(level_y - region_translation_y),
             )
 
             region_level_width, region_level_height = int(
