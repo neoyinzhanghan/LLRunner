@@ -215,25 +215,25 @@ def sample_N_cells(
 
 if __name__ == "__main__":
 
-    # results_root_dir = "/media/hdd2/neo/SameDayLLBMAResults"
-    # # find all the subdirectories of the results_root_dir
-    # subdirs = [
-    #     subdir
-    #     for subdir in os.listdir(results_root_dir)
-    #     if os.path.isdir(os.path.join(results_root_dir, subdir))
-    # ]
+    results_root_dir = "/media/hdd2/neo/SameDayLLBMAResults"
+    # find all the subdirectories of the results_root_dir
+    subdirs = [
+        subdir
+        for subdir in os.listdir(results_root_dir)
+        if os.path.isdir(os.path.join(results_root_dir, subdir))
+    ]
 
-    # # print the number of subdirectories that start with ERROR_
-    # error_dirs = [subdir for subdir in subdirs if subdir.startswith("ERROR_")]
-    # non_error_dirs = [subdir for subdir in subdirs if not subdir.startswith("ERROR_")]  
+    # print the number of subdirectories that start with ERROR_
+    error_dirs = [subdir for subdir in subdirs if subdir.startswith("ERROR_")]
+    non_error_dirs = [subdir for subdir in subdirs if not subdir.startswith("ERROR_")]  
 
-    # print(f"Number of error directories: {len(error_dirs)}")
-    # print(f"Number of non-error directories: {len(non_error_dirs)}")
-    # print(f"Number of total directories: {len(subdirs)}")
+    print(f"Number of error directories: {len(error_dirs)}")
+    print(f"Number of non-error directories: {len(non_error_dirs)}")
+    print(f"Number of total directories: {len(subdirs)}")
 
-    # for non_error_dir in non_error_dirs:
-    #     sample_N_cells(os.path.join(results_root_dir, non_error_dir))
+    for non_error_dir in non_error_dirs:
+        sample_N_cells(os.path.join(results_root_dir, non_error_dir))
 
 
-    test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
-    sample_N_cells(test_result_dir, verbose=True)
+    # test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
+    # sample_N_cells(test_result_dir, verbose=True)
