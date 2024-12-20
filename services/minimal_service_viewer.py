@@ -4,6 +4,10 @@ import h5py
 import pandas as pd
 from flask import Flask, send_file, request, render_template_string
 from LLBMA.tiling.dzsave_h5 import retrieve_tile_h5
+from compute_annotated_tiles import (
+    get_LLBMA_processing_status,
+    get_annotated_focus_region_indices_and_coordinates,
+)
 
 app = Flask(__name__)
 
@@ -32,9 +36,27 @@ def get_slide_datetime(slide_name):
 @app.route("/tile_api", methods=["GET"])
 def tile_api():
     slide = request.args.get("slide")
+
+    slide_h5_name = os.path.basename(slide)
+
     level = int(request.args.get("level"))
     row = int(request.args.get("x"))  # Note: x corresponds to row
-    col = int(request.args.get("y"))  # Note: y corresponds to col
+    col = int(request.args.get("y"))  # Note: y corresponds to col\
+
+    if get_LLBMA_processing_status(slide_h5_name) == "Processed":
+        df = get_annotated_focus_region_indices_and_coordinates(slide_h5_name)
+
+        if level == 18:
+            if (row, col) in df[["row", "col"]].values:
+                image_path = df.loc[
+                    (df["row"] == row) & (df["col"] == col), "image_path"
+                ].values[0]
+
+                img_io = io.BytesIO()
+                with open(image_path, "rb") as f:
+                    img_io.write(f.read())
+                    img_io.seek(0)
+                return send_file(img_io, mimetype="image/jpeg")
 
     tile = retrieve_tile_h5(slide, level, row, col)  # Retrieve the JPEG image file
     img_io = io.BytesIO()
