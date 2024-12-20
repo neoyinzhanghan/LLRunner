@@ -34,6 +34,33 @@ def _add_yellow_boundary(pil_image):  # TODO this function is for debugging only
     return pil_image
 
 
+def _add_green_boundary(pil_image):
+    # Get the current size of the image
+    width, height = pil_image.size
+
+    # If the image is too small to have an 8-pixel boundary, just make it green
+    if width <= 16 or height <= 16:
+        return Image.new(
+            "RGB", (width, height), (0, 255, 0)
+        )  # Return a completely green image
+
+    # Load the image data into a list of pixels
+    pixels = pil_image.load()
+
+    # Apply a green boundary of 8 pixels on each side (top, bottom, left, right)
+    for y in range(8):  # Top and bottom boundaries
+        for x in range(width):
+            pixels[x, y] = (0, 255, 0)  # Top row
+            pixels[x, height - y - 1] = (0, 255, 0)  # Bottom row
+
+    for x in range(8):  # Left and right boundaries
+        for y in range(height):
+            pixels[x, y] = (0, 255, 0)  # Left column
+            pixels[width - x - 1, y] = (0, 255, 0)  # Right column
+
+    return pil_image
+
+
 def string_to_tuple(input_str):
     # Remove the parentheses and split by commas
     return tuple(map(int, input_str.strip("()").split(", ")))
@@ -141,6 +168,8 @@ def get_annotated_tile(
         return tile_image
 
     elif tile_level < 15:
+
+        found = False
         # iterate over the rows of the focus_regions_df
         for idx, df_row in focus_regions_df.iterrows():
             level_x, level_y = df_row[f"x_{tile_level}"], df_row[f"y_{tile_level}"]
@@ -164,14 +193,21 @@ def get_annotated_tile(
                 tile_array[
                     rel_level_y : rel_level_y + region_level_height,
                     rel_level_x : rel_level_x + region_level_width,
-                ] = [255, 0, 0]
+                ] = [0, 255, 0]
                 tile_image = Image.fromarray(tile_array)
 
-        if debug_mode:
-            tile_image = _add_yellow_boundary(tile_image)
+                found = True
+
+        if not found:
+            if debug_mode:
+                tile_image = _add_yellow_boundary(tile_image)
+        if found:
+            tile_image = _add_green_boundary(tile_image)
         return tile_image
 
     elif tile_level < 18:
+        found = False
+
         # iterate over the rows of the focus_regions_df
         for idx, df_row in focus_regions_df.iterrows():
             level_x, level_y = df_row[f"x_{tile_level}"], df_row[f"y_{tile_level}"]
@@ -211,12 +247,17 @@ def get_annotated_tile(
 
                 tile_image = Image.fromarray(tile_array)
 
-        if debug_mode:
-            tile_image = _add_yellow_boundary(tile_image)
+                found = True
 
+        if not found:
+            if debug_mode:
+                tile_image = _add_yellow_boundary(tile_image)
+        if found:
+            tile_image = _add_green_boundary(tile_image)
         return tile_image
 
     else:
+        found = False
         # iterate over the rows of the df
         for idx, df_row in focus_regions_df.iterrows():
             img_row, img_col = df_row["row"], df_row["col"]
@@ -225,11 +266,16 @@ def get_annotated_tile(
                 image_path = df_row["image_path"]
 
                 # open the image
-                image = Image.open(image_path)
+                tile_iamge = Image.open(image_path)
 
-        if debug_mode:
-            tile_image = _add_yellow_boundary(tile_image)
-        return image
+                found = True
+
+        if found:
+            tile_iamge = _add_green_boundary(tile_iamge)
+        else:
+            if debug_mode:
+                tile_image = _add_yellow_boundary(tile_image)
+        return tile_iamge
 
 
 if __name__ == "__main__":
