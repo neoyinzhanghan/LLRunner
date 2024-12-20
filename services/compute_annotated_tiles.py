@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 from PIL import Image
 
@@ -126,10 +127,13 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
             if 0 <= rel_level_x < 512 and 0 <= rel_level_y < 512:
                 # set the corresponding pixels in the tile_image to red (should be a square of width  equal to region_level_width, and height equal to region_level_width)
                 # with topleft corner at (rel_level_x, rel_level_y)
-                tile_image[
-                    rel_level_x : rel_level_x + region_level_width,
+                tile_array = np.array(tile_image)
+                tile_array[
                     rel_level_y : rel_level_y + region_level_height,
+                    rel_level_x : rel_level_x + region_level_width,
                 ] = [255, 0, 0]
+
+                return Image.fromarray(tile_array)
 
         return tile_image
 
