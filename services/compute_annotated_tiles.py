@@ -131,10 +131,13 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
     return pd.DataFrame(df_dict)
 
 
-def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions_df):
+def get_annotated_tile(
+    tile_image, tile_row, tile_col, tile_level, focus_regions_df, debug_mode=True
+):
 
     if tile_level <= 10:
-        tile_image = _add_yellow_boundary(tile_image)
+        if debug_mode:
+            tile_image = _add_yellow_boundary(tile_image)
         return tile_image
 
     elif tile_level < 15:
@@ -164,8 +167,8 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
                 ] = [255, 0, 0]
 
                 return Image.fromarray(tile_array)
-
-        tile_image = _add_yellow_boundary(tile_image)
+        if debug_mode:
+            tile_image = _add_yellow_boundary(tile_image)
         return tile_image
 
     elif tile_level < 18:
@@ -207,7 +210,9 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
                 ] = image_array
 
                 tile_image = Image.fromarray(tile_array)
-                tile_image = _add_yellow_boundary(tile_image)
+
+                if debug_mode:
+                    tile_image = _add_yellow_boundary(tile_image)
 
                 return tile_image
 
@@ -222,10 +227,12 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
                 # open the image
                 image = Image.open(image_path)
 
-                tile_image = _add_yellow_boundary(tile_image)
+                if debug_mode:
+                    tile_image = _add_yellow_boundary(tile_image)
                 return image
 
-    tile_image = _add_yellow_boundary(tile_image)
+    if debug_mode:
+        tile_image = _add_yellow_boundary(tile_image)
     return tile_image
 
 
