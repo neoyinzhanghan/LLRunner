@@ -346,14 +346,17 @@ def tile_api():
 def index():
     root_dir = "/media/hdd2/neo/SameDayDzsave"
 
+    print("Finding slide options...")
     # find all the h5 files in the root_dir
     slide_h5_names = [
         slide_name for slide_name in os.listdir(root_dir) if slide_name.endswith(".h5")
     ]
 
+    print("Sorting slide options...")
     # sort the slide names by datetime
     slide_h5_names.sort(key=get_slide_datetime)
 
+    print("Creating slide options...")
     slide_h5_paths = [
         os.path.join(root_dir, slide_name) for slide_name in slide_h5_names
     ]
