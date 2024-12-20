@@ -165,8 +165,12 @@ def get_annotated_tile(
                     rel_level_y : rel_level_y + region_level_height,
                     rel_level_x : rel_level_x + region_level_width,
                 ] = [255, 0, 0]
+                tile_image = Image.fromarray(tile_array)
 
-                return Image.fromarray(tile_array)
+                if debug_mode:
+                    tile_image = _add_yellow_boundary(tile_image)
+
+                return tile_image
         if debug_mode:
             tile_image = _add_yellow_boundary(tile_image)
         return tile_image
