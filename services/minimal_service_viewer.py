@@ -362,6 +362,8 @@ def index():
         [f'<option value="{slide}"> {slide}</option>' for slide in slide_h5_paths]
     )
 
+    print(f"Found {len(slide_h5_paths)} slides options.")
+
     template = f"""
     <!DOCTYPE html>
     <html>
