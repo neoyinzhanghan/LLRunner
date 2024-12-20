@@ -7,6 +7,33 @@ root_dir = "/media/hdd2/neo/SameDayDzsave"
 results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 
 
+def _add_yellow_boundary(pil_image):  # TODO this function is for debugging only
+    # Get the current size of the image
+    width, height = pil_image.size
+
+    # If the image is too small to have an 8-pixel boundary, just make it yellow
+    if width <= 16 or height <= 16:
+        return Image.new(
+            "RGB", (width, height), (255, 255, 0)
+        )  # Return a completely yellow image
+
+    # Load the image data into a list of pixels
+    pixels = pil_image.load()
+
+    # Apply a yellow boundary of 8 pixels on each side (top, bottom, left, right)
+    for y in range(8):  # Top and bottom boundaries
+        for x in range(width):
+            pixels[x, y] = (255, 255, 0)  # Top row
+            pixels[x, height - y - 1] = (255, 255, 0)  # Bottom row
+
+    for x in range(8):  # Left and right boundaries
+        for y in range(height):
+            pixels[x, y] = (255, 255, 0)  # Left column
+            pixels[width - x - 1, y] = (255, 255, 0)  # Right column
+
+    return pil_image
+
+
 def string_to_tuple(input_str):
     # Remove the parentheses and split by commas
     return tuple(map(int, input_str.strip("()").split(", ")))
@@ -107,6 +134,7 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
 def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions_df):
 
     if tile_level <= 10:
+        tile_image = _add_yellow_boundary(tile_image)
         return tile_image
 
     elif tile_level < 15:
@@ -137,6 +165,7 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
 
                 return Image.fromarray(tile_array)
 
+        tile_image = _add_yellow_boundary(tile_image)
         return tile_image
 
     elif tile_level < 18:
@@ -177,7 +206,10 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
                     rel_level_x : rel_level_x + region_level_width,
                 ] = image_array
 
-                return Image.fromarray(tile_array)
+                tile_image = Image.fromarray(tile_array)
+                tile_image = _add_yellow_boundary(tile_image)
+
+                return tile_image
 
     else:
         # iterate over the rows of the df
@@ -190,8 +222,10 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
                 # open the image
                 image = Image.open(image_path)
 
+                tile_image = _add_yellow_boundary(tile_image)
                 return image
 
+    tile_image = _add_yellow_boundary(tile_image)
     return tile_image
 
 
