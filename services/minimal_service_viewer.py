@@ -61,8 +61,8 @@ def tile_api():
 
         else:
             # iterate through the rows of the df
-            for idx, row in df.iterrows():
-                level_x, level_y = row[f"x_{level}"], row[f"y_{level}"]
+            for idx, df_row in df.iterrows():
+                level_x, level_y = df_row[f"x_{level}"], df_row[f"y_{level}"]
 
                 if row == int(level_x // 512) and col == int(level_y // 512):
                     # return a completely green image of the same size as the tile
