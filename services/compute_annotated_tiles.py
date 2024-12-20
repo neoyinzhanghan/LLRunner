@@ -109,7 +109,7 @@ def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions
     if tile_level <= 10:
         return tile_image
 
-    elif tile_level < 13:
+    elif tile_level < 15:
         # iterate over the rows of the focus_regions_df
         for idx, df_row in focus_regions_df.iterrows():
             level_x, level_y = df_row[f"x_{tile_level}"], df_row[f"y_{tile_level}"]
