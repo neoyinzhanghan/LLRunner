@@ -48,16 +48,19 @@ def tile_api():
         df = get_annotated_focus_region_indices_and_coordinates(slide_h5_name)
 
         if level == 18:
-            if (row, col) in df[["row", "col"]].values:
-                image_path = df.loc[
-                    (df["row"] == row) & (df["col"] == col), "image_path"
-                ].values[0]
 
-                img_io = io.BytesIO()
-                with open(image_path, "rb") as f:
-                    img_io.write(f.read())
-                    img_io.seek(0)
-                return send_file(img_io, mimetype="image/jpeg")
+            # iterate over the rows of the df
+            for idx, df_row in df.iterrows():
+                img_row, img_col = df_row["row"], df_row["col"]
+
+                if row == img_row and col == img_col:
+                    image_path = df_row["image_path"]
+
+                    img_io = io.BytesIO()
+                    with open(image_path, "rb") as f:
+                        img_io.write(f.read())
+                        img_io.seek(0)
+                    return send_file(img_io, mimetype="image/jpeg")
 
         else:
             # iterate through the rows of the df
