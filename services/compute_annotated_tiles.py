@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from PIL import Image
 
 root_dir = "/media/hdd2/neo/SameDayDzsave"
 results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
@@ -100,6 +101,55 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
             df_dict[f"y_{level}"].append(TLy / downsample_factor)
 
     return pd.DataFrame(df_dict)
+
+
+def get_annotated_tile(tile_image, tile_row, tile_col, tile_level, focus_regions_df):
+
+    if tile_level <= 10:
+        return tile_image
+
+    elif tile_level < 18:
+        # iterate over the rows of the focus_regions_df
+        for idx, df_row in focus_regions_df.iterrows():
+            level_x, level_y = df_row[f"x_{tile_level}"], df_row[f"y_{tile_level}"]
+
+            region_translation_x, region_translation_y = tile_row * 512, tile_col * 512
+            rel_level_x, rel_level_y = (
+                level_x - region_translation_x,
+                level_y - region_translation_y,
+            )
+
+            region_level_width, region_level_height = int(
+                512 // 2 ** (18 - tile_level)
+            ), int(512 // 2 ** (18 - tile_level))
+
+            if 0 <= rel_level_x < 512 and 0 <= rel_level_y < 512:
+                # set the corresponding pixels in the tile_image to red (should be a square of width  equal to region_level_width, and height equal to region_level_width)
+                # with topleft corner at (rel_level_x, rel_level_y)
+                tile_image[
+                    rel_level_x : rel_level_x + region_level_width,
+                    rel_level_y : rel_level_y + region_level_height,
+                ] = [255, 0, 0]
+
+        return tile_image
+
+    # elif tile_level < 18:
+    #     return tile_image
+
+    else:
+        # iterate over the rows of the df
+        for idx, df_row in focus_regions_df.iterrows():
+            img_row, img_col = df_row["row"], df_row["col"]
+
+            if tile_row == img_row and tile_col == img_col:
+                image_path = df_row["image_path"]
+
+                # open the image
+                image = Image.open(image_path)
+
+                return image
+
+    return tile_image
 
 
 if __name__ == "__main__":
