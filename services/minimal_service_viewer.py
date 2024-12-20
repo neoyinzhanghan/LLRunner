@@ -342,6 +342,142 @@ def tile_api():
 #     return render_template_string(template)
 
 
+# @app.route("/", methods=["GET"])
+# def index():
+#     root_dir = "/media/hdd2/neo/SameDayDzsave"
+
+#     print("Finding slide options...")
+#     # find all the h5 files in the root_dir
+#     slide_h5_names = [
+#         slide_name for slide_name in os.listdir(root_dir) if slide_name.endswith(".h5")
+#     ]
+
+#     print("Sorting slide options...")
+#     # sort the slide names by datetime
+#     slide_h5_names.sort(key=get_slide_datetime)
+
+#     print("Creating slide options...")
+#     slide_h5_paths = [
+#         os.path.join(root_dir, slide_name) for slide_name in slide_h5_names
+#     ]
+
+#     slide_options = "".join(
+#         [f'<option value="{slide}"> {slide}</option>' for slide in slide_h5_paths]
+#     )
+
+#     print(f"Found {len(slide_h5_paths)} slides options.")
+
+#     template = f"""
+#     <!DOCTYPE html>
+#     <html>
+#     <head>
+#         <title> H5 Slide Viewer</title>
+#         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+#         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+#         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+#         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+#         <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.2/openseadragon.min.js"></script>
+#         <style>
+#             /* General Styles */
+#             body {{
+#                 font-family: 'Roboto', sans-serif;
+#                 margin: 0;
+#                 padding: 0;
+#                 background-color: #0a1e34;
+#                 color: #d3e3f1;
+#                 display: flex;
+#                 flex-direction: column;
+#                 align-items: center;
+#             }}
+
+#             .header {{
+#                 text-align: center;
+#                 padding: 20px;
+#                 background: linear-gradient(to right, #162b44, #0a1e34);
+#                 color: #00eaff;
+#                 font-family: 'Orbitron', sans-serif;
+#                 font-size: 28px;
+#                 letter-spacing: 2px;
+#                 width: 100%;
+#                 box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
+#             }}
+
+#             #slide {{
+#                 width: 90%;
+#                 max-width: 500px;
+#                 margin: 20px auto;
+#                 font-size: 16px;
+#             }}
+
+#             #openseadragon1 {{
+#                 width: 90%;
+#                 max-width: 1200px;
+#                 height: 600px;
+#                 margin-top: 30px;
+#             }}
+#         </style>
+#     </head>
+#     <body>
+#         <div class="header"> BMA and PBS Slide Viewer</div>
+#         <label for="slide" style="text-align: center; display: block; font-size: 18px; margin-top: 20px;"> Select a Slide:</label>
+#         <select id="slide" onchange="initializeViewer()" class="searchable-dropdown">
+#             {slide_options}
+#         </select>
+#         <div id="openseadragon1"></div>
+
+#         <script>
+#             $(document).ready(function() {{
+#                 // Initialize Select2 on the dropdown
+#                 $('.searchable-dropdown').select2({{
+#                     placeholder: "Search for a slide...",
+#                     allowClear: true,
+#                     width: 'resolve' // Ensures proper width of the dropdown
+#                 }});
+#             }});
+
+#             let viewer;
+
+#             // Initialize OpenSeadragon viewer
+#             function initializeViewer() {{
+#                 const slide = document.getElementById("slide").value;
+#                 fetch(`/get_dimensions?slide=${{encodeURIComponent(slide)}}`)
+#                     .then(response => response.json())
+#                     .then(dimensions => {{
+#                         const width = dimensions.width;
+#                         const height = dimensions.height;
+
+#                         if (viewer) {{
+#                             viewer.destroy();
+#                         }}
+
+#                         viewer = OpenSeadragon({{
+#                             id: "openseadragon1",
+#                             prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.2/images/",
+#                             tileSources: {{
+#                                 width: width,
+#                                 height: height,
+#                                 tileSize: 512,
+#                                 maxLevel: 18,
+#                                 getTileUrl: function(level, x, y) {{
+#                                     return `/tile_api?slide=${{encodeURIComponent(slide)}}&level=${{level}}&x=${{x}}&y=${{y}}`;
+#                                 }}
+#                             }},
+#                             showNavigator: true,
+#                             navigatorPosition: "BOTTOM_RIGHT",
+#                             minZoomLevel: 0.5,
+#                             zoomPerScroll: 1.5,
+#                         }});
+#                     }})
+#                     .catch(error => console.error("Error fetching slide data:", error));
+#             }}
+#         </script>
+#     </body>
+#     </html>
+#     """
+
+#     return render_template_string(template)
+
+
 @app.route("/", methods=["GET"])
 def index():
     root_dir = "/media/hdd2/neo/SameDayDzsave"
@@ -365,7 +501,7 @@ def index():
         [f'<option value="{slide}"> {slide}</option>' for slide in slide_h5_paths]
     )
 
-    print(f"Found {len(slide_h5_paths)} slides options.")
+    print(f"Found {len(slide_h5_paths)} slide options.")
 
     template = f"""
     <!DOCTYPE html>
@@ -383,8 +519,8 @@ def index():
                 font-family: 'Roboto', sans-serif;
                 margin: 0;
                 padding: 0;
-                background-color: #0a1e34;
-                color: #d3e3f1;
+                background-color: #e8f4fc; /* Pastel light blue background */
+                color: #003b66;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -393,13 +529,13 @@ def index():
             .header {{
                 text-align: center;
                 padding: 20px;
-                background: linear-gradient(to right, #162b44, #0a1e34);
-                color: #00eaff;
+                background: #b8dff7; /* Lighter blue */
+                color: #003b66;
                 font-family: 'Orbitron', sans-serif;
                 font-size: 28px;
                 letter-spacing: 2px;
                 width: 100%;
-                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             }}
 
             #slide {{
@@ -407,6 +543,12 @@ def index():
                 max-width: 500px;
                 margin: 20px auto;
                 font-size: 16px;
+                border-radius: 5px;
+                border: 1px solid #b8dff7;
+                padding: 8px;
+                background: #ffffff;
+                color: #003b66;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }}
 
             #openseadragon1 {{
@@ -414,6 +556,10 @@ def index():
                 max-width: 1200px;
                 height: 600px;
                 margin-top: 30px;
+                background-color: #ffffff;
+                border: 2px solid #b8dff7;
+                border-radius: 10px;
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             }}
         </style>
     </head>
