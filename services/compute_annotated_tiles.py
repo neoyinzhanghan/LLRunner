@@ -159,10 +159,10 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
 
 
 def get_annotated_tile(
-    tile_image, tile_row, tile_col, tile_level, focus_regions_df, debug_mode=True
+    tile_image, tile_row, tile_col, tile_level, focus_regions_df, debug_mode=False
 ):
 
-    if tile_level <= 10:
+    if tile_level <= 9:
         if debug_mode:
             tile_image = _add_yellow_boundary(tile_image)
         return tile_image
