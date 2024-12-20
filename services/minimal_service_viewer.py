@@ -2,6 +2,7 @@ import os
 import io
 import h5py
 import pandas as pd
+from PIL import Image
 from flask import Flask, send_file, request, render_template_string
 from LLBMA.tiling.dzsave_h5 import retrieve_tile_h5
 from compute_annotated_tiles import (
@@ -57,6 +58,30 @@ def tile_api():
                     img_io.write(f.read())
                     img_io.seek(0)
                 return send_file(img_io, mimetype="image/jpeg")
+
+        else:
+            # iterate through the rows of the df
+            for idx, row in df.iterrows():
+                level_x, level_y = row[f"x_{level}"], row[f"y_{level}"]
+
+                if row == int(level_x // 512) and col == int(level_y // 512):
+                    # return a completely green image of the same size as the tile
+
+                    tile = retrieve_tile_h5(
+                        slide, level, row, col
+                    )  # Retrieve the JPEG image file
+
+                    # get the shape of the tile
+                    width, height = tile.size
+
+                    # create a new image with the same size as the tile
+                    img = Image.new("RGB", (width, height), color="green")
+
+                    img_io = io.BytesIO()
+                    img.save(img_io, format="JPEG")
+
+                    img_io.seek(0)
+                    return send_file(img_io, mimetype="image/jpeg")
 
     tile = retrieve_tile_h5(slide, level, row, col)  # Retrieve the JPEG image file
     img_io = io.BytesIO()

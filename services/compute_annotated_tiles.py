@@ -40,6 +40,10 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
         "image_path": [],
     }
 
+    for level in range(19):
+        df_dict[f"x_{level}"] = []
+        df_dict[f"y_{level}"] = []
+
     if (
         get_LLBMA_processing_status(slide_h5_name=slide_h5_name) == "Error"
         or get_LLBMA_processing_status(slide_h5_name=slide_h5_name) == "Not Processed"
@@ -87,6 +91,13 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
         df_dict["col"].append(col)
         df_dict["coordinate"].append(coordinate)
         df_dict["image_path"].append(image_path)
+
+        for level in range(19):
+            downsample_level = 18 - level
+            downsample_factor = 2**downsample_level
+
+            df_dict[f"x_{level}"].append(TLx / downsample_factor)
+            df_dict[f"y_{level}"].append(TLy / downsample_factor)
 
     return pd.DataFrame(df_dict)
 
