@@ -81,7 +81,7 @@ def get_annotated_focus_region_indices_and_coordinates(slide_h5_name):
         image_path = os.path.join(
             subdir,
             "selected_focus_regions",
-            "high_mag_unannotated",
+            "high_mag_annotated",
             f"{idx}.jpg",
         )
 
