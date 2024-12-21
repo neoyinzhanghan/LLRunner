@@ -1,9 +1,6 @@
 import os
 import pandas as pd
 from tqdm import tqdm
-
-classes_to_remove = ["U1", "PL2", "PL3", "ER5", "ER6", "U4", "B1", "B2"]
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
@@ -78,6 +75,7 @@ def create_hist_KDE_rug_plot(data, title, lines=[]):
 
     return image
 
+classes_to_remove = ["U1", "PL2", "PL3", "ER5", "ER6", "U4", "B1", "B2"]
 
 def get_number_of_regions_and_cells(result_dir_path):
 

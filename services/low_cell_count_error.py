@@ -1,4 +1,5 @@
 import os
+from tqdm import tqdm
 from get_service_summary import get_number_of_regions_and_cells
 
 
@@ -40,15 +41,19 @@ if __name__ == "__main__":
 
     total_non_error_subdirs = len(non_error_subdirs)
     total_low_cells = 0
+    low_cells_dirs = []
 
-    for non_error_subdir in non_error_subdirs:
+    for non_error_subdir in tqdm(non_error_subdirs, desc="Checking subdirectories"):
         result_dir_path = os.path.join(root_dir, non_error_subdir)
 
         if has_less_than_N_cells(result_dir_path):
             print(f"{result_dir_path} has less than 200 cells.")
             total_low_cells += 1
+            low_cells_dirs.append(result_dir_path)
         else:
             print(f"{result_dir_path} has more than 200 cells.")
 
     print(f"Total number of subdirectories with less than 200 cells: {total_low_cells}")
     print(f"Total number of subdirectories: {total_non_error_subdirs}")
+
+    print("Subdirectories with less than 200 cells:")

@@ -577,7 +577,7 @@ def index():
         </style>
     </head>
     <body>
-        <div class="header"> BMA and PBS Slide Viewer</div>
+        <div class="header"> BMA and PBS Slide Viewer (Error Slides) </div>
         <label for="slide" style="text-align: center; display: block; font-size: 18px; margin-top: 20px;"> Select a Slide:</label>
         <select id="slide" onchange="initializeViewer()" class="searchable-dropdown">
             {slide_options}
