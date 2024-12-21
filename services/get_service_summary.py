@@ -36,24 +36,26 @@ def get_number_of_regions_and_cells(result_dir_path):
     num_cells_passed = 0
 
     for cell_subdir in cell_subdirs:
-        num_cells_passed += len(
-            [
-                name
-                for name in os.listdir(os.path.join(cells_save_subdir, cell_subdir))
-                if name.endswith(".jpg")
-            ]
-        )
+        if os.path.exists(os.path.join(cells_save_subdir, cell_subdir)):
+            num_cells_passed += len(
+                [
+                    name
+                    for name in os.listdir(os.path.join(cells_save_subdir, cell_subdir))
+                    if name.endswith(".jpg")
+                ]
+            )
 
     num_removed_cells = 0
 
     for cell_subdir in classes_to_remove:
-        num_removed_cells += len(
-            [
-                name
-                for name in os.listdir(os.path.join(cells_save_subdir, cell_subdir))
-                if name.endswith(".jpg")
-            ]
-        )
+        if os.path.exists(os.path.join(cells_save_subdir, cell_subdir)):
+            num_removed_cells += len(
+                [
+                    name
+                    for name in os.listdir(os.path.join(cells_save_subdir, cell_subdir))
+                    if name.endswith(".jpg")
+                ]
+            )
 
     return num_focus_regions_passed, num_cells_passed, num_removed_cells
 
