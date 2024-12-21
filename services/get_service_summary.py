@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from tqdm import tqdm
 
 classes_to_remove = ["U1", "PL2", "PL3", "ER5", "ER6", "U4", "B1", "B2"]
@@ -11,6 +12,9 @@ def get_number_of_regions_and_cells(result_dir_path):
     )
     cells_save_subdir = os.path.join(result_dir_path, "cells")
 
+    cells_info_path = os.path.join(cells_save_subdir, "cells_info.csv")
+    cells_info_df = pd.read_csv(cells_info_path)
+
     # num_focus_regions_passed is equal to the number of .jpg files in focus_regions_save_subdir
     num_focus_regions_passed = len(
         [
@@ -19,6 +23,15 @@ def get_number_of_regions_and_cells(result_dir_path):
             if name.endswith(".jpg")
         ]
     )
+
+    num_unannotated_focus_regions = 0
+
+    for focus_region_name in os.listdir(focus_regions_save_subdir):
+        if focus_region_name.endswith(".jpg"):
+            idx = int(focus_region_name.split(".jpg")[0])
+
+            if idx not in cells_info_df["focus_region_idx"].values:
+                num_unannotated_focus_regions += 1
 
     # find all the further subdirectories in cells_save_subdir
     cell_subdirs = [
@@ -57,17 +70,26 @@ def get_number_of_regions_and_cells(result_dir_path):
                 ]
             )
 
-    return num_focus_regions_passed, num_cells_passed, num_removed_cells
+    return (
+        num_focus_regions_passed,
+        num_unannotated_focus_regions,
+        num_cells_passed,
+        num_removed_cells,
+    )
 
 
 if __name__ == "__main__":
     test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
 
-    num_focus_regions_passed, num_cells_passed, num_removed_cells = (
-        get_number_of_regions_and_cells(test_result_dir)
-    )
+    (
+        num_focus_regions_passed,
+        num_unannotated_focus_regions,
+        num_cells_passed,
+        num_removed_cells,
+    ) = get_number_of_regions_and_cells(test_result_dir)
 
     print(f"Number of focus regions passed: {num_focus_regions_passed}")
+    print(f"Number of unannotated focus regions: {num_unannotated_focus_regions}")
     print(f"Number of cells passed: {num_cells_passed}")
     print(f"Number of cells removed: {num_removed_cells}")
 
