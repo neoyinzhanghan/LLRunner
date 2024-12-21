@@ -62,7 +62,7 @@ if __name__ == "__main__":
     test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
 
     num_focus_regions_passed, num_cells_passed, num_removed_cells = (
-        get_number_of_regions_and_cells()
+        get_number_of_regions_and_cells(test_result_dir)
     )
 
     print(f"Number of focus regions passed: {num_focus_regions_passed}")
