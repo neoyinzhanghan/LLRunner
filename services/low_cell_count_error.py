@@ -59,3 +59,16 @@ if __name__ == "__main__":
     print("Subdirectories with less than 200 cells:")
     for low_cells_dir in low_cells_dirs:
         print(low_cells_dir)
+
+    # rename the subdirectories, adding ERROR_ to the beginning of the name
+    for low_cells_dir in low_cells_dirs:
+        new_dir_name = f"ERROR_{low_cells_dir.split('/')[-1]}"
+        os.rename(low_cells_dir, os.path.join(root_dir, new_dir_name))
+        print(f"{low_cells_dir} renamed to {new_dir_name}")
+
+        # write an error.txt file in the renamed directory
+        with open(os.path.join(root_dir, new_dir_name, "error.txt"), "w") as f:
+            f.write(
+                "Number of cells passed is less than 200. This error is written posthoc before the number of cells checking is internalized in to the pipeline."
+            )
+            print(f"error.txt written in {new_dir_name}")
