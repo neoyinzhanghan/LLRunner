@@ -57,3 +57,5 @@ if __name__ == "__main__":
     print(f"Total number of subdirectories: {total_non_error_subdirs}")
 
     print("Subdirectories with less than 200 cells:")
+    for low_cells_dir in low_cells_dirs:
+        print(low_cells_dir)
