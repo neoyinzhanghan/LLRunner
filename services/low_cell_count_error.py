@@ -16,4 +16,6 @@ print(f"Number of cells removed: {num_removed_cells}")
 
 # if the number of cells passed is less than 200, print "ERROR: Number of cells passed is less than 200"
 if num_cells_passed < 200:
-    print("ERROR: Number of cells passed is less than 200")
+    print("ERROR: Number of cells passed is less than 200. :(")
+else:
+    print("Number of cells passed is greater than 200. :)")
