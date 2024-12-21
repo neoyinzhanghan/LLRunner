@@ -365,6 +365,8 @@ def tile_api():
 #         [f'<option value="{slide}"> {slide}</option>' for slide in slide_h5_paths]
 #     )
 
+#     print(f"Found {len(slide_h5_paths)} slides options.")
+
 #     template = f"""
 #     <!DOCTYPE html>
 #     <html>
@@ -479,6 +481,7 @@ def tile_api():
 @app.route("/", methods=["GET"])
 def index():
     root_dir = "/media/hdd2/neo/SameDayDzsave"
+    results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 
     print("Finding slide options...")
     # find all the h5 files in the root_dir
@@ -495,15 +498,29 @@ def index():
         os.path.join(root_dir, slide_name) for slide_name in slide_h5_names
     ]
 
+    error_slide_h5_paths = []
+
+    for slide_h5_path in slide_h5_paths:
+        slide_h5_name = os.path.basename(slide_h5_path)
+        slide_h5_basename = slide_h5_name.split(".h5")[0]
+
+        if os.path.exists(
+            os.path.join(
+                results_dir,
+                f"ERROR_{slide_h5_basename}",
+            )
+        ):
+            error_slide_h5_paths.append(slide_h5_path)
+
     slide_options = "".join(
-        [f'<option value="{slide}"> {slide}</option>' for slide in slide_h5_paths]
+        [f'<option value="{slide}"> {slide}</option>' for slide in error_slide_h5_paths]
     )
 
     template = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title> H5 Slide Viewer</title>
+        <title> H5 Slide Viewer (Error Slides) </title>
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -628,4 +645,4 @@ def get_dimensions_api():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=7991)
+    app.run(host="0.0.0.0", port=7992)

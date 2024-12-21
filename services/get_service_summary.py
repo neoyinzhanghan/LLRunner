@@ -153,19 +153,19 @@ def get_number_of_regions_and_cells(result_dir_path):
 
 
 if __name__ == "__main__":
-    test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
+    # test_result_dir = "/media/hdd2/neo/test_slide_result_dir"
 
-    (
-        num_focus_regions_passed,
-        num_unannotated_focus_regions,
-        num_cells_passed,
-        num_removed_cells,
-    ) = get_number_of_regions_and_cells(test_result_dir)
+    # (
+    #     num_focus_regions_passed,
+    #     num_unannotated_focus_regions,
+    #     num_cells_passed,
+    #     num_removed_cells,
+    # ) = get_number_of_regions_and_cells(test_result_dir)
 
-    print(f"Number of focus regions passed: {num_focus_regions_passed}")
-    print(f"Number of unannotated focus regions: {num_unannotated_focus_regions}")
-    print(f"Number of cells passed: {num_cells_passed}")
-    print(f"Number of cells removed: {num_removed_cells}")
+    # print(f"Number of focus regions passed: {num_focus_regions_passed}")
+    # print(f"Number of unannotated focus regions: {num_unannotated_focus_regions}")
+    # print(f"Number of cells passed: {num_cells_passed}")
+    # print(f"Number of cells removed: {num_removed_cells}")
 
     results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 

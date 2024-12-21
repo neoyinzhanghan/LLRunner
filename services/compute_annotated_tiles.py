@@ -266,16 +266,16 @@ def get_annotated_tile(
                 image_path = df_row["image_path"]
 
                 # open the image
-                tile_iamge = Image.open(image_path)
+                tile_image = Image.open(image_path)
 
                 found = True
 
         if found:
-            tile_iamge = _add_green_boundary(tile_iamge)
+            tile_image = _add_green_boundary(tile_image)
         else:
             if debug_mode:
                 tile_image = _add_yellow_boundary(tile_image)
-        return tile_iamge
+        return tile_image
 
 
 if __name__ == "__main__":
