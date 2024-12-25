@@ -60,11 +60,14 @@ for subdir in tqdm(specific_errors_dir, desc="Deleting h5 dzsave files"):
 for subdir in tqdm(specific_errors_dir, desc="Deleting error directories"):
     result_dir_path = os.path.join(LLBMA_results_dir, subdir)
 
-    shutil.rmtree(result_dir_path)
+    if os.path.exists(result_dir_path):
+        shutil.rmtree(result_dir_path)
     num_result_dirs_deleted += 1
 
+    wsi_name = subdir.replace("ERROR_", "") + ".ndpi"
+
     # remove the subdir from the metadata_df
-    metadata_df = metadata_df[metadata_df["wsi_name"] != subdir]
+    metadata_df = metadata_df[metadata_df["wsi_name"] != wsi_name]
 
 metadata_df.to_csv(metadata_path, index=False)
 
