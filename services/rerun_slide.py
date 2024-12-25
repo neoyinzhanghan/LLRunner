@@ -28,6 +28,17 @@ LLBMA_results_dir = "/media/hdd2/neo/debug/SameDayLLBMAResults"
 dzsave_dir = "/media/hdd2/neo/debug/SameDayDzsave"
 topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
 
+# remove the LLBMA_results_dir and dzsave_dir if they exist
+if os.path.exists(LLBMA_results_dir):
+    shutil.rmtree(LLBMA_results_dir)
+
+if os.path.exists(dzsave_dir):
+    shutil.rmtree(dzsave_dir)
+
+# create the LLBMA_results_dir and dzsave_dir
+os.makedirs(LLBMA_results_dir, exist_ok=True)
+os.makedirs(dzsave_dir, exist_ok=True)
+
 # first copy the slide to the tmp_slide_dir
 slide_path = os.path.join(slide_source_dir, slide_name)
 tmp_slide_path = os.path.join(tmp_slide_dir, slide_name)
