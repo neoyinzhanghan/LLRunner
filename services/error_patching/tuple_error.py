@@ -87,7 +87,17 @@ for i, row in tqdm(metadata_df.iterrows(), desc="Checking metadata"):
     error_dir_name = f"ERROR_{wsi_name.split('.ndpi')[0]}"
     error_dir_path = os.path.join(LLBMA_results_dir, error_dir_name)
 
-    if not os.path.exists(error_dir_path):
+    non_error_dir_name = wsi_name.split(".ndpi")[0]
+    non_error_dir_path = os.path.join(LLBMA_results_dir, non_error_dir_name)
+
+    is_bma = row["is_bma"]
+    is_bma = bool(is_bma)
+
+    if (
+        not os.path.exists(error_dir_path)
+        and not os.path.exists(non_error_dir_path)
+        and is_bma
+    ):
         print(f"{error_dir_path} does not exist")
         num_error_with_no_dir += 1
 
