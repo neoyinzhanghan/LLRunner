@@ -78,6 +78,7 @@ print(
     f"Number of rows in metadata before deletion: {num_metadata_rows_before_deletion - len(metadata_df)}"
 )
 
+num_error_with_no_dir = 0
 
 # iterate through rows of metadata_df
 for i, row in tqdm(metadata_df.iterrows(), desc="Checking metadata"):
@@ -88,3 +89,6 @@ for i, row in tqdm(metadata_df.iterrows(), desc="Checking metadata"):
 
     if not os.path.exists(error_dir_path):
         print(f"{error_dir_path} does not exist")
+        num_error_with_no_dir += 1
+
+print(f"Found {num_error_with_no_dir} errors with no corresponding directory")
