@@ -50,6 +50,8 @@ copy_start_time = time.time()
 
 if not os.path.exists(tmp_slide_path):
     shutil.copy(slide_path, tmp_slide_path)
+else:
+    print("already copied")
 # print("already copied")
 
 slide_copy_time = time.time() - copy_start_time
