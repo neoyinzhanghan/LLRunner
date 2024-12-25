@@ -1,0 +1,39 @@
+import os
+from tqdm import tqdm
+
+slide_source_dir = "/pesgisipth/NDPI"
+tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
+LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
+dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
+metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
+topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
+
+error_message = "'<' not supported between instances of 'tuple' and 'int'"
+
+# get the list of subdirectories of the LLBMA_results_dir
+subdirs = [
+    subdir
+    for subdir in os.listdir(LLBMA_results_dir)
+    if os.path.isdir(os.path.join(LLBMA_results_dir, subdir))
+    and subdir.startswith("ERROR_")
+]
+
+print(f"Found {len(subdirs)} error directories")
+
+specific_errors_dir = []
+
+for subdir in tqdm(subdirs, desc="Finding error directories"):
+    result_dir_path = os.path.join(LLBMA_results_dir, subdir)
+
+    error_txt_path = os.path.join(result_dir_path, "error.txt")
+
+    # get the error message from the error.txt file as a string
+    with open(error_txt_path, "r") as f:
+        slide_error_message = f.read()
+
+    if error_message in slide_error_message:
+        specific_errors_dir.append(subdir)
+        print(f"Error message found in {subdir}")
+
+
+print(f"Found {len(specific_errors_dir)} directories with the specified error message")
