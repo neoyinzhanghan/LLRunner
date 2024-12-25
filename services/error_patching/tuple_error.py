@@ -45,7 +45,7 @@ num_metadata_rows_before_deletion = len(metadata_df)
 num_result_dirs_deleted = 0
 
 for subdir in tqdm(specific_errors_dir, desc="Deleting h5 dzsave files"):
-    dzsave_h5_name = subdir.replace(".ndpi", ".h5")
+    dzsave_h5_name = subdir + ".h5"
     dzsave_h5_name = dzsave_h5_name.replace("ERROR_", "")
     dzsave_h5_path = os.path.join(dzsave_dir, dzsave_h5_name)
 
