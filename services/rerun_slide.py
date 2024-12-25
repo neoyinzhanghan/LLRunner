@@ -146,7 +146,7 @@ else:
             dump_dir=LLBMA_results_dir,
             hoarding=True,
             extra_hoarding=False,
-            continue_on_error=True,
+            continue_on_error=False,
             do_extract_features=False,
             check_specimen_clf=False,
             pretiled_h5_path=None,
