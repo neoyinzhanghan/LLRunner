@@ -48,7 +48,8 @@ dzsave_h5_path = os.path.join(dzsave_dir, slide_name.replace(".ndpi", ".h5"))
 print(f"Copying slide from {slide_name} to {tmp_slide_path}")
 copy_start_time = time.time()
 
-shutil.copy(slide_path, tmp_slide_path)
+if not os.path.exists(tmp_slide_path):
+    shutil.copy(slide_path, tmp_slide_path)
 # print("already copied")
 
 slide_copy_time = time.time() - copy_start_time
