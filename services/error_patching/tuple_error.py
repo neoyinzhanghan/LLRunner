@@ -69,9 +69,6 @@ for subdir in tqdm(specific_errors_dir, desc="Deleting error directories"):
     # remove the subdir from the metadata_df
     metadata_df = metadata_df[metadata_df["wsi_name"] != wsi_name]
 
-metadata_df.to_csv(metadata_path, index=False)
-
-
 print(f"Found {len(specific_errors_dir)} directories with the specified error message")
 print(f"Deleted {num_result_dirs_deleted} directories")
 print(
@@ -79,6 +76,8 @@ print(
 )
 
 num_error_with_no_dir = 0
+
+wsi_names_to_remove = []
 
 # iterate through rows of metadata_df
 for i, row in tqdm(metadata_df.iterrows(), desc="Checking metadata"):
@@ -101,4 +100,10 @@ for i, row in tqdm(metadata_df.iterrows(), desc="Checking metadata"):
         print(f"{error_dir_path} does not exist")
         num_error_with_no_dir += 1
 
+        wsi_names_to_remove.append(wsi_name)
+
 print(f"Found {num_error_with_no_dir} errors with no corresponding directory")
+
+# remove the rows from metadata_df
+metadata_df = metadata_df[~metadata_df["wsi_name"].isin(wsi_names_to_remove)]
+metadata_df.to_csv(metadata_path, index=False)
