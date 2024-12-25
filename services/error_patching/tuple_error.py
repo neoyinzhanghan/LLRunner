@@ -77,3 +77,14 @@ print(f"Deleted {num_result_dirs_deleted} directories")
 print(
     f"Number of rows in metadata before deletion: {num_metadata_rows_before_deletion - len(metadata_df)}"
 )
+
+
+# iterate through rows of metadata_df
+for i, row in tqdm(metadata_df.iterrows(), desc="Checking metadata"):
+    wsi_name = row["wsi_name"]
+
+    error_dir_name = f"ERROR_{wsi_name.split('.ndpi')[0]}"
+    error_dir_path = os.path.join(LLBMA_results_dir, error_dir_name)
+
+    if os.path.exists(error_dir_path):
+        print(f"{error_dir_path} exists")
