@@ -20,7 +20,11 @@ for error_subdir in tqdm(error_subdirs, desc="Finding error messages"):
     with open(error_txt_path, "r") as f:
         error_message = f.read()
 
-    if error_message not in error_names:
+    if (
+        error_message not in error_names
+        and "Too few focus regions found" not in error_message
+        and "Too few candidates found" not in error_message
+    ):
         error_names.append(error_message)
 
 print(f"Number of distinct error messages: {len(error_names)}")
