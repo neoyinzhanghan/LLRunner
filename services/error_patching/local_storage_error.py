@@ -11,7 +11,7 @@ dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
 metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
 topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
 
-error_message = "Local Storage"
+error_message = "Local disk is full"
 
 # get the list of subdirectories of the LLBMA_results_dir
 subdirs = [
