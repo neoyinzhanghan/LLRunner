@@ -29,3 +29,11 @@ for result_dir in tqdm(subdirs, desc="Finding YOLO df paths", total=len(subdirs)
     ]
 
 print(f"Found {len(YOLO_df_paths)} YOLO dataframes")
+
+for YOLO_df_path in tqdm(YOLO_df_paths, desc="Removing YOLO dataframes"):
+
+    # open the YOLO dataframe as a pandas dataframe, note that the current csv file has an index column without any name, open and resave it without this index column
+    YOLO_df = pd.read_csv(YOLO_df_path, index_col=0)
+    YOLO_df.to_csv(YOLO_df_path, index=False)
+
+print("Finished removing YOLO dataframes, index column")
