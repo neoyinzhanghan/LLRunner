@@ -1,4 +1,5 @@
 import os
+from tqdm import tqdm
 
 LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
 
@@ -12,7 +13,7 @@ error_subdirs = [
 
 error_names = []
 
-for error_subdir in error_subdirs:
+for error_subdir in tqdm(error_subdirs, desc="Finding error messages"):
     # open the error.txt file in the error_subdir as a string
     error_txt_path = os.path.join(LLBMA_results_dir, error_subdir, "error.txt")
 
