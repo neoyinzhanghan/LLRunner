@@ -25,7 +25,8 @@ for error_subdir in tqdm(error_subdirs, desc="Finding error messages"):
     if (
         error_message not in error_names
         and "Too few focus regions found" not in error_message
-        and "Too few candidates found" not in error_message
+        and "Too few good candidates found" not in error_message
+        # and "Too few candidates found" not in error_message
     ):
         error_names.append(error_message)
 
@@ -45,7 +46,7 @@ for error_subdir in tqdm(error_subdirs, desc="Creating error mapping"):
 
     if (
         "Too few focus regions found" not in error_message
-        and "Too few candidates found" not in error_message
+        and "Too few good candidates found" not in error_message
     ):
         error_mapping_df_dict["result_dir_name"].append(error_subdir)
         error_mapping_df_dict["error_message"].append(error_message)
