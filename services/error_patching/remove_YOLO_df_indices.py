@@ -18,6 +18,9 @@ for result_dir in tqdm(subdirs, desc="Finding YOLO df paths", total=len(subdirs)
 
     YOLO_df_dir_path = os.path.join(result_dir_path, "focus_regions", "YOLO_df")
 
+    if not os.path.exists(YOLO_df_dir_path):
+        continue
+
     # find the paths to all the csv files in the YOLO_df_dir_path
     YOLO_df_paths += [
         os.path.join(YOLO_df_dir_path, csv_file)
