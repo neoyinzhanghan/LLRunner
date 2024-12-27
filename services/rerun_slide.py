@@ -18,10 +18,14 @@ from sample_N_cells import sample_N_cells
 parser = ArgumentParser()
 
 parser.add_argument("--slide_name", type=str, help="Name of the slide to process")
+parser.add_argument(
+    "--continue_on_error", type=bool, help="Continue on error", default=False
+)
 
 args = parser.parse_args()
 
 slide_name = args.slide_name
+continue_on_error = args.continue_on_error
 slide_source_dir = "/pesgisipth/NDPI"
 tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
 LLBMA_results_dir = "/media/hdd2/neo/debug/SameDayLLBMAResults"
@@ -97,7 +101,7 @@ else:
         dump_dir=LLBMA_results_dir,
         hoarding=True,
         extra_hoarding=False,
-        continue_on_error=False,
+        continue_on_error=continue_on_error,
         do_extract_features=False,
         check_specimen_clf=False,
         pretiled_h5_path=None,
