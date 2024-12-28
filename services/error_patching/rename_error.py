@@ -17,6 +17,8 @@ subdirs = [
     and subdir.startswith("ERROR_")
 ]
 
+num_changed = 0
+
 for error_dir in tqdm(subdirs, desc="Finding error directories"):
     result_dir_path = os.path.join(LLBMA_results_dir, error_dir)
 
@@ -35,4 +37,7 @@ for error_dir in tqdm(subdirs, desc="Finding error directories"):
         with open(error_txt_path, "w") as f:
             f.write("Too few good candidates found. " + slide_error_message)
 
+        num_changed += 1
+
 print("Finished adding error message to error directories")
+print(f"Number of error directories changed: {num_changed}")
