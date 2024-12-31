@@ -4,9 +4,9 @@ slide_source_hostname = "172.28.164.44" # "172.28.164.166" this is the GLV (the 
 slide_source_username = "greg"
 slide_source_dir = "/pesgisipth/NDPI"
 
-tmp_slide_dir = "/media/hdd3/neo/tmp_slide_dir"
-results_dir = "/media/hdd3/neo/results_dir"
-dzsave_dir = "/media/hdd3/neo/dzsave_dir"
+tmp_slide_dir = "/media/hdd4/neo/tmp_slide_dir"
+results_dir = "/media/hdd4/neo/results_dir"
+dzsave_dir = "/media/hdd4/neo/dzsave_dir"
 
 ssh_config = {
     "glv2": {"hostname": "172.28.164.44", "username": "greg", "key_filename": None},
