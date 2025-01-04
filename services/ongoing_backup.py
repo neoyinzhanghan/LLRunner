@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # Configuration
-ssh_name = "glv3"
+ssh_name = "glv1"
 remote_backup_dir = "/media/hdd2/neo/test_back_up_dir"
 storage_dir = "/media/hdd2/neo"
 matching_subdirs = ["tmp_slides_dir/topview", "SameDayDzsave", "SameDayLLBMAResults"]
