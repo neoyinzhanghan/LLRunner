@@ -17,8 +17,11 @@ while True:
     from sample_N_cells import sample_N_cells
 
     cutoffdatetime = "2024-12-08 00:00:00"
+    enddatetime = "2024-01-03 00:00:00"
     # convert the cutoff datetime to a datetime object
     cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
+    if enddatetime is not None:
+        enddatetime = pd.to_datetime(enddatetime, format="%Y-%m-%d %H:%M:%S")
     headers = ["H24", "H25", "H26"]
 
     slide_source_dir = "/pesgisipth/NDPI"
@@ -66,7 +69,9 @@ while True:
 
     for slide_name in all_slide_names:
         slide_datetime = get_slide_datetime(slide_name)
-        if slide_datetime > cutoffdatetime:
+        if slide_datetime > cutoffdatetime and enddatetime is None:
+            newer_slides.append(slide_name)
+        elif slide_datetime > cutoffdatetime and slide_datetime < enddatetime:
             newer_slides.append(slide_name)
 
     print(f"Found a total of {len(newer_slides)} slides.")
