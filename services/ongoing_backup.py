@@ -2,10 +2,10 @@ import os
 import subprocess
 
 # Configuration
-ssh_name = "glv1"
-remote_backup_dir = "/media/hdd1/neo/test_back_up_dir"
+ssh_name = "glv3"
+remote_backup_dir = "/media/hdd2/neo/test_back_up_dir"
 storage_dir = "/media/hdd2/neo"
-matching_subdirs = ["SameDayDzsave", "SameDayLLBMAResults"]
+matching_subdirs = ["tmp_slides_dir/topview", "SameDayDzsave", "SameDayLLBMAResults"]
 
 # rsync options for incremental backup
 rsync_options = [
