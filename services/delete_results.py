@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import shutil
 from tqdm import tqdm
 
 cutoffdatetime = "2025-01-03 00:00:00"
@@ -59,11 +60,11 @@ for index, row in tqdm(metadata.iterrows(), total=metadata.shape[0]):
 
     if os.path.exists(result_folder_path):
         print(f"Removing {result_folder_path}")
-        os.rmdir(result_folder_path)
+        shutil.rmtree(result_folder_path)
 
     if os.path.exists(error_result_folder_path):
         print(f"Removing {error_result_folder_path}")
-        os.rmdir(error_result_folder_path)
+        shutil.rmtree(error_result_folder_path)
 
 print(f"Found {len(wsi_names_after_cutoff)} slides after {cutoffdatetime}")
 
