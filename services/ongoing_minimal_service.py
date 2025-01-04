@@ -16,8 +16,8 @@ while True:
     from intialize_csv_file import initialize_minimal_servcice_csv_file
     from sample_N_cells import sample_N_cells
 
-    cutoffdatetime = "2024-12-08 00:00:00"
-    enddatetime = "2025-01-03 00:00:00"
+    cutoffdatetime = "2024-01-03 00:00:00"
+    enddatetime = None
     # convert the cutoff datetime to a datetime object
     cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
     if enddatetime is not None:

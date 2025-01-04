@@ -2,9 +2,8 @@ import os
 import subprocess
 
 # Configuration
-remote_ip = "172.28.164.44"
-remote_user = "greg"
-remote_backup_dir = "/media/hdd2"
+ssh_name = "glv"
+remote_backup_dir = "/media/hdd1/neo/test_back_up_dir"
 storage_dir = "/media/hdd2"
 matching_subdirs = ["SameDayDzsave", "SameDayLLBMAResults"]
 
@@ -19,7 +18,7 @@ rsync_options = [
 # Iterate through matching subdirectories
 for subdir in matching_subdirs:
     local_path = os.path.join(storage_dir, subdir)
-    remote_path = f"{remote_user}@{remote_ip}:{remote_backup_dir}/{subdir}"
+    remote_path = f"{ssh_name}:{remote_backup_dir}/{subdir}"
 
     # Ensure the local path exists
     if os.path.exists(local_path):
