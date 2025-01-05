@@ -40,16 +40,13 @@ for index, row in tqdm(metadata.iterrows(), total=metadata.shape[0]):
     h5_path = os.path.join(dzsave_dir, h5_name)
 
     tmp_slide_path = os.path.join(tmp_slide_dir, slide_name)
+    result_folder_path = os.path.join(LLBMA_results_dir, slide_name.split(".ndpi")[0])
+    error_result_folder_path = os.path.join(
+        LLBMA_results_dir, "ERROR_" + slide_name.split(".ndpi")[0]
+    )
 
     # check if the slide_datetime is less than the cutoffdatetime
     if slide_datetime > pd.to_datetime(cutoffdatetime):
-
-        result_folder_path = os.path.join(
-            LLBMA_results_dir, slide_name.split(".ndpi")[0]
-        )
-        error_result_folder_path = os.path.join(
-            LLBMA_results_dir, "ERROR_" + slide_name.split(".ndpi")[0]
-        )
 
         if os.path.exists(h5_path):
             print(f"Removing {h5_path}")
