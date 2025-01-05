@@ -366,7 +366,7 @@ while True:
         ]
         subprocess.Popen(command)
 
-    sleep_num_seconds = 5
+    sleep_num_seconds = 3
     print("Service complete.")
     print(f"Sleeping for {sleep_num_seconds} seconds...")
     time.sleep(sleep_num_seconds)  # currently set to 30 seconds
