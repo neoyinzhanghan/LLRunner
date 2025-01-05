@@ -366,10 +366,6 @@ while True:
         ]
         subprocess.Popen(command)
 
-    import sys
-
-    sys.exit()
-
     sleep_num_seconds = 5
     print("Service complete.")
     print(f"Sleeping for {sleep_num_seconds} seconds...")
