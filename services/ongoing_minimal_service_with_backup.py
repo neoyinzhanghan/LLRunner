@@ -5,6 +5,7 @@ while True:
     import shutil
     import datetime
     import openslide
+    import subprocess
     import pandas as pd
     from tqdm import tqdm
     from LLBMA.front_end.api import analyse_bma
@@ -16,7 +17,7 @@ while True:
     from intialize_csv_file import initialize_minimal_servcice_csv_file
     from sample_N_cells import sample_N_cells
 
-    cutoffdatetime = "2024-01-03 00:00:00"
+    cutoffdatetime = "2024-01-03 10:00:00"
     enddatetime = None
     # convert the cutoff datetime to a datetime object
     cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
@@ -30,6 +31,12 @@ while True:
     dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
     metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
     topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
+    ssh_name = "glv1"
+    remote_backup_dir = "/media/hdd2/neo"
+    remote_dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
+    remote_LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
+    remote_topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
+    remote_tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
 
     if not os.path.exists(metadata_path):
         initialize_minimal_servcice_csv_file(metadata_path)
@@ -82,6 +89,10 @@ while True:
         slide_name for slide_name in newer_slides if slide_name not in wsi_names
     ]
     print(f"Found a total of {len(newer_slides_to_process)} slides to process.")
+
+    import sys
+
+    sys.exit()
 
     def process_slide(slide_name, metadata_df):
         metadata_df = pd.read_csv(metadata_path)
@@ -282,6 +293,28 @@ while True:
             oldest_slide_to_process = slide_name
 
     process_slide(oldest_slide_to_process, metadata_df)
+    h5_name = oldest_slide_to_process.replace(".ndpi", ".h5")
+    h5_path = os.path.join(remote_dzsave_dir, h5_name)
+
+    tmp_slide_path = os.path.join(remote_tmp_slide_dir, oldest_slide_to_process)
+    result_folder_path = os.path.join(
+        remote_LLBMA_results_dir, oldest_slide_to_process.split(".ndpi")[0]
+    )
+    error_result_folder_path = os.path.join(
+        remote_LLBMA_results_dir, "ERROR_" + oldest_slide_to_process.split(".ndpi")[0]
+    )
+
+    # if h5_path exists, rsync it to the remote location in the backgroud
+    if os.path.exists(h5_path):
+        print(f"Rsyncing {h5_path} to {h5_path}")
+        command = [
+            "rsync",
+            "-avz",
+            "--progress",
+            h5_path + "/",
+            f"{ssh_name}:{remote_dzsave_dir}/{h5_name}",
+        ]
+        subprocess.Popen(command)
 
     sleep_num_seconds = 10
     print("Service complete.")
