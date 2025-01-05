@@ -309,13 +309,12 @@ while True:
 
     # if h5_path exists, rsync it to the remote location in the backgroud
     if os.path.exists(h5_path):
-        print(f"Rsyncing {h5_path} to {h5_path}")
+        print(f"Rsyncing {h5_path} to {remote_dzsave_dir}")
         command = [
             "rsync",
-            "-avz",
-            "--progress",
+            "-a",
             h5_path + "/",
-            f"{ssh_name}:{remote_dzsave_dir}/{h5_name}",
+            f"{ssh_name}:{remote_dzsave_dir}",
         ]
         subprocess.Popen(command)
 
@@ -324,8 +323,7 @@ while True:
         print(f"Rsyncing {tmp_slide_path} to {remote_tmp_slide_dir}")
         command = [
             "rsync",
-            "-avz",
-            "--progress",
+            "-a",
             tmp_slide_path + "/",
             f"{ssh_name}:{remote_tmp_slide_dir}/{oldest_slide_to_process}",
         ]
@@ -336,8 +334,7 @@ while True:
         print(f"Rsyncing {result_folder_path} to {remote_LLBMA_results_dir}")
         command = [
             "rsync",
-            "-avz",
-            "--progress",
+            "-a",
             result_folder_path + "/",
             f"{ssh_name}:{remote_LLBMA_results_dir}/{oldest_slide_to_process.split('.ndpi')[0]}",
         ]
@@ -348,8 +345,7 @@ while True:
         print(f"Rsyncing {error_result_folder_path} to {remote_LLBMA_results_dir}")
         command = [
             "rsync",
-            "-avz",
-            "--progress",
+            "-a",
             error_result_folder_path + "/",
             f"{ssh_name}:{remote_LLBMA_results_dir}/ERROR_{oldest_slide_to_process.split('.ndpi')[0]}",
         ]
@@ -357,7 +353,7 @@ while True:
 
     # if topview_path exists, rsync it to the remote location in the backgroud
     topview_path = os.path.join(
-        remote_topview_save_dir, oldest_slide_to_process.replace(".ndpi", ".jpg")
+        tmp_slide_dir, "topview", oldest_slide_to_process.replace(".ndpi", ".jpg")
     )
     if os.path.exists(topview_path):
         print(f"Rsyncing {topview_path} to {remote_topview_save_dir}")
