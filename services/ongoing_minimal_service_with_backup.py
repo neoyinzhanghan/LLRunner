@@ -297,14 +297,14 @@ while True:
 
     print("Initiating output backup and moving to production server...")
     h5_name = oldest_slide_to_process.replace(".ndpi", ".h5")
-    h5_path = os.path.join(remote_dzsave_dir, h5_name)
+    h5_path = os.path.join(dzsave_dir, h5_name)
 
-    tmp_slide_path = os.path.join(remote_tmp_slide_dir, oldest_slide_to_process)
+    tmp_slide_path = os.path.join(tmp_slide_dir, oldest_slide_to_process)
     result_folder_path = os.path.join(
-        remote_LLBMA_results_dir, oldest_slide_to_process.split(".ndpi")[0]
+        LLBMA_results_dir, oldest_slide_to_process.split(".ndpi")[0]
     )
     error_result_folder_path = os.path.join(
-        remote_LLBMA_results_dir, "ERROR_" + oldest_slide_to_process.split(".ndpi")[0]
+        LLBMA_results_dir, "ERROR_" + oldest_slide_to_process.split(".ndpi")[0]
     )
 
     # if h5_path exists, rsync it to the remote location in the backgroud
@@ -321,7 +321,7 @@ while True:
 
     # if tmp_slide_path exists, rsync it to the remote location in the backgroud
     if os.path.exists(tmp_slide_path):
-        print(f"Rsyncing {tmp_slide_path} to {tmp_slide_path}")
+        print(f"Rsyncing {tmp_slide_path} to {remote_tmp_slide_dir}")
         command = [
             "rsync",
             "-avz",
@@ -333,7 +333,7 @@ while True:
 
     # if result_folder_path exists, rsync it to the remote location in the backgroud
     if os.path.exists(result_folder_path):
-        print(f"Rsyncing {result_folder_path} to {result_folder_path}")
+        print(f"Rsyncing {result_folder_path} to {remote_LLBMA_results_dir}")
         command = [
             "rsync",
             "-avz",
@@ -345,7 +345,7 @@ while True:
 
     # if error_result_folder_path exists, rsync it to the remote location in the backgroud
     if os.path.exists(error_result_folder_path):
-        print(f"Rsyncing {error_result_folder_path} to {error_result_folder_path}")
+        print(f"Rsyncing {error_result_folder_path} to {remote_LLBMA_results_dir}")
         command = [
             "rsync",
             "-avz",
@@ -360,7 +360,7 @@ while True:
         remote_topview_save_dir, oldest_slide_to_process.replace(".ndpi", ".jpg")
     )
     if os.path.exists(topview_path):
-        print(f"Rsyncing {topview_path} to {topview_path}")
+        print(f"Rsyncing {topview_path} to {remote_topview_save_dir}")
         command = [
             "rsync",
             "-avz",
@@ -371,6 +371,7 @@ while True:
         subprocess.Popen(command)
 
     import sys
+
     sys.exit()
 
     sleep_num_seconds = 5
