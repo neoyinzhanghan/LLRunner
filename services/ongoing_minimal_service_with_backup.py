@@ -313,7 +313,7 @@ while True:
         command = [
             "rsync",
             "-a",
-            h5_path + "/",
+            h5_path,
             f"{ssh_name}:{remote_dzsave_dir}",
         ]
         subprocess.Popen(command)
@@ -324,7 +324,7 @@ while True:
         command = [
             "rsync",
             "-a",
-            tmp_slide_path + "/",
+            tmp_slide_path,
             f"{ssh_name}:{remote_tmp_slide_dir}/{oldest_slide_to_process}",
         ]
         subprocess.Popen(command)
@@ -361,7 +361,7 @@ while True:
             "rsync",
             "-avz",
             "--progress",
-            topview_path + "/",
+            topview_path,
             f"{ssh_name}:{remote_topview_save_dir}/{oldest_slide_to_process.replace('.ndpi', '.jpg')}",
         ]
         subprocess.Popen(command)
