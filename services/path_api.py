@@ -31,12 +31,13 @@ if not all([PATH_API_HOST, USERNAME, PASSWORD]):
 
 def login():
     """Logs in to the Path API and retrieves an access token."""
+    """Logs in to the Path API and retrieves an access token."""
     login_url = f"{PATH_API_HOST}/login"
     login_data = {"username": USERNAME, "password": PASSWORD}
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(
-        login_url, data=urlencode(login_data), headers=headers, verify=False
-    )
+    # Remove verify=False and either:
+    # A) Let it use the system's CA certificates:
+    response = requests.post(login_url, data=urlencode(login_data), headers=headers)
     if response.status_code == 200:
         token = response.json().get("token", {}).get("tokenValue")
         logger.info(f"Login successful")
