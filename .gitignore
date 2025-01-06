@@ -2,3 +2,4 @@
 LLRunner.egg-info/
 build/
 /LLRunner/config.py
+.env
