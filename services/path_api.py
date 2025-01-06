@@ -123,12 +123,7 @@ if __name__ == "__main__":
         # Get authentication token
         token = login()
 
-        num_to_get = 100
-        num_got = 0
-
         for slide_file in tqdm(slide_files, desc="Processing slides"):
-            if num_got >= num_to_get:
-                break
             slide_date_time = get_slide_datetime(slide_file)
 
             if slide_date_time > enddatetime:
@@ -153,8 +148,6 @@ if __name__ == "__main__":
             retrieval_flag_df_dict["retrieval_flag"].append(
                 flag_info["retrieval_flag"] if flag_info else None
             )
-
-            num_got += 1
 
         retrieval_flag_df = pd.DataFrame(retrieval_flag_df_dict)
         retrieval_flag_df.to_csv("retrieval_flags.csv", index=False)
