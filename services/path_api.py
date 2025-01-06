@@ -85,22 +85,53 @@ def get_retrieval_flag_info(token, case_id):
 
 
 if __name__ == "__main__":
+
+    retrieval_flag_df_dict = {
+        "case_id": [],
+        "slide_name": [],
+        "slide_datetime": [],
+        "retrieval_flag": [],
+    }
     try:
 
         from tqdm import tqdm
+
+        enddatetime = "2024-12-08 00:00:00"
+        enddatetime = pd.to_datetime(enddatetime, format="%Y-%m-%d %H:%M:%S")
+
         slide_dir = "/pesgisipth/NDPI"
 
-        # get a list of filenames in slide_dir that start with "H22" and end with ".ndpi"
+        # get a list of filenames in slide_dir that start with "H" and end with ".ndpi"
         slide_files = [
-            f for f in os.listdir(slide_dir) if f.startswith("H22") and f.endswith(".ndpi")
+            f
+            for f in os.listdir(slide_dir)
+            if f.startswith("H") and f.endswith(".ndpi")
         ]
+
+        def get_slide_datetime(slide_name):
+            try:
+                name = slide_name.split(".ndpi")[0]
+                datetime = name.split(" - ")[-1]
+
+                # convert the datetime to a datetime object
+                datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
+            except Exception as e:
+                print(f"Error getting datetime for {slide_name}: {e}")
+                raise e
+            return datetime
 
         # Get authentication token
         token = login()
 
         for slide_file in tqdm(slide_files, desc="Processing slides"):
+            slide_date_time = get_slide_datetime(slide_file)
+
+            if slide_date_time > enddatetime:
+                print(f"Slide {slide_file} is after the cutoff date")
+                continue
+
             accession_number = slide_file.split(";")[0]
-            
+
             # Use test case ID from environment variables
             flag_info = get_retrieval_flag_info(token, accession_number)
 
@@ -110,6 +141,16 @@ if __name__ == "__main__":
                 )
             else:
                 print(f"No retrieval flags found for case {accession_number}")
+
+            retrieval_flag_df_dict["case_id"].append(accession_number)
+            retrieval_flag_df_dict["slide_name"].append(slide_file)
+            retrieval_flag_df_dict["slide_datetime"].append(slide_date_time)
+            retrieval_flag_df_dict["retrieval_flag"].append(
+                flag_info["retrieval_flag"] if flag_info else None
+            )
+
+        retrieval_flag_df = pd.DataFrame(retrieval_flag_df_dict)
+        retrieval_flag_df.to_csv("retrieval_flags.csv", index=False)
 
     except Exception as e:
         logger.error(f"Error occurred: {str(e)}")
