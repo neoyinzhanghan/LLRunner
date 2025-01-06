@@ -284,6 +284,10 @@ while True:
         print(f"Deleting slide {tmp_slide_path}")
         os.remove(tmp_slide_path)
 
+    if len(newer_slides_to_process) == 0:
+        print("No slides to process. Sleeping for 30s...")
+        time.sleep(30)
+
     # find the slide in newer_slides that is the oldest
     # process the oldest slide first
     oldest_slide_to_process = newer_slides_to_process[0]
