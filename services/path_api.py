@@ -88,14 +88,11 @@ if __name__ == "__main__":
     try:
 
         from tqdm import tqdm
-
         slide_dir = "/pesgisipth/NDPI"
 
         # get a list of filenames in slide_dir that start with "H22" and end with ".ndpi"
         slide_files = [
-            f
-            for f in os.listdir(slide_dir)
-            if f.startswith("H22") and f.endswith(".ndpi")
+            f for f in os.listdir(slide_dir) if f.startswith("H22") and f.endswith(".ndpi")
         ]
 
         # Get authentication token
@@ -103,7 +100,7 @@ if __name__ == "__main__":
 
         for slide_file in tqdm(slide_files, desc="Processing slides"):
             accession_number = slide_file.split(";")[0]
-
+            
             # Use test case ID from environment variables
             flag_info = get_retrieval_flag_info(token, accession_number)
 
