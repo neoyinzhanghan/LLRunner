@@ -287,91 +287,94 @@ while True:
     if len(newer_slides_to_process) == 0:
         print("No slides to process. Sleeping for 30s...")
         time.sleep(30)
+        print("Service reiterating...")
 
-    # find the slide in newer_slides that is the oldest
-    # process the oldest slide first
-    oldest_slide_to_process = newer_slides_to_process[0]
-    for slide_name in newer_slides_to_process:
-        slide_datetime = get_slide_datetime(slide_name)
-        if slide_datetime < get_slide_datetime(oldest_slide_to_process):
-            oldest_slide_to_process = slide_name
+    else:
 
-    print(f"Processing slide {oldest_slide_to_process}")
-    process_slide(oldest_slide_to_process, metadata_df)
+        # find the slide in newer_slides that is the oldest
+        # process the oldest slide first
+        oldest_slide_to_process = newer_slides_to_process[0]
+        for slide_name in newer_slides_to_process:
+            slide_datetime = get_slide_datetime(slide_name)
+            if slide_datetime < get_slide_datetime(oldest_slide_to_process):
+                oldest_slide_to_process = slide_name
 
-    print("Initiating output backup and moving to production server...")
-    h5_name = oldest_slide_to_process.replace(".ndpi", ".h5")
-    h5_path = os.path.join(dzsave_dir, h5_name)
+        print(f"Processing slide {oldest_slide_to_process}")
+        process_slide(oldest_slide_to_process, metadata_df)
 
-    tmp_slide_path = os.path.join(tmp_slide_dir, oldest_slide_to_process)
-    result_folder_path = os.path.join(
-        LLBMA_results_dir, oldest_slide_to_process.split(".ndpi")[0]
-    )
-    error_result_folder_path = os.path.join(
-        LLBMA_results_dir, "ERROR_" + oldest_slide_to_process.split(".ndpi")[0]
-    )
+        print("Initiating output backup and moving to production server...")
+        h5_name = oldest_slide_to_process.replace(".ndpi", ".h5")
+        h5_path = os.path.join(dzsave_dir, h5_name)
 
-    # if h5_path exists, rsync it to the remote location in the backgroud
-    if os.path.exists(h5_path):
-        print(f"Rsyncing {h5_path} to {remote_dzsave_dir}")
-        command = [
-            "rsync",
-            "-a",
-            h5_path,
-            f"{ssh_name}:{remote_dzsave_dir}",
-        ]
-        subprocess.Popen(command)
+        tmp_slide_path = os.path.join(tmp_slide_dir, oldest_slide_to_process)
+        result_folder_path = os.path.join(
+            LLBMA_results_dir, oldest_slide_to_process.split(".ndpi")[0]
+        )
+        error_result_folder_path = os.path.join(
+            LLBMA_results_dir, "ERROR_" + oldest_slide_to_process.split(".ndpi")[0]
+        )
 
-    # if tmp_slide_path exists, rsync it to the remote location in the backgroud
-    if os.path.exists(tmp_slide_path):
-        print(f"Rsyncing {tmp_slide_path} to {remote_tmp_slide_dir}")
-        command = [
-            "rsync",
-            "-a",
-            tmp_slide_path,
-            f"{ssh_name}:{remote_tmp_slide_dir}/{oldest_slide_to_process}",
-        ]
-        subprocess.Popen(command)
+        # if h5_path exists, rsync it to the remote location in the backgroud
+        if os.path.exists(h5_path):
+            print(f"Rsyncing {h5_path} to {remote_dzsave_dir}")
+            command = [
+                "rsync",
+                "-a",
+                h5_path,
+                f"{ssh_name}:{remote_dzsave_dir}",
+            ]
+            subprocess.Popen(command)
 
-    # if result_folder_path exists, rsync it to the remote location in the backgroud
-    if os.path.exists(result_folder_path):
-        print(f"Rsyncing {result_folder_path} to {remote_LLBMA_results_dir}")
-        command = [
-            "rsync",
-            "-a",
-            result_folder_path + "/",
-            f"{ssh_name}:{remote_LLBMA_results_dir}/{oldest_slide_to_process.split('.ndpi')[0]}",
-        ]
-        subprocess.Popen(command)
+        # if tmp_slide_path exists, rsync it to the remote location in the backgroud
+        if os.path.exists(tmp_slide_path):
+            print(f"Rsyncing {tmp_slide_path} to {remote_tmp_slide_dir}")
+            command = [
+                "rsync",
+                "-a",
+                tmp_slide_path,
+                f"{ssh_name}:{remote_tmp_slide_dir}/{oldest_slide_to_process}",
+            ]
+            subprocess.Popen(command)
 
-    # if error_result_folder_path exists, rsync it to the remote location in the backgroud
-    if os.path.exists(error_result_folder_path):
-        print(f"Rsyncing {error_result_folder_path} to {remote_LLBMA_results_dir}")
-        command = [
-            "rsync",
-            "-a",
-            error_result_folder_path + "/",
-            f"{ssh_name}:{remote_LLBMA_results_dir}/ERROR_{oldest_slide_to_process.split('.ndpi')[0]}",
-        ]
-        subprocess.Popen(command)
+        # if result_folder_path exists, rsync it to the remote location in the backgroud
+        if os.path.exists(result_folder_path):
+            print(f"Rsyncing {result_folder_path} to {remote_LLBMA_results_dir}")
+            command = [
+                "rsync",
+                "-a",
+                result_folder_path + "/",
+                f"{ssh_name}:{remote_LLBMA_results_dir}/{oldest_slide_to_process.split('.ndpi')[0]}",
+            ]
+            subprocess.Popen(command)
 
-    # if topview_path exists, rsync it to the remote location in the backgroud
-    topview_path = os.path.join(
-        tmp_slide_dir, "topview", oldest_slide_to_process.replace(".ndpi", ".jpg")
-    )
-    if os.path.exists(topview_path):
-        print(f"Rsyncing {topview_path} to {remote_topview_save_dir}")
-        command = [
-            "rsync",
-            "-avz",
-            "--progress",
-            topview_path,
-            f"{ssh_name}:{remote_topview_save_dir}/{oldest_slide_to_process.replace('.ndpi', '.jpg')}",
-        ]
-        subprocess.Popen(command)
+        # if error_result_folder_path exists, rsync it to the remote location in the backgroud
+        if os.path.exists(error_result_folder_path):
+            print(f"Rsyncing {error_result_folder_path} to {remote_LLBMA_results_dir}")
+            command = [
+                "rsync",
+                "-a",
+                error_result_folder_path + "/",
+                f"{ssh_name}:{remote_LLBMA_results_dir}/ERROR_{oldest_slide_to_process.split('.ndpi')[0]}",
+            ]
+            subprocess.Popen(command)
 
-    sleep_num_seconds = 3
-    print("Service complete.")
-    print(f"Sleeping for {sleep_num_seconds} seconds...")
-    time.sleep(sleep_num_seconds)  # currently set to 30 seconds
-    print("Service reiterating...")
+        # if topview_path exists, rsync it to the remote location in the backgroud
+        topview_path = os.path.join(
+            tmp_slide_dir, "topview", oldest_slide_to_process.replace(".ndpi", ".jpg")
+        )
+        if os.path.exists(topview_path):
+            print(f"Rsyncing {topview_path} to {remote_topview_save_dir}")
+            command = [
+                "rsync",
+                "-avz",
+                "--progress",
+                topview_path,
+                f"{ssh_name}:{remote_topview_save_dir}/{oldest_slide_to_process.replace('.ndpi', '.jpg')}",
+            ]
+            subprocess.Popen(command)
+
+        sleep_num_seconds = 3
+        print("Service complete.")
+        print(f"Sleeping for {sleep_num_seconds} seconds...")
+        time.sleep(sleep_num_seconds)  # currently set to 30 seconds
+        print("Service reiterating...")
