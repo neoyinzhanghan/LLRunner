@@ -13,6 +13,7 @@ from compute_annotated_tiles import (
 
 app = Flask(__name__)
 
+debug_mode = False
 
 # Function to get dimensions from H5 file
 def get_dimensions(h5_path):
@@ -94,6 +95,7 @@ def tile_api():
             tile_col=col,
             tile_level=level,
             focus_regions_df=df,
+            debug_mode=debug_mode,
         )
     img_io = io.BytesIO()
     tile.save(img_io, format="JPEG")
