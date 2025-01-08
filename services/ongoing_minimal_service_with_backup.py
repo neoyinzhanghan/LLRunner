@@ -17,7 +17,7 @@ while True:
     from intialize_csv_file import initialize_minimal_servcice_csv_file
     from sample_N_cells import sample_N_cells
 
-    cutoffdatetime = "2025-01-03 00:00:00"
+    cutoffdatetime = "2024-12-08 00:00:00"
     enddatetime = None
     # convert the cutoff datetime to a datetime object
     cutoffdatetime = pd.to_datetime(cutoffdatetime, format="%Y-%m-%d %H:%M:%S")
@@ -32,15 +32,11 @@ while True:
     metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
     topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
     ssh_name = "glv1"
-    remote_backup_dir = "/media/hdd2/neo/test_back_up_dir_ongoing"
-    remote_dzsave_dir = "/media/hdd2/neo/test_back_up_dir_ongoing/SameDayDzsave"
-    remote_LLBMA_results_dir = (
-        "/media/hdd2/neo/test_back_up_dir_ongoing/SameDayLLBMAResults"
-    )
-    remote_topview_save_dir = (
-        "/media/hdd2/neo/test_back_up_dir_ongoing/tmp_slides_dir/topview"
-    )
-    remote_tmp_slide_dir = "/media/hdd2/neo/test_back_up_dir_ongoing/tmp_slides_dir"
+    remote_backup_dir = "/media/hdd2/neo"
+    remote_dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
+    remote_LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
+    remote_topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
+    remote_tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
 
     if not os.path.exists(metadata_path):
         initialize_minimal_servcice_csv_file(metadata_path)
