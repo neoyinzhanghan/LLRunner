@@ -41,9 +41,9 @@ while True:
 
     slide_source_dir = "/pesgisipth/NDPI"
     tmp_slide_dir = "/media/hdd2/neo/tmp_slides_dir"
-    LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
-    dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
-    metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
+    LLBMA_results_dir = "/media/hdd2/neo/HighPlasmaCellLLBMAResults"
+    dzsave_dir = "/media/hdd2/neo/HighPlasmaCellDzsave"
+    metadata_path = "/media/hdd2/neo/high_plasma_cell_processing_metadata.csv"
     topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
 
     if not os.path.exists(metadata_path):
@@ -103,6 +103,7 @@ while True:
     print(f"Found a total of {len(newer_slides_to_process)} slides to process.")
 
     import sys
+
     sys.exit()
 
     def process_slide(slide_name, metadata_df):
