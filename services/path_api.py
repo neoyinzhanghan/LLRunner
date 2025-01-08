@@ -92,38 +92,36 @@ if __name__ == "__main__":
         "slide_datetime": [],
         "retrieval_flag": [],
     }
-    try:
 
-        from tqdm import tqdm
+    from tqdm import tqdm
 
-        enddatetime = "2024-12-08 00:00:00"
-        enddatetime = pd.to_datetime(enddatetime, format="%Y-%m-%d %H:%M:%S")
+    enddatetime = "2024-12-08 00:00:00"
+    enddatetime = pd.to_datetime(enddatetime, format="%Y-%m-%d %H:%M:%S")
 
-        slide_dir = "/pesgisipth/NDPI"
+    slide_dir = "/pesgisipth/NDPI"
 
-        # get a list of filenames in slide_dir that start with "H" and end with ".ndpi"
-        slide_files = [
-            f
-            for f in os.listdir(slide_dir)
-            if f.startswith("H") and f.endswith(".ndpi")
-        ]
+    # get a list of filenames in slide_dir that start with "H" and end with ".ndpi"
+    slide_files = [
+        f for f in os.listdir(slide_dir) if f.startswith("H") and f.endswith(".ndpi")
+    ]
 
-        def get_slide_datetime(slide_name):
-            try:
-                name = slide_name.split(".ndpi")[0]
-                datetime = name.split(" - ")[-1]
+    def get_slide_datetime(slide_name):
+        try:
+            name = slide_name.split(".ndpi")[0]
+            datetime = name.split(" - ")[-1]
 
-                # convert the datetime to a datetime object
-                datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
-            except Exception as e:
-                print(f"Error getting datetime for {slide_name}: {e}")
-                raise e
-            return datetime
+            # convert the datetime to a datetime object
+            datetime = pd.to_datetime(datetime, format="%Y-%m-%d %H.%M.%S")
+        except Exception as e:
+            print(f"Error getting datetime for {slide_name}: {e}")
+            raise e
+        return datetime
 
-        # Get authentication token
-        token = login()
+    # Get authentication token
+    token = login()
 
-        for slide_file in tqdm(slide_files, desc="Processing slides"):
+    for slide_file in tqdm(slide_files, desc="Processing slides"):
+        try:
             slide_date_time = get_slide_datetime(slide_file)
 
             if slide_date_time > enddatetime:
@@ -149,8 +147,11 @@ if __name__ == "__main__":
                 flag_info["retrieval_flag"] if flag_info else None
             )
 
-        retrieval_flag_df = pd.DataFrame(retrieval_flag_df_dict)
-        retrieval_flag_df.to_csv("retrieval_flags.csv", index=False)
+            retrieval_flag_df = pd.DataFrame(retrieval_flag_df_dict)
+            retrieval_flag_df.to_csv("retrieval_flags.csv", index=False)
 
-    except Exception as e:
-        logger.error(f"Error occurred: {str(e)}")
+        except Exception as e:
+            print(f"Error processing slide {slide_file}: {e}")
+            retrieval_flag_df = pd.DataFrame(retrieval_flag_df_dict)
+            retrieval_flag_df.to_csv("retrieval_flags.csv", index=False)
+            continue
