@@ -31,7 +31,7 @@ while True:
     dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
     metadata_path = "/media/hdd2/neo/same_day_processing_metadata.csv"
     topview_save_dir = "/media/hdd2/neo/tmp_slides_dir/topview"
-    ssh_name = "glv1"
+    ssh_name = "glv3"
     remote_backup_dir = "/media/hdd2/neo"
     remote_dzsave_dir = "/media/hdd2/neo/SameDayDzsave"
     remote_LLBMA_results_dir = "/media/hdd2/neo/SameDayLLBMAResults"
