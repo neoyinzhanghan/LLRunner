@@ -3,7 +3,7 @@ import sqlite3
 
 
 def get_path_data(case_numbers):
-    conn = sqlite3.connect("/media/hdd3/neo/copath.db")
+    conn = sqlite3.connect("/media/ssd2/clinical_text_data/Copath Database/copath.db")
     placeholders = ",".join(["?"] * len(case_numbers))
     query = f"SELECT specnum_formatted, part_description, text_data_final FROM heme_v2 WHERE specnum_formatted IN ({placeholders})"
     df = pd.read_sql_query(query, conn, params=case_numbers)
