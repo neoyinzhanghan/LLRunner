@@ -2,7 +2,7 @@ import os
 from get_copath_data import get_path_data, get_diff
 
 normal_slides_dir = "/media/hdd2/neo/BMA_Normal_lite"
-normal_slides_names = os.listdir(normal_slides_dir)
+normal_slides_names = [slide_name for slide_name in os.listdir(normal_slides_dir) if slide_name.endswith(".ndpi")]
 
 accession_numbers = [slide_name.split(";")[0] for slide_name in normal_slides_names]
 
